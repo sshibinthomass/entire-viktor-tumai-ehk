@@ -1,15 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+.env.*
+
+# Datasets and Exports (Large files / Hackathon terms)
 export/
 results/
-submission/
 outputs/
 work/
-*.zip
-*.tar.gz
+submission/
 *.jsonl
 *.csv
-__pycache__/
-.env
-.venv/
-env/
-venv/
+*.tar.gz
+*.zip
+
+# OS / IDE generated files
 .DS_Store
+Thumbs.db
