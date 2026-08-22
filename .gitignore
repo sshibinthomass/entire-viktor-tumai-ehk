@@ -1,0 +1,15 @@
+export/
+results/
+submission/
+outputs/
+work/
+*.zip
+*.tar.gz
+*.jsonl
+*.csv
+__pycache__/
+.env
+.venv/
+env/
+venv/
+.DS_Store
