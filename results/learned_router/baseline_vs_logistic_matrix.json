@@ -1,0 +1,106 @@
+{
+  "baseline_policy": {
+    "baseline_model_choice_counts": {
+      "claude-fable-5": 399,
+      "claude-opus-4-6": 1,
+      "claude-opus-4-8": 34,
+      "claude-opus-5": 166,
+      "claude-sonnet-4-6": 1,
+      "claude-sonnet-5": 154,
+      "gpt-5.6-luna": 19,
+      "gpt-5.6-sol": 136,
+      "gpt-5.6-terra": 90
+    },
+    "cheap_model_by_family": {
+      "claude": "claude-fable-5",
+      "gpt": "gpt-5.6-sol"
+    },
+    "model_to_tier_assumption": {
+      "claude-fable-5": "economical",
+      "claude-opus-4-6": "strongest",
+      "claude-opus-4-8": "strongest",
+      "claude-opus-5": "strongest",
+      "claude-sonnet-4-6": "balanced",
+      "claude-sonnet-5": "balanced",
+      "gpt-5.6-luna": "strongest",
+      "gpt-5.6-sol": "economical",
+      "gpt-5.6-terra": "balanced"
+    },
+    "small_trajectory_estimated_input_token_threshold": 15000
+  },
+  "comparison_semantics": "choice agreement only; neither router is ground truth",
+  "counts": {
+    "balanced": {
+      "balanced": 4,
+      "economical": 241,
+      "strongest": 0
+    },
+    "economical": {
+      "balanced": 3,
+      "economical": 532,
+      "strongest": 0
+    },
+    "strongest": {
+      "balanced": 5,
+      "economical": 215,
+      "strongest": 0
+    }
+  },
+  "learned_model": {
+    "artifact": "results\\learned_router\\ordinal_logistic_model.json",
+    "artifact_sha256": "f7814e62904bbbe9e5b4d52e64baa55c1898d4ae67d38cdffb0dc30276f3c20c",
+    "model_type": "two_head_ordinal_logistic",
+    "tier_choice_counts": {
+      "balanced": 12,
+      "economical": 988,
+      "strongest": 0
+    },
+    "trainable_parameter_count": 50
+  },
+  "orientation": "rows=baseline_router tier, columns=learned ordinal-logistic tier",
+  "overall_percent_of_all_requests": {
+    "balanced": {
+      "balanced": 0.4,
+      "economical": 24.1,
+      "strongest": 0.0
+    },
+    "economical": {
+      "balanced": 0.3,
+      "economical": 53.2,
+      "strongest": 0.0
+    },
+    "strongest": {
+      "balanced": 0.5,
+      "economical": 21.5,
+      "strongest": 0.0
+    }
+  },
+  "row_percent_within_baseline_tier": {
+    "balanced": {
+      "balanced": 1.6,
+      "economical": 98.4,
+      "strongest": 0.0
+    },
+    "economical": {
+      "balanced": 0.6,
+      "economical": 99.4,
+      "strongest": 0.0
+    },
+    "strongest": {
+      "balanced": 2.3,
+      "economical": 97.7,
+      "strongest": 0.0
+    }
+  },
+  "source": "export",
+  "summary": {
+    "exact_choice_agreement_count": 536,
+    "exact_choice_agreement_percent": 53.6,
+    "learned_higher_than_baseline_count": 3,
+    "learned_higher_than_baseline_percent": 0.3,
+    "learned_lower_than_baseline_count": 461,
+    "learned_lower_than_baseline_percent": 46.1
+  },
+  "total_requests": 1000,
+  "warning": "Viktor logs contain no counterfactual quality label. Agreement, a higher learned tier, or a lower learned tier does not by itself establish better routing."
+}

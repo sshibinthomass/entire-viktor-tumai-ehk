@@ -1,0 +1,199 @@
+{
+  "distributions": {
+    "expected_action": {
+      "multiple_writes_or_chained_tools": 750,
+      "no_tool": 18,
+      "one_local_write": 1,
+      "one_read_only": 10,
+      "search_or_multiple_reads": 221
+    },
+    "primary_intent": {
+      "analyze": 105,
+      "compare": 14,
+      "debug_prove_or_diagnose": 31,
+      "extract_or_classify": 521,
+      "plan_or_design": 77,
+      "research_or_synthesize": 151,
+      "rewrite_or_format": 97,
+      "summarize": 4
+    },
+    "target_tier": {
+      "balanced": 623,
+      "economical": 331,
+      "strongest": 46
+    }
+  },
+  "embedded_history": {
+    "note": "These are prior items embedded in a request, not linked next-request outcomes.",
+    "requests_with_assistant_messages": 1000,
+    "requests_with_tool_outputs": 996
+  },
+  "interpretation_warnings": [
+    "Logged model tier is a treatment/selection decision, not a quality label.",
+    "A feature/model association does not show that the feature needs that tier.",
+    "The export has no output, usage, acceptance, success, or counterfactual labels.",
+    "All token and input-cost figures are estimates; output cost is absent.",
+    "Tier ordering and anonymized-model prices are assumptions."
+  ],
+  "largest_absolute_phi_correlations": [
+    {
+      "left": "multi_file_or_stateful",
+      "phi": 0.7403,
+      "right": "cross_system_dependency"
+    },
+    {
+      "left": "context_ge_24000_est_tokens",
+      "phi": 0.6093,
+      "right": "history_gt_30_items"
+    },
+    {
+      "left": "multi_write_or_chained_action",
+      "phi": 0.5428,
+      "right": "cross_system_dependency"
+    },
+    {
+      "left": "multi_write_or_chained_action",
+      "phi": 0.4488,
+      "right": "multi_file_or_stateful"
+    },
+    {
+      "left": "high_reasoning_intent",
+      "phi": 0.3873,
+      "right": "any_special_requirement"
+    },
+    {
+      "left": "any_special_requirement",
+      "phi": 0.3682,
+      "right": "risk_or_security_floor"
+    },
+    {
+      "left": "cross_system_dependency",
+      "phi": 0.3661,
+      "right": "any_special_requirement"
+    },
+    {
+      "left": "history_gt_30_items",
+      "phi": 0.3489,
+      "right": "has_image"
+    },
+    {
+      "left": "cross_system_dependency",
+      "phi": 0.3122,
+      "right": "risk_or_security_floor"
+    },
+    {
+      "left": "high_reasoning_intent",
+      "phi": 0.3055,
+      "right": "cross_system_dependency"
+    }
+  ],
+  "scope": {
+    "all_requests_seen": 1153,
+    "generated_synthetic_requests_excluded": 153,
+    "mixed_model_groups": 0,
+    "multi_request_groups": 0,
+    "real_requests": 1000,
+    "reconstructed_groups": 1000,
+    "singleton_groups": 1000
+  },
+  "signals": {
+    "any_special_requirement": {
+      "count": 361,
+      "mean_logged_assumed_tier_absent": 1.2207,
+      "mean_logged_assumed_tier_present": 1.2715,
+      "mean_router_score_absent": 32.1049,
+      "mean_router_score_present": 53.1994,
+      "prevalence": 0.361
+    },
+    "context_ge_24000_est_tokens": {
+      "count": 299,
+      "mean_logged_assumed_tier_absent": 1.3024,
+      "mean_logged_assumed_tier_present": 1.0903,
+      "mean_router_score_absent": 36.6976,
+      "mean_router_score_present": 46.806,
+      "prevalence": 0.299
+    },
+    "cross_system_dependency": {
+      "count": 510,
+      "mean_logged_assumed_tier_absent": 1.2571,
+      "mean_logged_assumed_tier_present": 1.2216,
+      "mean_router_score_absent": 27.6633,
+      "mean_router_score_present": 51.3039,
+      "prevalence": 0.51
+    },
+    "has_image": {
+      "count": 64,
+      "mean_logged_assumed_tier_absent": 1.2415,
+      "mean_logged_assumed_tier_present": 1.2031,
+      "mean_router_score_absent": 38.9744,
+      "mean_router_score_present": 50.625,
+      "prevalence": 0.064
+    },
+    "high_reasoning_intent": {
+      "count": 259,
+      "mean_logged_assumed_tier_absent": 1.2092,
+      "mean_logged_assumed_tier_present": 1.3243,
+      "mean_router_score_absent": 33.7989,
+      "mean_router_score_present": 56.6602,
+      "prevalence": 0.259
+    },
+    "history_gt_30_items": {
+      "count": 287,
+      "mean_logged_assumed_tier_absent": 1.244,
+      "mean_logged_assumed_tier_present": 1.2265,
+      "mean_router_score_absent": 36.9144,
+      "mean_router_score_present": 46.6899,
+      "prevalence": 0.287
+    },
+    "multi_file_or_stateful": {
+      "count": 415,
+      "mean_logged_assumed_tier_absent": 1.2889,
+      "mean_logged_assumed_tier_present": 1.1687,
+      "mean_router_score_absent": 31.2137,
+      "mean_router_score_present": 51.7108,
+      "prevalence": 0.415
+    },
+    "multi_write_or_chained_action": {
+      "count": 750,
+      "mean_logged_assumed_tier_absent": 1.244,
+      "mean_logged_assumed_tier_present": 1.2373,
+      "mean_router_score_absent": 27.04,
+      "mean_router_score_present": 43.9467,
+      "prevalence": 0.75
+    },
+    "reasoning_modifier": {
+      "count": 78,
+      "mean_logged_assumed_tier_absent": 1.2332,
+      "mean_logged_assumed_tier_present": 1.3077,
+      "mean_router_score_absent": 38.2375,
+      "mean_router_score_present": 57.2436,
+      "prevalence": 0.078
+    },
+    "risk_or_security_floor": {
+      "count": 313,
+      "mean_logged_assumed_tier_absent": 1.2183,
+      "mean_logged_assumed_tier_present": 1.2843,
+      "mean_router_score_absent": 34.5924,
+      "mean_router_score_present": 50.9744,
+      "prevalence": 0.313
+    },
+    "testing_or_verification": {
+      "count": 154,
+      "mean_logged_assumed_tier_absent": 1.2423,
+      "mean_logged_assumed_tier_present": 1.2208,
+      "mean_router_score_absent": 36.9031,
+      "mean_router_score_present": 55.1948,
+      "prevalence": 0.154
+    }
+  },
+  "task_text_extraction": {
+    "median_active_characters": 2064.0,
+    "median_active_share": 0.2156,
+    "median_full_user_characters": 9995.5,
+    "modes": {
+      "final_thread_info_block": 832,
+      "full_text_fallback": 5,
+      "tail_after_final_system": 163
+    }
+  }
+}

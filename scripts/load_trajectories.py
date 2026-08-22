@@ -15,28 +15,61 @@ import json, sys, hashlib
 from pathlib import Path
 from collections import Counter, defaultdict
 
+SYNTHETIC_MARKER = "do the synthetic thing for <PERSON_A> on <PROJECT_NAME>"
+
 def iter_requests(export_dir):
     """Yield (chunk_name, line_no, request) for every line of every chunk."""
     chunks = sorted(Path(export_dir).glob("*.jsonl"))
     if not chunks:
         sys.exit(f"no *.jsonl chunks found in {export_dir}")
     for p in chunks:
-        with open(p) as f:
+        with open(p, encoding="utf-8") as f:
             for i, line in enumerate(f):
                 if line.strip():
                     yield p.name, i, json.loads(line)
+
+def _message_text(item):
+    content = item.get("content", "")
+    if isinstance(content, str):
+        return content
+    if not isinstance(content, list):
+        return ""
+    return " ".join(
+        part.get("text", "")
+        for part in content
+        if isinstance(part, dict) and part.get("type") in {"input_text", "text"}
+    )
+
 
 def first_user_text(req):
     """Text of the first user message — stable across all requests of a task."""
     for item in req["input"]:
         if item.get("role") == "user":
-            c = item.get("content")
-            if isinstance(c, str): return c
-            return " ".join(p.get("text", "") for p in c if p.get("type") == "input_text")
+            return _message_text(item)
     return ""
 
+
+def is_generated_synthetic(req):
+    """Recognize only the exact marker emitted by make_synthetic_sample.py."""
+
+    return SYNTHETIC_MARKER in first_user_text(req)
+
 def group_key(req):
-    return hashlib.sha1(first_user_text(req)[:2000].encode()).hexdigest()[:16]
+    """Hash the complete opening system + first user message.
+
+    Long Viktor memory envelopes often share their first 2,000 characters.  A
+    truncated first-user hash therefore merges unrelated tasks and can create
+    false mixed-model trajectories.  Full opening messages follow the challenge
+    reconstruction rule and remain safe because only the digest is returned.
+    """
+
+    system = ""
+    for item in req["input"]:
+        if item.get("role") == "system":
+            system = _message_text(item)
+            break
+    opening = json.dumps([system, first_user_text(req)], ensure_ascii=False, separators=(",", ":"))
+    return hashlib.sha256(opening.encode("utf-8")).hexdigest()[:24]
 
 def group_trajectories(requests):
     """Group requests by task and order each group by input length (= call order)."""
@@ -53,8 +86,11 @@ def est_tokens(obj):
 def main():
     export = sys.argv[1] if len(sys.argv) > 1 else "export"
     reqs = [r for _, _, r in iter_requests(export)]
+    generated = sum(is_generated_synthetic(r) for r in reqs)
     models = Counter(r["model"] for r in reqs)
     print(f"requests={len(reqs)}  per-model request counts: {dict(models)}")
+    if generated:
+        print(f"generated synthetic requests present={generated}  (exclude from real-data evaluation)")
     groups = group_trajectories(reqs)
     sizes = sorted(len(v) for v in groups.values())
     print(f"reconstructed trajectories={len(groups)}  calls/trajectory min/median/max: "

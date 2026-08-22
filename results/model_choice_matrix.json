@@ -1,0 +1,87 @@
+{
+  "counts": {
+    "balanced": {
+      "balanced": 253,
+      "economical": 129,
+      "strongest": 13
+    },
+    "economical": {
+      "balanced": 118,
+      "economical": 51,
+      "strongest": 14
+    },
+    "strongest": {
+      "balanced": 252,
+      "economical": 151,
+      "strongest": 19
+    }
+  },
+  "logged_model_counts": {
+    "claude-fable-5": 71,
+    "claude-opus-4-6": 2,
+    "claude-opus-4-8": 69,
+    "claude-opus-5": 331,
+    "claude-sonnet-4-6": 1,
+    "claude-sonnet-5": 281,
+    "gpt-5.6-luna": 20,
+    "gpt-5.6-sol": 112,
+    "gpt-5.6-terra": 113
+  },
+  "logged_tier_mapping_assumption": {
+    "claude-fable-5": "economical",
+    "claude-opus-4-6": "strongest",
+    "claude-opus-4-8": "strongest",
+    "claude-opus-5": "strongest",
+    "claude-sonnet-4-6": "balanced",
+    "claude-sonnet-5": "balanced",
+    "gpt-5.6-luna": "strongest",
+    "gpt-5.6-sol": "economical",
+    "gpt-5.6-terra": "balanced"
+  },
+  "orientation": "rows=logged reference tier, columns=our router tier",
+  "overall_percent_of_all_requests": {
+    "balanced": {
+      "balanced": 25.3,
+      "economical": 12.9,
+      "strongest": 1.3
+    },
+    "economical": {
+      "balanced": 11.8,
+      "economical": 5.1,
+      "strongest": 1.4
+    },
+    "strongest": {
+      "balanced": 25.2,
+      "economical": 15.1,
+      "strongest": 1.9
+    }
+  },
+  "row_percent_within_logged_tier": {
+    "balanced": {
+      "balanced": 64.1,
+      "economical": 32.7,
+      "strongest": 3.2
+    },
+    "economical": {
+      "balanced": 64.5,
+      "economical": 27.9,
+      "strongest": 7.6
+    },
+    "strongest": {
+      "balanced": 59.7,
+      "economical": 35.8,
+      "strongest": 4.5
+    }
+  },
+  "source": "export\\trajectories_v1_01.jsonl",
+  "summary": {
+    "exact_agreement_count": 323,
+    "exact_agreement_percent": 32.3,
+    "our_tier_higher_count": 145,
+    "our_tier_higher_percent": 14.5,
+    "our_tier_lower_count": 532,
+    "our_tier_lower_percent": 53.2
+  },
+  "total_requests": 1000,
+  "warning": "Logged choice is assumed ground truth for this requested diagnostic; it is not an observed quality label."
+}

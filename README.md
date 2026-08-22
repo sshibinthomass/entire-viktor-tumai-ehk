@@ -26,6 +26,21 @@ python scripts/plot_frontier.py results/routes.jsonl
 
 Python 3.10+, standard library only (matplotlib optional for the PNG).
 
+## Hybrid router
+
+The versioned production experiment is `scripts/hybrid_router.py`. It combines
+the optimized interpretable score with conservative safety/OOD escalation and
+keeps one model for the trajectory to preserve prefix caching. The frozen v2
+router remains available in `scripts/deterministic_router.py` for comparison.
+
+```bash
+python scripts/hybrid_router.py request_metrics.json --pretty
+python scripts/learned_router/hybrid_frontier.py
+python scripts/learned_router/audit_hybrid_router.py
+```
+
+See `results/hybrid_router/report.md` for the evaluation claim and its limits.
+
 ## Using a coding agent
 
 Point Claude Code / Codex / Cursor / opencode at this repo — `AGENTS.md` briefs your agent.

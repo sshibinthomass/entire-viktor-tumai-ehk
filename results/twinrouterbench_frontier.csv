@@ -1,0 +1,5 @@
+policy,normalized_failure_aware_bill_percent,row_weighted_trajectory_pass_percent,safe_step_rate_percent
+independent_step:balanced_as_mid,49.195987,62.268041,77.835052
+independent_step:balanced_as_mid_high,50.265653,62.680412,82.061856
+stateful:balanced_as_mid,44.620477,62.268041,76.907216
+stateful:balanced_as_mid_high,45.735006,62.680412,81.237113

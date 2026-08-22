@@ -1,0 +1,43 @@
+{
+  "policy_version": "hybrid-v3-optimized-guarded-2026-08-22",
+  "optimized_config": {
+    "analytic_intent_weight": 15,
+    "chained_action_weight": 10,
+    "compare_intent_weight": 15,
+    "context_unit": 5,
+    "debug_intent_weight": 30,
+    "deep_intent_weight": 25,
+    "economical_threshold": 40,
+    "history_weight": 5,
+    "light_intent_weight": 5,
+    "reasoning_modifier_weight": 0,
+    "scope_unit": 5,
+    "simple_action_weight": 0,
+    "software_engineering_interaction": 5,
+    "special_requirement_unit": 5,
+    "specialist_interaction": 0,
+    "strongest_threshold": 75,
+    "testing_weight": 5
+  },
+  "guards": {
+    "threshold_margin": 5,
+    "strong_floor_dependent_steps": 7,
+    "large_shape_input_tokens": 100000,
+    "large_shape_history_items": 100,
+    "large_shape_dependent_steps": 10,
+    "large_shape_artifacts": 12,
+    "large_shape_deliverables": 8
+  },
+  "learned_second_opinion": {
+    "enabled": true,
+    "artifact": "results/learned_router/ordinal_logistic_model.json",
+    "strong_rank_gap": 2,
+    "higher_tier_probability": 0.9,
+    "may_downgrade": false
+  },
+  "provenance": {
+    "optimized_policy": "results/optimized_deterministic/optimized_policy.json",
+    "question_bank_sha256": "7e2870b5e2e5c801f6444c05a4311c9c9010e965016f6938f0bb5abc226252d0",
+    "note": "Weights are the full-data deployment fit. Headline evaluation must use nested out-of-fold predictions, not this fit."
+  }
+}

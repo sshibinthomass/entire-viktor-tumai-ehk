@@ -1,0 +1,5 @@
+economical_threshold,strongest_threshold,exact_tier_percent,safe_step_percent,under_route_percent,over_route_percent,row_weighted_trajectory_pass_percent,failure_aware_cost_savings_proxy_percent,normalized_failure_aware_bill_percent,runtime_v3_equivalent,pareto_efficient
+55,75,74.123711,96.185567,3.814433,22.061856,93.298969,56.492784,43.507216,False,True
+50,75,72.061856,96.391753,3.608247,24.329897,93.505155,56.402062,43.597938,False,True
+40,75,66.701031,97.113402,2.886598,30.412371,94.329897,56.397938,43.602062,False,True
+20,75,47.216495,98.350515,1.649485,51.134021,96.701031,56.134021,43.865979,False,True

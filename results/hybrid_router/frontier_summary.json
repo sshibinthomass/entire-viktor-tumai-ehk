@@ -1,0 +1,562 @@
+{
+  "artifacts": {
+    "all_points_csv": "frontier_all_points.csv",
+    "pareto_csv": "frontier_pareto.csv",
+    "png": "frontier.png"
+  },
+  "interpretation": {
+    "cost": "fast Twin tier-price proxy (0.5/3.5/25); a failed trajectory adds an always-high retry",
+    "guard_warning": "hard floors, OOD escalation, and learned disagreement are not reconstructed in this score-only frontier",
+    "official_reference": "the selected 40/75 nested OOF policy's previously computed official two-mapping result is included separately; it is not substituted into every proxy frontier point",
+    "quality": "a trajectory passes only when every step is at or above its cheapest-sufficient Twin tier",
+    "selection_warning": "thresholds were swept on the same OOF predictions; this is sensitivity analysis, not a fresh unbiased estimate of a selected threshold"
+  },
+  "official_selected_policy_reference": {
+    "balanced_as_mid": {
+      "by_benchmark": {
+        "bfcl": {
+          "api_errors": 0,
+          "cost_savings_score": 98.34141362592499,
+          "cost_score_cases_used": 240,
+          "exact_match": 175,
+          "pass_rate": 0.967741935483871,
+          "passed": 240,
+          "router_accounting": {
+            "D_usd": 3.3156913834500004,
+            "N_usd": 3.1574323570000007,
+            "accounting_savings_score_percent": 95.22696752659381,
+            "evaluable_step_count": 248,
+            "exact_match_rate_percent": 76.15384615384616,
+            "exact_match_trajectories": 99,
+            "fallback_output_tokens": 500,
+            "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+            "overall_score_percent": 88.66539943194152,
+            "pass_rate_percent": 94.61538461538461,
+            "passed_trajectories": 123,
+            "skipped_step_count": 0,
+            "total_trajectories": 130
+          },
+          "sampled": 248,
+          "tier_match_accuracy": 0.7056451612903226,
+          "valid_response_rate": 1.0
+        },
+        "mtrag": {
+          "api_errors": 0,
+          "cost_savings_score": 96.4297306069458,
+          "cost_score_cases_used": 189,
+          "exact_match": 79,
+          "pass_rate": 0.9792746113989638,
+          "passed": 189,
+          "router_accounting": {
+            "D_usd": 3.970793554479997,
+            "N_usd": 3.8110645000000005,
+            "accounting_savings_score_percent": 95.97740219206852,
+            "evaluable_step_count": 193,
+            "exact_match_rate_percent": 40.932642487046635,
+            "exact_match_trajectories": 79,
+            "fallback_output_tokens": 500,
+            "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+            "overall_score_percent": 78.27916860633718,
+            "pass_rate_percent": 97.92746113989638,
+            "passed_trajectories": 189,
+            "skipped_step_count": 0,
+            "total_trajectories": 193
+          },
+          "sampled": 193,
+          "tier_match_accuracy": 0.40932642487046633,
+          "valid_response_rate": 1.0
+        },
+        "pinchbench": {
+          "api_errors": 0,
+          "cost_savings_score": 98.10218978102189,
+          "cost_score_cases_used": 42,
+          "exact_match": 29,
+          "pass_rate": 0.875,
+          "passed": 42,
+          "router_accounting": {
+            "D_usd": 2.20795911983,
+            "N_usd": 0.9908786270000002,
+            "accounting_savings_score_percent": 44.877580300322414,
+            "evaluable_step_count": 48,
+            "exact_match_rate_percent": 41.666666666666664,
+            "exact_match_trajectories": 5,
+            "fallback_output_tokens": 500,
+            "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+            "overall_score_percent": 51.070304544551924,
+            "pass_rate_percent": 66.66666666666667,
+            "passed_trajectories": 8,
+            "skipped_step_count": 0,
+            "total_trajectories": 12
+          },
+          "sampled": 48,
+          "tier_match_accuracy": 0.6041666666666666,
+          "valid_response_rate": 1.0
+        },
+        "qmsum": {
+          "api_errors": 0,
+          "cost_savings_score": 97.07317073170732,
+          "cost_score_cases_used": 134,
+          "exact_match": 70,
+          "pass_rate": 0.9241379310344827,
+          "passed": 134,
+          "router_accounting": {
+            "D_usd": 4.107302848680002,
+            "N_usd": 3.8435728699999983,
+            "accounting_savings_score_percent": 93.57899847183754,
+            "evaluable_step_count": 145,
+            "exact_match_rate_percent": 48.275862068965516,
+            "exact_match_trajectories": 70,
+            "fallback_output_tokens": 500,
+            "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+            "overall_score_percent": 78.08955121475044,
+            "pass_rate_percent": 92.41379310344827,
+            "passed_trajectories": 134,
+            "skipped_step_count": 0,
+            "total_trajectories": 145
+          },
+          "sampled": 145,
+          "tier_match_accuracy": 0.4827586206896552,
+          "valid_response_rate": 1.0
+        },
+        "swebench": {
+          "api_errors": 0,
+          "cost_savings_score": 0.0,
+          "cost_score_cases_used": 168,
+          "exact_match": 168,
+          "pass_rate": 1.0,
+          "passed": 336,
+          "router_accounting": {
+            "D_usd": 0.044068094029999956,
+            "N_usd": 0.0,
+            "accounting_savings_score_percent": 0.0,
+            "evaluable_step_count": 336,
+            "exact_match_rate_percent": 0.0,
+            "exact_match_trajectories": 0,
+            "fallback_output_tokens": 500,
+            "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+            "overall_score_percent": 33.333333333333336,
+            "pass_rate_percent": 100.0,
+            "passed_trajectories": 40,
+            "skipped_step_count": 0,
+            "total_trajectories": 40
+          },
+          "sampled": 336,
+          "tier_match_accuracy": 0.5,
+          "valid_response_rate": 1.0
+        }
+      },
+      "router_accounting": {
+        "D_usd": 13.645815000470028,
+        "N_usd": 11.802948354000023,
+        "accounting_savings_score_percent": 86.49500490511906,
+        "evaluable_step_count": 970,
+        "exact_match_rate_percent": 48.65384615384615,
+        "exact_match_trajectories": 253,
+        "fallback_output_tokens": 500,
+        "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+        "overall_score_percent": 76.71628368632174,
+        "pass_rate_percent": 95.0,
+        "passed_trajectories": 494,
+        "skipped_step_count": 0,
+        "total_trajectories": 520
+      },
+      "router_to_official_tier_id": {
+        "balanced": 1,
+        "economical": 0,
+        "strongest": 3
+      },
+      "scores_v2": {
+        "by_benchmark": {
+          "bfcl": {
+            "D_usd": 3.46049175,
+            "N_usd": 3.1574323570000007,
+            "cost_savings_score_percent": 91.24230268718313,
+            "failed_retry_baseline_usd": 0.13112025,
+            "failed_trajectory_count": 7,
+            "row_count": 248,
+            "step_count": 248,
+            "weight_in_global_cost_savings": 0.2556701030927835
+          },
+          "mtrag": {
+            "D_usd": 4.114025000000002,
+            "N_usd": 3.8110645000000005,
+            "cost_savings_score_percent": 92.63591008805243,
+            "failed_retry_baseline_usd": 0.0879625,
+            "failed_trajectory_count": 4,
+            "row_count": 193,
+            "step_count": 193,
+            "weight_in_global_cost_savings": 0.19896907216494844
+          },
+          "pinchbench": {
+            "D_usd": 2.41320775,
+            "N_usd": 0.9908786270000002,
+            "cost_savings_score_percent": 41.060643328366574,
+            "failed_retry_baseline_usd": 1.3000040000000002,
+            "failed_trajectory_count": 4,
+            "row_count": 48,
+            "step_count": 48,
+            "weight_in_global_cost_savings": 0.049484536082474224
+          },
+          "qmsum": {
+            "D_usd": 4.25871875,
+            "N_usd": 3.8435728699999983,
+            "cost_savings_score_percent": 90.25185967023529,
+            "failed_retry_baseline_usd": 0.21306250000000002,
+            "failed_trajectory_count": 11,
+            "row_count": 145,
+            "step_count": 145,
+            "weight_in_global_cost_savings": 0.14948453608247422
+          },
+          "swebench": {
+            "D_usd": 3.3790735000000023,
+            "N_usd": 0.0,
+            "cost_savings_score_percent": 0.0,
+            "failed_retry_baseline_usd": 0.0,
+            "failed_trajectory_count": 0,
+            "row_count": 336,
+            "step_count": 336,
+            "weight_in_global_cost_savings": 0.3463917525773196
+          }
+        },
+        "case_exact_count": 521,
+        "case_exact_match_percent": 53.71134020618557,
+        "case_pass_count": 941,
+        "case_pass_rate_percent": 97.01030927835052,
+        "combined_score_percent": 75.66088975395908,
+        "cost_savings_score_percent": 57.282734273568295,
+        "error_rows": 0,
+        "note": "cost_savings_score_percent is macro-averaged across benchmarks by each benchmark's total row count (same scope as case_pass_rate). All gold tiers are included; D_b = \u03a3 baseline_cost over every evaluable step. Numerator is trajectory-level: passed trajectories (no error AND every step pred>=gold) contribute N_b += baseline_cost - pred_cost per step; failed trajectories contribute N_b -= pred_cost per step, which under D = \u03a3 baseline encodes the failed-trajectory user bill = \u03a3 pred_cost + \u03a3 baseline_cost (router's chain wasted + one full always-high re-run of every step). No additional retry penalty is applied on top. trajectory_pass_rate_percent uses row-weighted denominator: a row counts toward the numerator iff its entire trajectory passes.",
+        "passed_trajectories": 494,
+        "rows_in_passed_trajectories": 918,
+        "total_rows": 970,
+        "total_trajectories": 520,
+        "trajectory_pass_rate_percent": 94.63917525773196
+      },
+      "section_11": {
+        "assumed_completion_tokens_per_routing_step": 1000000,
+        "baseline_nominal_cost_per_step_usd": 25.0,
+        "baseline_tier": "high",
+        "cost_formula": "save_gt = baseline.cost - optimal_path.cost per \u00a711.2 (nominal USD)",
+        "cost_savings_score": 77.20645282110276,
+        "cost_score_cases_used": 773,
+        "note": "Sums are nominal USD under uniform T per step. If real completion_tokens v_i vary by case, \u00a711.2 uses v_i in each cost; ratio equals current only when all v_i are equal.",
+        "pass_rate": 0.9701030927835051,
+        "passed": 941,
+        "sum_save_gt_usd": 18689.5,
+        "sum_save_test_usd": 14429.5,
+        "total": 970
+      }
+    },
+    "balanced_as_mid_high": {
+      "by_benchmark": {
+        "bfcl": {
+          "api_errors": 0,
+          "cost_savings_score": 94.99025175892176,
+          "cost_score_cases_used": 241,
+          "exact_match": 175,
+          "pass_rate": 0.9717741935483871,
+          "passed": 241,
+          "router_accounting": {
+            "D_usd": 3.3156913834500004,
+            "N_usd": 3.1352912095399996,
+            "accounting_savings_score_percent": 94.55919888049733,
+            "evaluable_step_count": 248,
+            "exact_match_rate_percent": 76.92307692307692,
+            "exact_match_trajectories": 100,
+            "fallback_output_tokens": 500,
+            "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+            "overall_score_percent": 88.95563039606321,
+            "pass_rate_percent": 95.38461538461539,
+            "passed_trajectories": 124,
+            "skipped_step_count": 0,
+            "total_trajectories": 130
+          },
+          "sampled": 248,
+          "tier_match_accuracy": 0.7056451612903226,
+          "valid_response_rate": 1.0
+        },
+        "mtrag": {
+          "api_errors": 0,
+          "cost_savings_score": 88.94753851125714,
+          "cost_score_cases_used": 190,
+          "exact_match": 74,
+          "pass_rate": 0.9844559585492227,
+          "passed": 190,
+          "router_accounting": {
+            "D_usd": 3.970793554479997,
+            "N_usd": 3.7016481553799996,
+            "accounting_savings_score_percent": 93.22187377894936,
+            "evaluable_step_count": 193,
+            "exact_match_rate_percent": 38.3419689119171,
+            "exact_match_trajectories": 74,
+            "fallback_output_tokens": 500,
+            "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+            "overall_score_percent": 76.66981284859624,
+            "pass_rate_percent": 98.44559585492227,
+            "passed_trajectories": 190,
+            "skipped_step_count": 0,
+            "total_trajectories": 193
+          },
+          "sampled": 193,
+          "tier_match_accuracy": 0.38341968911917096,
+          "valid_response_rate": 1.0
+        },
+        "pinchbench": {
+          "api_errors": 0,
+          "cost_savings_score": 94.01459854014598,
+          "cost_score_cases_used": 42,
+          "exact_match": 28,
+          "pass_rate": 0.875,
+          "passed": 42,
+          "router_accounting": {
+            "D_usd": 2.20795911983,
+            "N_usd": 0.9993674557099999,
+            "accounting_savings_score_percent": 45.26204524053622,
+            "evaluable_step_count": 48,
+            "exact_match_rate_percent": 41.666666666666664,
+            "exact_match_trajectories": 5,
+            "fallback_output_tokens": 500,
+            "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+            "overall_score_percent": 51.19845952462319,
+            "pass_rate_percent": 66.66666666666667,
+            "passed_trajectories": 8,
+            "skipped_step_count": 0,
+            "total_trajectories": 12
+          },
+          "sampled": 48,
+          "tier_match_accuracy": 0.5833333333333334,
+          "valid_response_rate": 1.0
+        },
+        "qmsum": {
+          "api_errors": 0,
+          "cost_savings_score": 91.144578313253,
+          "cost_score_cases_used": 136,
+          "exact_match": 70,
+          "pass_rate": 0.9379310344827586,
+          "passed": 136,
+          "router_accounting": {
+            "D_usd": 4.107302848680002,
+            "N_usd": 3.880748475889998,
+            "accounting_savings_score_percent": 94.48410840065488,
+            "evaluable_step_count": 145,
+            "exact_match_rate_percent": 48.275862068965516,
+            "exact_match_trajectories": 70,
+            "fallback_output_tokens": 500,
+            "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+            "overall_score_percent": 78.85102463929876,
+            "pass_rate_percent": 93.79310344827586,
+            "passed_trajectories": 136,
+            "skipped_step_count": 0,
+            "total_trajectories": 145
+          },
+          "sampled": 145,
+          "tier_match_accuracy": 0.4827586206896552,
+          "valid_response_rate": 1.0
+        },
+        "swebench": {
+          "api_errors": 0,
+          "cost_savings_score": 0.0,
+          "cost_score_cases_used": 168,
+          "exact_match": 168,
+          "pass_rate": 1.0,
+          "passed": 336,
+          "router_accounting": {
+            "D_usd": 0.044068094029999956,
+            "N_usd": 0.0,
+            "accounting_savings_score_percent": 0.0,
+            "evaluable_step_count": 336,
+            "exact_match_rate_percent": 0.0,
+            "exact_match_trajectories": 0,
+            "fallback_output_tokens": 500,
+            "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+            "overall_score_percent": 33.333333333333336,
+            "pass_rate_percent": 100.0,
+            "passed_trajectories": 40,
+            "skipped_step_count": 0,
+            "total_trajectories": 40
+          },
+          "sampled": 336,
+          "tier_match_accuracy": 0.5,
+          "valid_response_rate": 1.0
+        }
+      },
+      "router_accounting": {
+        "D_usd": 13.645815000470028,
+        "N_usd": 11.717055296520025,
+        "accounting_savings_score_percent": 85.86555875274898,
+        "evaluable_step_count": 970,
+        "exact_match_rate_percent": 47.88461538461539,
+        "exact_match_trajectories": 249,
+        "fallback_output_tokens": 500,
+        "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+        "overall_score_percent": 76.50646830219837,
+        "pass_rate_percent": 95.76923076923077,
+        "passed_trajectories": 498,
+        "skipped_step_count": 0,
+        "total_trajectories": 520
+      },
+      "router_to_official_tier_id": {
+        "balanced": 2,
+        "economical": 0,
+        "strongest": 3
+      },
+      "scores_v2": {
+        "by_benchmark": {
+          "bfcl": {
+            "D_usd": 3.46049175,
+            "N_usd": 3.1352912095399996,
+            "cost_savings_score_percent": 90.60247606543201,
+            "failed_retry_baseline_usd": 0.11840149999999999,
+            "failed_trajectory_count": 6,
+            "row_count": 248,
+            "step_count": 248,
+            "weight_in_global_cost_savings": 0.2556701030927835
+          },
+          "mtrag": {
+            "D_usd": 4.114025000000002,
+            "N_usd": 3.7016481553799996,
+            "cost_savings_score_percent": 89.9763165119317,
+            "failed_retry_baseline_usd": 0.060812500000000005,
+            "failed_trajectory_count": 3,
+            "row_count": 193,
+            "step_count": 193,
+            "weight_in_global_cost_savings": 0.19896907216494844
+          },
+          "pinchbench": {
+            "D_usd": 2.41320775,
+            "N_usd": 0.9993674557099999,
+            "cost_savings_score_percent": 41.412408679277604,
+            "failed_retry_baseline_usd": 1.3000040000000002,
+            "failed_trajectory_count": 4,
+            "row_count": 48,
+            "step_count": 48,
+            "weight_in_global_cost_savings": 0.049484536082474224
+          },
+          "qmsum": {
+            "D_usd": 4.25871875,
+            "N_usd": 3.880748475889998,
+            "cost_savings_score_percent": 91.124789019937,
+            "failed_retry_baseline_usd": 0.1446875,
+            "failed_trajectory_count": 9,
+            "row_count": 145,
+            "step_count": 145,
+            "weight_in_global_cost_savings": 0.14948453608247422
+          },
+          "swebench": {
+            "D_usd": 3.3790735000000023,
+            "N_usd": 0.0,
+            "cost_savings_score_percent": 0.0,
+            "failed_retry_baseline_usd": 0.0,
+            "failed_trajectory_count": 0,
+            "row_count": 336,
+            "step_count": 336,
+            "weight_in_global_cost_savings": 0.3463917525773196
+          }
+        },
+        "case_exact_count": 515,
+        "case_exact_match_percent": 53.09278350515464,
+        "case_pass_count": 945,
+        "case_pass_rate_percent": 97.42268041237114,
+        "combined_score_percent": 75.57621989059953,
+        "cost_savings_score_percent": 56.73786925311974,
+        "error_rows": 0,
+        "note": "cost_savings_score_percent is macro-averaged across benchmarks by each benchmark's total row count (same scope as case_pass_rate). All gold tiers are included; D_b = \u03a3 baseline_cost over every evaluable step. Numerator is trajectory-level: passed trajectories (no error AND every step pred>=gold) contribute N_b += baseline_cost - pred_cost per step; failed trajectories contribute N_b -= pred_cost per step, which under D = \u03a3 baseline encodes the failed-trajectory user bill = \u03a3 pred_cost + \u03a3 baseline_cost (router's chain wasted + one full always-high re-run of every step). No additional retry penalty is applied on top. trajectory_pass_rate_percent uses row-weighted denominator: a row counts toward the numerator iff its entire trajectory passes.",
+        "passed_trajectories": 498,
+        "rows_in_passed_trajectories": 922,
+        "total_rows": 970,
+        "total_trajectories": 520,
+        "trajectory_pass_rate_percent": 95.05154639175258
+      },
+      "section_11": {
+        "assumed_completion_tokens_per_routing_step": 1000000,
+        "baseline_nominal_cost_per_step_usd": 25.0,
+        "baseline_tier": "high",
+        "cost_formula": "save_gt = baseline.cost - optimal_path.cost per \u00a711.2 (nominal USD)",
+        "cost_savings_score": 73.11595940222169,
+        "cost_score_cases_used": 777,
+        "note": "Sums are nominal USD under uniform T per step. If real completion_tokens v_i vary by case, \u00a711.2 uses v_i in each cost; ratio equals current only when all v_i are equal.",
+        "pass_rate": 0.9742268041237113,
+        "passed": 945,
+        "sum_save_gt_usd": 18769.5,
+        "sum_save_test_usd": 13723.5,
+        "total": 970
+      }
+    }
+  },
+  "pareto_points": [
+    {
+      "economical_threshold": 55,
+      "exact_tier_percent": 74.123711,
+      "failure_aware_cost_savings_proxy_percent": 56.492784,
+      "normalized_failure_aware_bill_percent": 43.507216,
+      "over_route_percent": 22.061856,
+      "pareto_efficient": true,
+      "row_weighted_trajectory_pass_percent": 93.298969,
+      "runtime_v3_equivalent": false,
+      "safe_step_percent": 96.185567,
+      "strongest_threshold": 75,
+      "under_route_percent": 3.814433
+    },
+    {
+      "economical_threshold": 50,
+      "exact_tier_percent": 72.061856,
+      "failure_aware_cost_savings_proxy_percent": 56.402062,
+      "normalized_failure_aware_bill_percent": 43.597938,
+      "over_route_percent": 24.329897,
+      "pareto_efficient": true,
+      "row_weighted_trajectory_pass_percent": 93.505155,
+      "runtime_v3_equivalent": false,
+      "safe_step_percent": 96.391753,
+      "strongest_threshold": 75,
+      "under_route_percent": 3.608247
+    },
+    {
+      "economical_threshold": 40,
+      "exact_tier_percent": 66.701031,
+      "failure_aware_cost_savings_proxy_percent": 56.397938,
+      "normalized_failure_aware_bill_percent": 43.602062,
+      "over_route_percent": 30.412371,
+      "pareto_efficient": true,
+      "row_weighted_trajectory_pass_percent": 94.329897,
+      "runtime_v3_equivalent": false,
+      "safe_step_percent": 97.113402,
+      "strongest_threshold": 75,
+      "under_route_percent": 2.886598
+    },
+    {
+      "economical_threshold": 20,
+      "exact_tier_percent": 47.216495,
+      "failure_aware_cost_savings_proxy_percent": 56.134021,
+      "normalized_failure_aware_bill_percent": 43.865979,
+      "over_route_percent": 51.134021,
+      "pareto_efficient": true,
+      "row_weighted_trajectory_pass_percent": 96.701031,
+      "runtime_v3_equivalent": false,
+      "safe_step_percent": 98.350515,
+      "strongest_threshold": 75,
+      "under_route_percent": 1.649485
+    }
+  ],
+  "runtime_v3_equivalent": [
+    {
+      "economical_threshold": 35,
+      "exact_tier_percent": 52.989691,
+      "failure_aware_cost_savings_proxy_percent": 55.230928,
+      "normalized_failure_aware_bill_percent": 44.769072,
+      "over_route_percent": 44.639175,
+      "pareto_efficient": false,
+      "row_weighted_trajectory_pass_percent": 95.463918,
+      "runtime_v3_equivalent": true,
+      "safe_step_percent": 97.628866,
+      "strongest_threshold": 70,
+      "under_route_percent": 2.371134
+    }
+  ],
+  "scope": {
+    "rows": 970,
+    "score_evaluation": "nested grouped out-of-fold",
+    "score_source": "results/optimized_deterministic/nested_oof_predictions.jsonl",
+    "threshold_points": 63,
+    "trajectories": 520
+  }
+}

@@ -1,0 +1,2857 @@
+{
+  "baselines": {
+    "always_balanced": {
+      "by_benchmark": {
+        "bfcl": {
+          "confusion": {
+            "balanced": {
+              "balanced": 9,
+              "economical": 0,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 239,
+              "economical": 0,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 3.629032,
+          "exact_rows": 9,
+          "over_routed_rows": 239,
+          "over_routing_rate_percent": 96.370968,
+          "passed_trajectories": 130,
+          "row_weighted_trajectory_pass_rate_percent": 100.0,
+          "rows": 248,
+          "safe_rows": 248,
+          "safe_step_rate_percent": 100.0,
+          "trajectories": 130,
+          "trajectory_pass_rate_percent": 100.0,
+          "under_routed_rows": 0,
+          "under_routing_rate_percent": 0.0
+        },
+        "mtrag": {
+          "confusion": {
+            "balanced": {
+              "balanced": 9,
+              "economical": 0,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 183,
+              "economical": 0,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 1,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 4.663212,
+          "exact_rows": 9,
+          "over_routed_rows": 183,
+          "over_routing_rate_percent": 94.818653,
+          "passed_trajectories": 192,
+          "row_weighted_trajectory_pass_rate_percent": 99.481865,
+          "rows": 193,
+          "safe_rows": 192,
+          "safe_step_rate_percent": 99.481865,
+          "trajectories": 193,
+          "trajectory_pass_rate_percent": 99.481865,
+          "under_routed_rows": 1,
+          "under_routing_rate_percent": 0.518135
+        },
+        "pinchbench": {
+          "confusion": {
+            "balanced": {
+              "balanced": 6,
+              "economical": 0,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 41,
+              "economical": 0,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 1,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 12.5,
+          "exact_rows": 6,
+          "over_routed_rows": 41,
+          "over_routing_rate_percent": 85.416667,
+          "passed_trajectories": 11,
+          "row_weighted_trajectory_pass_rate_percent": 91.666667,
+          "rows": 48,
+          "safe_rows": 47,
+          "safe_step_rate_percent": 97.916667,
+          "trajectories": 12,
+          "trajectory_pass_rate_percent": 91.666667,
+          "under_routed_rows": 1,
+          "under_routing_rate_percent": 2.083333
+        },
+        "qmsum": {
+          "confusion": {
+            "balanced": {
+              "balanced": 13,
+              "economical": 0,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 132,
+              "economical": 0,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 8.965517,
+          "exact_rows": 13,
+          "over_routed_rows": 132,
+          "over_routing_rate_percent": 91.034483,
+          "passed_trajectories": 145,
+          "row_weighted_trajectory_pass_rate_percent": 100.0,
+          "rows": 145,
+          "safe_rows": 145,
+          "safe_step_rate_percent": 100.0,
+          "trajectories": 145,
+          "trajectory_pass_rate_percent": 100.0,
+          "under_routed_rows": 0,
+          "under_routing_rate_percent": 0.0
+        },
+        "swebench": {
+          "confusion": {
+            "balanced": {
+              "balanced": 74,
+              "economical": 0,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 94,
+              "economical": 0,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 168,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 22.02381,
+          "exact_rows": 74,
+          "over_routed_rows": 94,
+          "over_routing_rate_percent": 27.97619,
+          "passed_trajectories": 1,
+          "row_weighted_trajectory_pass_rate_percent": 2.083333,
+          "rows": 336,
+          "safe_rows": 168,
+          "safe_step_rate_percent": 50.0,
+          "trajectories": 40,
+          "trajectory_pass_rate_percent": 2.5,
+          "under_routed_rows": 168,
+          "under_routing_rate_percent": 50.0
+        }
+      },
+      "confusion": {
+        "balanced": {
+          "balanced": 111,
+          "economical": 0,
+          "strongest": 0
+        },
+        "economical": {
+          "balanced": 689,
+          "economical": 0,
+          "strongest": 0
+        },
+        "strongest": {
+          "balanced": 170,
+          "economical": 0,
+          "strongest": 0
+        }
+      },
+      "exact_rate_percent": 11.443299,
+      "exact_rows": 111,
+      "over_routed_rows": 689,
+      "over_routing_rate_percent": 71.030928,
+      "passed_trajectories": 479,
+      "row_weighted_trajectory_pass_rate_percent": 65.56701,
+      "rows": 970,
+      "safe_rows": 800,
+      "safe_step_rate_percent": 82.474227,
+      "trajectories": 520,
+      "trajectory_pass_rate_percent": 92.115385,
+      "under_routed_rows": 170,
+      "under_routing_rate_percent": 17.525773
+    },
+    "always_economical": {
+      "by_benchmark": {
+        "bfcl": {
+          "confusion": {
+            "balanced": {
+              "balanced": 0,
+              "economical": 9,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 0,
+              "economical": 239,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 96.370968,
+          "exact_rows": 239,
+          "over_routed_rows": 0,
+          "over_routing_rate_percent": 0.0,
+          "passed_trajectories": 122,
+          "row_weighted_trajectory_pass_rate_percent": 92.33871,
+          "rows": 248,
+          "safe_rows": 239,
+          "safe_step_rate_percent": 96.370968,
+          "trajectories": 130,
+          "trajectory_pass_rate_percent": 93.846154,
+          "under_routed_rows": 9,
+          "under_routing_rate_percent": 3.629032
+        },
+        "mtrag": {
+          "confusion": {
+            "balanced": {
+              "balanced": 0,
+              "economical": 9,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 0,
+              "economical": 183,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 1,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 94.818653,
+          "exact_rows": 183,
+          "over_routed_rows": 0,
+          "over_routing_rate_percent": 0.0,
+          "passed_trajectories": 183,
+          "row_weighted_trajectory_pass_rate_percent": 94.818653,
+          "rows": 193,
+          "safe_rows": 183,
+          "safe_step_rate_percent": 94.818653,
+          "trajectories": 193,
+          "trajectory_pass_rate_percent": 94.818653,
+          "under_routed_rows": 10,
+          "under_routing_rate_percent": 5.181347
+        },
+        "pinchbench": {
+          "confusion": {
+            "balanced": {
+              "balanced": 0,
+              "economical": 6,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 0,
+              "economical": 41,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 1,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 85.416667,
+          "exact_rows": 41,
+          "over_routed_rows": 0,
+          "over_routing_rate_percent": 0.0,
+          "passed_trajectories": 7,
+          "row_weighted_trajectory_pass_rate_percent": 47.916667,
+          "rows": 48,
+          "safe_rows": 41,
+          "safe_step_rate_percent": 85.416667,
+          "trajectories": 12,
+          "trajectory_pass_rate_percent": 58.333333,
+          "under_routed_rows": 7,
+          "under_routing_rate_percent": 14.583333
+        },
+        "qmsum": {
+          "confusion": {
+            "balanced": {
+              "balanced": 0,
+              "economical": 13,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 0,
+              "economical": 132,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 91.034483,
+          "exact_rows": 132,
+          "over_routed_rows": 0,
+          "over_routing_rate_percent": 0.0,
+          "passed_trajectories": 132,
+          "row_weighted_trajectory_pass_rate_percent": 91.034483,
+          "rows": 145,
+          "safe_rows": 132,
+          "safe_step_rate_percent": 91.034483,
+          "trajectories": 145,
+          "trajectory_pass_rate_percent": 91.034483,
+          "under_routed_rows": 13,
+          "under_routing_rate_percent": 8.965517
+        },
+        "swebench": {
+          "confusion": {
+            "balanced": {
+              "balanced": 0,
+              "economical": 74,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 0,
+              "economical": 94,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 168,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 27.97619,
+          "exact_rows": 94,
+          "over_routed_rows": 0,
+          "over_routing_rate_percent": 0.0,
+          "passed_trajectories": 0,
+          "row_weighted_trajectory_pass_rate_percent": 0.0,
+          "rows": 336,
+          "safe_rows": 94,
+          "safe_step_rate_percent": 27.97619,
+          "trajectories": 40,
+          "trajectory_pass_rate_percent": 0.0,
+          "under_routed_rows": 242,
+          "under_routing_rate_percent": 72.02381
+        }
+      },
+      "confusion": {
+        "balanced": {
+          "balanced": 0,
+          "economical": 111,
+          "strongest": 0
+        },
+        "economical": {
+          "balanced": 0,
+          "economical": 689,
+          "strongest": 0
+        },
+        "strongest": {
+          "balanced": 0,
+          "economical": 170,
+          "strongest": 0
+        }
+      },
+      "exact_rate_percent": 71.030928,
+      "exact_rows": 689,
+      "over_routed_rows": 0,
+      "over_routing_rate_percent": 0.0,
+      "passed_trajectories": 444,
+      "row_weighted_trajectory_pass_rate_percent": 58.453608,
+      "rows": 970,
+      "safe_rows": 689,
+      "safe_step_rate_percent": 71.030928,
+      "trajectories": 520,
+      "trajectory_pass_rate_percent": 85.384615,
+      "under_routed_rows": 281,
+      "under_routing_rate_percent": 28.969072
+    },
+    "always_strongest": {
+      "by_benchmark": {
+        "bfcl": {
+          "confusion": {
+            "balanced": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 9
+            },
+            "economical": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 239
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 0.0,
+          "exact_rows": 0,
+          "over_routed_rows": 248,
+          "over_routing_rate_percent": 100.0,
+          "passed_trajectories": 130,
+          "row_weighted_trajectory_pass_rate_percent": 100.0,
+          "rows": 248,
+          "safe_rows": 248,
+          "safe_step_rate_percent": 100.0,
+          "trajectories": 130,
+          "trajectory_pass_rate_percent": 100.0,
+          "under_routed_rows": 0,
+          "under_routing_rate_percent": 0.0
+        },
+        "mtrag": {
+          "confusion": {
+            "balanced": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 9
+            },
+            "economical": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 183
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 1
+            }
+          },
+          "exact_rate_percent": 0.518135,
+          "exact_rows": 1,
+          "over_routed_rows": 192,
+          "over_routing_rate_percent": 99.481865,
+          "passed_trajectories": 193,
+          "row_weighted_trajectory_pass_rate_percent": 100.0,
+          "rows": 193,
+          "safe_rows": 193,
+          "safe_step_rate_percent": 100.0,
+          "trajectories": 193,
+          "trajectory_pass_rate_percent": 100.0,
+          "under_routed_rows": 0,
+          "under_routing_rate_percent": 0.0
+        },
+        "pinchbench": {
+          "confusion": {
+            "balanced": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 6
+            },
+            "economical": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 41
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 1
+            }
+          },
+          "exact_rate_percent": 2.083333,
+          "exact_rows": 1,
+          "over_routed_rows": 47,
+          "over_routing_rate_percent": 97.916667,
+          "passed_trajectories": 12,
+          "row_weighted_trajectory_pass_rate_percent": 100.0,
+          "rows": 48,
+          "safe_rows": 48,
+          "safe_step_rate_percent": 100.0,
+          "trajectories": 12,
+          "trajectory_pass_rate_percent": 100.0,
+          "under_routed_rows": 0,
+          "under_routing_rate_percent": 0.0
+        },
+        "qmsum": {
+          "confusion": {
+            "balanced": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 13
+            },
+            "economical": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 132
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 0.0,
+          "exact_rows": 0,
+          "over_routed_rows": 145,
+          "over_routing_rate_percent": 100.0,
+          "passed_trajectories": 145,
+          "row_weighted_trajectory_pass_rate_percent": 100.0,
+          "rows": 145,
+          "safe_rows": 145,
+          "safe_step_rate_percent": 100.0,
+          "trajectories": 145,
+          "trajectory_pass_rate_percent": 100.0,
+          "under_routed_rows": 0,
+          "under_routing_rate_percent": 0.0
+        },
+        "swebench": {
+          "confusion": {
+            "balanced": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 74
+            },
+            "economical": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 94
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 168
+            }
+          },
+          "exact_rate_percent": 50.0,
+          "exact_rows": 168,
+          "over_routed_rows": 168,
+          "over_routing_rate_percent": 50.0,
+          "passed_trajectories": 40,
+          "row_weighted_trajectory_pass_rate_percent": 100.0,
+          "rows": 336,
+          "safe_rows": 336,
+          "safe_step_rate_percent": 100.0,
+          "trajectories": 40,
+          "trajectory_pass_rate_percent": 100.0,
+          "under_routed_rows": 0,
+          "under_routing_rate_percent": 0.0
+        }
+      },
+      "confusion": {
+        "balanced": {
+          "balanced": 0,
+          "economical": 0,
+          "strongest": 111
+        },
+        "economical": {
+          "balanced": 0,
+          "economical": 0,
+          "strongest": 689
+        },
+        "strongest": {
+          "balanced": 0,
+          "economical": 0,
+          "strongest": 170
+        }
+      },
+      "exact_rate_percent": 17.525773,
+      "exact_rows": 170,
+      "over_routed_rows": 800,
+      "over_routing_rate_percent": 82.474227,
+      "passed_trajectories": 520,
+      "row_weighted_trajectory_pass_rate_percent": 100.0,
+      "rows": 970,
+      "safe_rows": 970,
+      "safe_step_rate_percent": 100.0,
+      "trajectories": 520,
+      "trajectory_pass_rate_percent": 100.0,
+      "under_routed_rows": 0,
+      "under_routing_rate_percent": 0.0
+    },
+    "deterministic_router": {
+      "by_benchmark": {
+        "bfcl": {
+          "confusion": {
+            "balanced": {
+              "balanced": 2,
+              "economical": 7,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 64,
+              "economical": 175,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 71.370968,
+          "exact_rows": 177,
+          "over_routed_rows": 64,
+          "over_routing_rate_percent": 25.806452,
+          "passed_trajectories": 124,
+          "row_weighted_trajectory_pass_rate_percent": 93.548387,
+          "rows": 248,
+          "safe_rows": 241,
+          "safe_step_rate_percent": 97.177419,
+          "trajectories": 130,
+          "trajectory_pass_rate_percent": 95.384615,
+          "under_routed_rows": 7,
+          "under_routing_rate_percent": 2.822581
+        },
+        "mtrag": {
+          "confusion": {
+            "balanced": {
+              "balanced": 8,
+              "economical": 1,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 109,
+              "economical": 74,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 1,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 42.487047,
+          "exact_rows": 82,
+          "over_routed_rows": 109,
+          "over_routing_rate_percent": 56.476684,
+          "passed_trajectories": 191,
+          "row_weighted_trajectory_pass_rate_percent": 98.963731,
+          "rows": 193,
+          "safe_rows": 191,
+          "safe_step_rate_percent": 98.963731,
+          "trajectories": 193,
+          "trajectory_pass_rate_percent": 98.963731,
+          "under_routed_rows": 2,
+          "under_routing_rate_percent": 1.036269
+        },
+        "pinchbench": {
+          "confusion": {
+            "balanced": {
+              "balanced": 0,
+              "economical": 6,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 9,
+              "economical": 32,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 1,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 66.666667,
+          "exact_rows": 32,
+          "over_routed_rows": 9,
+          "over_routing_rate_percent": 18.75,
+          "passed_trajectories": 7,
+          "row_weighted_trajectory_pass_rate_percent": 47.916667,
+          "rows": 48,
+          "safe_rows": 41,
+          "safe_step_rate_percent": 85.416667,
+          "trajectories": 12,
+          "trajectory_pass_rate_percent": 58.333333,
+          "under_routed_rows": 7,
+          "under_routing_rate_percent": 14.583333
+        },
+        "qmsum": {
+          "confusion": {
+            "balanced": {
+              "balanced": 4,
+              "economical": 9,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 46,
+              "economical": 86,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 62.068966,
+          "exact_rows": 90,
+          "over_routed_rows": 46,
+          "over_routing_rate_percent": 31.724138,
+          "passed_trajectories": 136,
+          "row_weighted_trajectory_pass_rate_percent": 93.793103,
+          "rows": 145,
+          "safe_rows": 136,
+          "safe_step_rate_percent": 93.793103,
+          "trajectories": 145,
+          "trajectory_pass_rate_percent": 93.793103,
+          "under_routed_rows": 9,
+          "under_routing_rate_percent": 6.206897
+        },
+        "swebench": {
+          "confusion": {
+            "balanced": {
+              "balanced": 66,
+              "economical": 0,
+              "strongest": 8
+            },
+            "economical": {
+              "balanced": 87,
+              "economical": 0,
+              "strongest": 7
+            },
+            "strongest": {
+              "balanced": 149,
+              "economical": 0,
+              "strongest": 19
+            }
+          },
+          "exact_rate_percent": 25.297619,
+          "exact_rows": 85,
+          "over_routed_rows": 102,
+          "over_routing_rate_percent": 30.357143,
+          "passed_trajectories": 3,
+          "row_weighted_trajectory_pass_rate_percent": 7.738095,
+          "rows": 336,
+          "safe_rows": 187,
+          "safe_step_rate_percent": 55.654762,
+          "trajectories": 40,
+          "trajectory_pass_rate_percent": 7.5,
+          "under_routed_rows": 149,
+          "under_routing_rate_percent": 44.345238
+        }
+      },
+      "confusion": {
+        "balanced": {
+          "balanced": 80,
+          "economical": 23,
+          "strongest": 8
+        },
+        "economical": {
+          "balanced": 315,
+          "economical": 367,
+          "strongest": 7
+        },
+        "strongest": {
+          "balanced": 150,
+          "economical": 1,
+          "strongest": 19
+        }
+      },
+      "exact_rate_percent": 48.041237,
+      "exact_rows": 466,
+      "over_routed_rows": 330,
+      "over_routing_rate_percent": 34.020619,
+      "passed_trajectories": 461,
+      "row_weighted_trajectory_pass_rate_percent": 62.680412,
+      "rows": 970,
+      "safe_rows": 796,
+      "safe_step_rate_percent": 82.061856,
+      "trajectories": 520,
+      "trajectory_pass_rate_percent": 88.653846,
+      "under_routed_rows": 174,
+      "under_routing_rate_percent": 17.938144
+    }
+  },
+  "dataset": {
+    "benchmarks": {
+      "bfcl": 248,
+      "mtrag": 193,
+      "pinchbench": 48,
+      "qmsum": 145,
+      "swebench": 336
+    },
+    "gold_merged_tier_counts": {
+      "balanced": 111,
+      "economical": 689,
+      "strongest": 170
+    },
+    "question_bank": ".external\\TwinRouterBench\\data\\static\\question_bank.jsonl",
+    "question_bank_sha256": "7e2870b5e2e5c801f6444c05a4311c9c9010e965016f6938f0bb5abc226252d0",
+    "rows": 970,
+    "trajectories": 520
+  },
+  "evaluation_protocol": {
+    "bootstrap_samples": 1000,
+    "grouped_folds": 5,
+    "grouping_key": "instance_id / complete trajectory",
+    "leave_one_benchmark_out": true,
+    "official_balanced_sensitivity_maps": {
+      "balanced_as_mid": {
+        "balanced": 1,
+        "economical": 0,
+        "strongest": 3
+      },
+      "balanced_as_mid_high": {
+        "balanced": 2,
+        "economical": 0,
+        "strongest": 3
+      }
+    },
+    "seed": 42,
+    "thresholds": {
+      "economical_max": 34.999999,
+      "strongest_min": 75.0
+    },
+    "thresholds_tuned_on_test": false
+  },
+  "feature_contract": {
+    "encoded_column_count": 24,
+    "excluded_source_fields": {
+      "distinct_referenced_artifact_count": "duplicate of artifact_object_count",
+      "estimated_uncached_tokens_after_switch": "initial-route duplicate of input size",
+      "explicit_requirement_term_count": "duplicate of hard_constraint_count",
+      "matched_requirement_terms": "represented by hard_constraint_count",
+      "reasoning_item_count": "can reveal the historical provider family",
+      "request_model": "historical-policy leakage",
+      "serialized_character_count": "duplicate of estimated_input_tokens",
+      "shared_prefix_tokens": "cost rather than task difficulty",
+      "switch_count": "cost rather than task difficulty",
+      "tool_argument_fingerprints": "high-cardinality identifier",
+      "tool_call_sequence": "high-cardinality domain identifier",
+      "tool_definition_count": "near-duplicate of tool_schema_character_count",
+      "tool_output_count": "redundant with completed tool-call history",
+      "tool_output_statuses": "runtime outcome, excluded from initial difficulty"
+    },
+    "raw_feature_count": 15,
+    "raw_features": [
+      "log_input_tokens",
+      "log_history_items",
+      "log_total_tool_calls",
+      "log_unique_tools",
+      "log_tool_schema_chars",
+      "log_dependent_steps",
+      "scope_level",
+      "log_artifact_count",
+      "log_deliverable_count",
+      "log_hard_constraint_count",
+      "reasoning_complexity_count",
+      "specialist_work_count",
+      "special_requirement_count",
+      "primary_intent",
+      "expected_action"
+    ]
+  },
+  "models": {
+    "ordinal_boosted_trees": {
+      "final_model": {
+        "artifact": "ordinal_boosted_trees_model.json",
+        "learned_leaf_count": 464,
+        "trainable_parameter_count": null
+      },
+      "grouped_oof": {
+        "merged_three_tier": {
+          "by_benchmark": {
+            "bfcl": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 0,
+                  "economical": 9,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 0,
+                  "economical": 239,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 0,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 96.370968,
+              "exact_rows": 239,
+              "over_routed_rows": 0,
+              "over_routing_rate_percent": 0.0,
+              "passed_trajectories": 122,
+              "row_weighted_trajectory_pass_rate_percent": 92.33871,
+              "rows": 248,
+              "safe_rows": 239,
+              "safe_step_rate_percent": 96.370968,
+              "trajectories": 130,
+              "trajectory_pass_rate_percent": 93.846154,
+              "under_routed_rows": 9,
+              "under_routing_rate_percent": 3.629032
+            },
+            "mtrag": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 1,
+                  "economical": 8,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 2,
+                  "economical": 181,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 1,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 94.300518,
+              "exact_rows": 182,
+              "over_routed_rows": 2,
+              "over_routing_rate_percent": 1.036269,
+              "passed_trajectories": 184,
+              "row_weighted_trajectory_pass_rate_percent": 95.336788,
+              "rows": 193,
+              "safe_rows": 184,
+              "safe_step_rate_percent": 95.336788,
+              "trajectories": 193,
+              "trajectory_pass_rate_percent": 95.336788,
+              "under_routed_rows": 9,
+              "under_routing_rate_percent": 4.663212
+            },
+            "pinchbench": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 0,
+                  "economical": 6,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 0,
+                  "economical": 41,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 1,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 85.416667,
+              "exact_rows": 41,
+              "over_routed_rows": 0,
+              "over_routing_rate_percent": 0.0,
+              "passed_trajectories": 7,
+              "row_weighted_trajectory_pass_rate_percent": 47.916667,
+              "rows": 48,
+              "safe_rows": 41,
+              "safe_step_rate_percent": 85.416667,
+              "trajectories": 12,
+              "trajectory_pass_rate_percent": 58.333333,
+              "under_routed_rows": 7,
+              "under_routing_rate_percent": 14.583333
+            },
+            "qmsum": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 0,
+                  "economical": 13,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 0,
+                  "economical": 132,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 0,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 91.034483,
+              "exact_rows": 132,
+              "over_routed_rows": 0,
+              "over_routing_rate_percent": 0.0,
+              "passed_trajectories": 132,
+              "row_weighted_trajectory_pass_rate_percent": 91.034483,
+              "rows": 145,
+              "safe_rows": 132,
+              "safe_step_rate_percent": 91.034483,
+              "trajectories": 145,
+              "trajectory_pass_rate_percent": 91.034483,
+              "under_routed_rows": 13,
+              "under_routing_rate_percent": 8.965517
+            },
+            "swebench": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 18,
+                  "economical": 0,
+                  "strongest": 56
+                },
+                "economical": {
+                  "balanced": 35,
+                  "economical": 0,
+                  "strongest": 59
+                },
+                "strongest": {
+                  "balanced": 16,
+                  "economical": 0,
+                  "strongest": 152
+                }
+              },
+              "exact_rate_percent": 50.595238,
+              "exact_rows": 170,
+              "over_routed_rows": 150,
+              "over_routing_rate_percent": 44.642857,
+              "passed_trajectories": 31,
+              "row_weighted_trajectory_pass_rate_percent": 76.190476,
+              "rows": 336,
+              "safe_rows": 320,
+              "safe_step_rate_percent": 95.238095,
+              "trajectories": 40,
+              "trajectory_pass_rate_percent": 77.5,
+              "under_routed_rows": 16,
+              "under_routing_rate_percent": 4.761905
+            }
+          },
+          "cluster_bootstrap_95_ci": {
+            "exact_rate_percent": {
+              "lower_95": 74.975247,
+              "upper_95": 82.719407
+            },
+            "safe_step_rate_percent": {
+              "lower_95": 92.687509,
+              "upper_95": 96.013663
+            },
+            "trajectory_pass_rate_percent": {
+              "lower_95": 88.846154,
+              "upper_95": 93.846154
+            }
+          },
+          "confusion": {
+            "balanced": {
+              "balanced": 19,
+              "economical": 36,
+              "strongest": 56
+            },
+            "economical": {
+              "balanced": 37,
+              "economical": 593,
+              "strongest": 59
+            },
+            "strongest": {
+              "balanced": 16,
+              "economical": 2,
+              "strongest": 152
+            }
+          },
+          "exact_rate_percent": 78.762887,
+          "exact_rows": 764,
+          "over_routed_rows": 152,
+          "over_routing_rate_percent": 15.670103,
+          "passed_trajectories": 476,
+          "row_weighted_trajectory_pass_rate_percent": 84.948454,
+          "rows": 970,
+          "safe_rows": 916,
+          "safe_step_rate_percent": 94.43299,
+          "trajectories": 520,
+          "trajectory_pass_rate_percent": 91.538462,
+          "under_routed_rows": 54,
+          "under_routing_rate_percent": 5.56701
+        },
+        "official_four_tier": {
+          "balanced_as_mid": {
+            "by_benchmark": {
+              "bfcl": {
+                "api_errors": 0,
+                "cost_savings_score": 100.0,
+                "cost_score_cases_used": 239,
+                "exact_match": 239,
+                "pass_rate": 0.9637096774193549,
+                "passed": 239,
+                "router_accounting": {
+                  "D_usd": 3.3156913834500004,
+                  "N_usd": 3.1416001700000016,
+                  "accounting_savings_score_percent": 94.7494747454796,
+                  "evaluable_step_count": 248,
+                  "exact_match_rate_percent": 93.84615384615384,
+                  "exact_match_trajectories": 122,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 94.14726081259577,
+                  "pass_rate_percent": 93.84615384615384,
+                  "passed_trajectories": 122,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 130
+                },
+                "sampled": 248,
+                "tier_match_accuracy": 0.9637096774193549,
+                "valid_response_rate": 1.0
+              },
+              "mtrag": {
+                "api_errors": 0,
+                "cost_savings_score": 99.9334294907356,
+                "cost_score_cases_used": 184,
+                "exact_match": 182,
+                "pass_rate": 0.9533678756476683,
+                "passed": 184,
+                "router_accounting": {
+                  "D_usd": 3.970793554479997,
+                  "N_usd": 3.8000645299999967,
+                  "accounting_savings_score_percent": 95.70038023539709,
+                  "evaluable_step_count": 193,
+                  "exact_match_rate_percent": 94.30051813471502,
+                  "exact_match_trajectories": 182,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 95.11256197829299,
+                  "pass_rate_percent": 95.33678756476684,
+                  "passed_trajectories": 184,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 193
+                },
+                "sampled": 193,
+                "tier_match_accuracy": 0.9430051813471503,
+                "valid_response_rate": 1.0
+              },
+              "pinchbench": {
+                "api_errors": 0,
+                "cost_savings_score": 100.0,
+                "cost_score_cases_used": 41,
+                "exact_match": 41,
+                "pass_rate": 0.8541666666666666,
+                "passed": 41,
+                "router_accounting": {
+                  "D_usd": 2.20795911983,
+                  "N_usd": 0.8386767500000001,
+                  "accounting_savings_score_percent": 37.98425172222271,
+                  "evaluable_step_count": 48,
+                  "exact_match_rate_percent": 58.333333333333336,
+                  "exact_match_trajectories": 7,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 51.550306129629796,
+                  "pass_rate_percent": 58.333333333333336,
+                  "passed_trajectories": 7,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 12
+                },
+                "sampled": 48,
+                "tier_match_accuracy": 0.8541666666666666,
+                "valid_response_rate": 1.0
+              },
+              "qmsum": {
+                "api_errors": 0,
+                "cost_savings_score": 100.0,
+                "cost_score_cases_used": 132,
+                "exact_match": 132,
+                "pass_rate": 0.9103448275862069,
+                "passed": 132,
+                "router_accounting": {
+                  "D_usd": 4.107302848680002,
+                  "N_usd": 3.8330872999999985,
+                  "accounting_savings_score_percent": 93.32370758177402,
+                  "evaluable_step_count": 145,
+                  "exact_match_rate_percent": 91.03448275862068,
+                  "exact_match_trajectories": 132,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 91.7975576996718,
+                  "pass_rate_percent": 91.03448275862068,
+                  "passed_trajectories": 132,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 145
+                },
+                "sampled": 145,
+                "tier_match_accuracy": 0.9103448275862069,
+                "valid_response_rate": 1.0
+              },
+              "swebench": {
+                "api_errors": 0,
+                "cost_savings_score": 25.892366831411312,
+                "cost_score_cases_used": 156,
+                "exact_match": 158,
+                "pass_rate": 0.9166666666666666,
+                "passed": 308,
+                "router_accounting": {
+                  "D_usd": 0.044068094029999956,
+                  "N_usd": -1.5160531579999998,
+                  "accounting_savings_score_percent": -3440.2512551777845,
+                  "evaluable_step_count": 336,
+                  "exact_match_rate_percent": 0.0,
+                  "exact_match_trajectories": 0,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": -1129.2504183925948,
+                  "pass_rate_percent": 52.5,
+                  "passed_trajectories": 21,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 40
+                },
+                "sampled": 336,
+                "tier_match_accuracy": 0.47023809523809523,
+                "valid_response_rate": 1.0
+              }
+            },
+            "router_accounting": {
+              "D_usd": 13.645815000470028,
+              "N_usd": 10.09737559200001,
+              "accounting_savings_score_percent": 73.99613428477674,
+              "evaluable_step_count": 970,
+              "exact_match_rate_percent": 85.1923076923077,
+              "exact_match_trajectories": 443,
+              "fallback_output_tokens": 500,
+              "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+              "overall_score_percent": 82.93460886415636,
+              "pass_rate_percent": 89.61538461538461,
+              "passed_trajectories": 466,
+              "skipped_step_count": 0,
+              "total_trajectories": 520
+            },
+            "router_to_official_tier_id": {
+              "balanced": 1,
+              "economical": 0,
+              "strongest": 3
+            },
+            "scores_v2": {
+              "by_benchmark": {
+                "bfcl": {
+                  "D_usd": 3.46049175,
+                  "N_usd": 3.1416001700000016,
+                  "cost_savings_score_percent": 90.78479005187634,
+                  "failed_retry_baseline_usd": 0.18212950000000003,
+                  "failed_trajectory_count": 8,
+                  "row_count": 248,
+                  "step_count": 248,
+                  "weight_in_global_cost_savings": 0.2556701030927835
+                },
+                "mtrag": {
+                  "D_usd": 4.114025000000002,
+                  "N_usd": 3.8000645299999967,
+                  "cost_savings_score_percent": 92.3685327629267,
+                  "failed_retry_baseline_usd": 0.19241874999999997,
+                  "failed_trajectory_count": 9,
+                  "row_count": 193,
+                  "step_count": 193,
+                  "weight_in_global_cost_savings": 0.19896907216494844
+                },
+                "pinchbench": {
+                  "D_usd": 2.41320775,
+                  "N_usd": 0.8386767500000001,
+                  "cost_savings_score_percent": 34.753607516799995,
+                  "failed_retry_baseline_usd": 1.45478775,
+                  "failed_trajectory_count": 5,
+                  "row_count": 48,
+                  "step_count": 48,
+                  "weight_in_global_cost_savings": 0.049484536082474224
+                },
+                "qmsum": {
+                  "D_usd": 4.25871875,
+                  "N_usd": 3.8330872999999985,
+                  "cost_savings_score_percent": 90.00564547729287,
+                  "failed_retry_baseline_usd": 0.28761875000000003,
+                  "failed_trajectory_count": 13,
+                  "row_count": 145,
+                  "step_count": 145,
+                  "weight_in_global_cost_savings": 0.14948453608247422
+                },
+                "swebench": {
+                  "D_usd": 3.3790735000000023,
+                  "N_usd": -1.5160531579999998,
+                  "cost_savings_score_percent": -44.86594204002957,
+                  "failed_retry_baseline_usd": 1.8765207499999998,
+                  "failed_trajectory_count": 19,
+                  "row_count": 336,
+                  "step_count": 336,
+                  "weight_in_global_cost_savings": 0.3463917525773196
+                }
+              },
+              "case_exact_count": 752,
+              "case_exact_match_percent": 77.52577319587628,
+              "case_pass_count": 904,
+              "case_pass_rate_percent": 93.19587628865979,
+              "combined_score_percent": 72.1355128829057,
+              "cost_savings_score_percent": 41.222463902756814,
+              "error_rows": 0,
+              "note": "cost_savings_score_percent is macro-averaged across benchmarks by each benchmark's total row count (same scope as case_pass_rate). All gold tiers are included; D_b = Σ baseline_cost over every evaluable step. Numerator is trajectory-level: passed trajectories (no error AND every step pred>=gold) contribute N_b += baseline_cost - pred_cost per step; failed trajectories contribute N_b -= pred_cost per step, which under D = Σ baseline encodes the failed-trajectory user bill = Σ pred_cost + Σ baseline_cost (router's chain wasted + one full always-high re-run of every step). No additional retry penalty is applied on top. trajectory_pass_rate_percent uses row-weighted denominator: a row counts toward the numerator iff its entire trajectory passes.",
+              "passed_trajectories": 466,
+              "rows_in_passed_trajectories": 743,
+              "total_rows": 970,
+              "total_trajectories": 520,
+              "trajectory_pass_rate_percent": 76.5979381443299
+            },
+            "section_11": {
+              "assumed_completion_tokens_per_routing_step": 1000000,
+              "baseline_nominal_cost_per_step_usd": 25.0,
+              "baseline_tier": "high",
+              "cost_formula": "save_gt = baseline.cost - optimal_path.cost per §11.2 (nominal USD)",
+              "cost_savings_score": 85.18843360285048,
+              "cost_score_cases_used": 752,
+              "note": "Sums are nominal USD under uniform T per step. If real completion_tokens v_i vary by case, §11.2 uses v_i in each cost; ratio equals current only when all v_i are equal.",
+              "pass_rate": 0.931958762886598,
+              "passed": 904,
+              "sum_save_gt_usd": 18242.5,
+              "sum_save_test_usd": 15540.5,
+              "total": 970
+            }
+          },
+          "balanced_as_mid_high": {
+            "by_benchmark": {
+              "bfcl": {
+                "api_errors": 0,
+                "cost_savings_score": 100.0,
+                "cost_score_cases_used": 239,
+                "exact_match": 239,
+                "pass_rate": 0.9637096774193549,
+                "passed": 239,
+                "router_accounting": {
+                  "D_usd": 3.3156913834500004,
+                  "N_usd": 3.1416001700000016,
+                  "accounting_savings_score_percent": 94.7494747454796,
+                  "evaluable_step_count": 248,
+                  "exact_match_rate_percent": 93.84615384615384,
+                  "exact_match_trajectories": 122,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 94.14726081259577,
+                  "pass_rate_percent": 93.84615384615384,
+                  "passed_trajectories": 122,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 130
+                },
+                "sampled": 248,
+                "tier_match_accuracy": 0.9637096774193549,
+                "valid_response_rate": 1.0
+              },
+              "mtrag": {
+                "api_errors": 0,
+                "cost_savings_score": 99.73371796294242,
+                "cost_score_cases_used": 184,
+                "exact_match": 181,
+                "pass_rate": 0.9533678756476683,
+                "passed": 184,
+                "router_accounting": {
+                  "D_usd": 3.970793554479997,
+                  "N_usd": 3.796963568189997,
+                  "accounting_savings_score_percent": 95.62228597621555,
+                  "evaluable_step_count": 193,
+                  "exact_match_rate_percent": 93.78238341968913,
+                  "exact_match_trajectories": 181,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 94.91381898689049,
+                  "pass_rate_percent": 95.33678756476684,
+                  "passed_trajectories": 184,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 193
+                },
+                "sampled": 193,
+                "tier_match_accuracy": 0.9378238341968912,
+                "valid_response_rate": 1.0
+              },
+              "pinchbench": {
+                "api_errors": 0,
+                "cost_savings_score": 100.0,
+                "cost_score_cases_used": 41,
+                "exact_match": 41,
+                "pass_rate": 0.8541666666666666,
+                "passed": 41,
+                "router_accounting": {
+                  "D_usd": 2.20795911983,
+                  "N_usd": 0.8386767500000001,
+                  "accounting_savings_score_percent": 37.98425172222271,
+                  "evaluable_step_count": 48,
+                  "exact_match_rate_percent": 58.333333333333336,
+                  "exact_match_trajectories": 7,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 51.550306129629796,
+                  "pass_rate_percent": 58.333333333333336,
+                  "passed_trajectories": 7,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 12
+                },
+                "sampled": 48,
+                "tier_match_accuracy": 0.8541666666666666,
+                "valid_response_rate": 1.0
+              },
+              "qmsum": {
+                "api_errors": 0,
+                "cost_savings_score": 100.0,
+                "cost_score_cases_used": 132,
+                "exact_match": 132,
+                "pass_rate": 0.9103448275862069,
+                "passed": 132,
+                "router_accounting": {
+                  "D_usd": 4.107302848680002,
+                  "N_usd": 3.8330872999999985,
+                  "accounting_savings_score_percent": 93.32370758177402,
+                  "evaluable_step_count": 145,
+                  "exact_match_rate_percent": 91.03448275862068,
+                  "exact_match_trajectories": 132,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 91.7975576996718,
+                  "pass_rate_percent": 91.03448275862068,
+                  "passed_trajectories": 132,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 145
+                },
+                "sampled": 145,
+                "tier_match_accuracy": 0.9103448275862069,
+                "valid_response_rate": 1.0
+              },
+              "swebench": {
+                "api_errors": 0,
+                "cost_savings_score": 27.305512622359608,
+                "cost_score_cases_used": 168,
+                "exact_match": 164,
+                "pass_rate": 0.9523809523809523,
+                "passed": 320,
+                "router_accounting": {
+                  "D_usd": 0.044068094029999956,
+                  "N_usd": -0.6623956885200001,
+                  "accounting_savings_score_percent": -1503.1185330345015,
+                  "evaluable_step_count": 336,
+                  "exact_match_rate_percent": 0.0,
+                  "exact_match_trajectories": 0,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": -475.2061776781672,
+                  "pass_rate_percent": 77.5,
+                  "passed_trajectories": 31,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 40
+                },
+                "sampled": 336,
+                "tier_match_accuracy": 0.4880952380952381,
+                "valid_response_rate": 1.0
+              }
+            },
+            "router_accounting": {
+              "D_usd": 13.645815000470028,
+              "N_usd": 10.947932099670023,
+              "accounting_savings_score_percent": 80.22922851652996,
+              "evaluable_step_count": 970,
+              "exact_match_rate_percent": 85.0,
+              "exact_match_trajectories": 442,
+              "fallback_output_tokens": 500,
+              "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+              "overall_score_percent": 85.5892300183305,
+              "pass_rate_percent": 91.53846153846153,
+              "passed_trajectories": 476,
+              "skipped_step_count": 0,
+              "total_trajectories": 520
+            },
+            "router_to_official_tier_id": {
+              "balanced": 2,
+              "economical": 0,
+              "strongest": 3
+            },
+            "scores_v2": {
+              "by_benchmark": {
+                "bfcl": {
+                  "D_usd": 3.46049175,
+                  "N_usd": 3.1416001700000016,
+                  "cost_savings_score_percent": 90.78479005187634,
+                  "failed_retry_baseline_usd": 0.18212950000000003,
+                  "failed_trajectory_count": 8,
+                  "row_count": 248,
+                  "step_count": 248,
+                  "weight_in_global_cost_savings": 0.2556701030927835
+                },
+                "mtrag": {
+                  "D_usd": 4.114025000000002,
+                  "N_usd": 3.796963568189997,
+                  "cost_savings_score_percent": 92.29315738698709,
+                  "failed_retry_baseline_usd": 0.19241874999999997,
+                  "failed_trajectory_count": 9,
+                  "row_count": 193,
+                  "step_count": 193,
+                  "weight_in_global_cost_savings": 0.19896907216494844
+                },
+                "pinchbench": {
+                  "D_usd": 2.41320775,
+                  "N_usd": 0.8386767500000001,
+                  "cost_savings_score_percent": 34.753607516799995,
+                  "failed_retry_baseline_usd": 1.45478775,
+                  "failed_trajectory_count": 5,
+                  "row_count": 48,
+                  "step_count": 48,
+                  "weight_in_global_cost_savings": 0.049484536082474224
+                },
+                "qmsum": {
+                  "D_usd": 4.25871875,
+                  "N_usd": 3.8330872999999985,
+                  "cost_savings_score_percent": 90.00564547729287,
+                  "failed_retry_baseline_usd": 0.28761875000000003,
+                  "failed_trajectory_count": 13,
+                  "row_count": 145,
+                  "step_count": 145,
+                  "weight_in_global_cost_savings": 0.14948453608247422
+                },
+                "swebench": {
+                  "D_usd": 3.3790735000000023,
+                  "N_usd": -0.6623956885200001,
+                  "cost_savings_score_percent": -19.60287897022659,
+                  "failed_retry_baseline_usd": 1.0327862499999998,
+                  "failed_trajectory_count": 9,
+                  "row_count": 336,
+                  "step_count": 336,
+                  "weight_in_global_cost_savings": 0.3463917525773196
+                }
+              },
+              "case_exact_count": 757,
+              "case_exact_match_percent": 78.04123711340206,
+              "case_pass_count": 916,
+              "case_pass_rate_percent": 94.43298969072166,
+              "combined_score_percent": 76.84526590968339,
+              "cost_savings_score_percent": 49.95838322636244,
+              "error_rows": 0,
+              "note": "cost_savings_score_percent is macro-averaged across benchmarks by each benchmark's total row count (same scope as case_pass_rate). All gold tiers are included; D_b = Σ baseline_cost over every evaluable step. Numerator is trajectory-level: passed trajectories (no error AND every step pred>=gold) contribute N_b += baseline_cost - pred_cost per step; failed trajectories contribute N_b -= pred_cost per step, which under D = Σ baseline encodes the failed-trajectory user bill = Σ pred_cost + Σ baseline_cost (router's chain wasted + one full always-high re-run of every step). No additional retry penalty is applied on top. trajectory_pass_rate_percent uses row-weighted denominator: a row counts toward the numerator iff its entire trajectory passes.",
+              "passed_trajectories": 476,
+              "rows_in_passed_trajectories": 824,
+              "total_rows": 970,
+              "total_trajectories": 520,
+              "trajectory_pass_rate_percent": 84.94845360824742
+            },
+            "section_11": {
+              "assumed_completion_tokens_per_routing_step": 1000000,
+              "baseline_nominal_cost_per_step_usd": 25.0,
+              "baseline_tier": "high",
+              "cost_formula": "save_gt = baseline.cost - optimal_path.cost per §11.2 (nominal USD)",
+              "cost_savings_score": 84.66657649127553,
+              "cost_score_cases_used": 764,
+              "note": "Sums are nominal USD under uniform T per step. If real completion_tokens v_i vary by case, §11.2 uses v_i in each cost; ratio equals current only when all v_i are equal.",
+              "pass_rate": 0.9443298969072165,
+              "passed": 916,
+              "sum_save_gt_usd": 18482.5,
+              "sum_save_test_usd": 15648.5,
+              "total": 970
+            }
+          }
+        },
+        "split_details": {
+          "elapsed_seconds": 6.497,
+          "folds": [
+            {
+              "fold": 0,
+              "test_gold_counts": {
+                "0": 139,
+                "1": 14,
+                "2": 41
+              },
+              "test_rows": 194,
+              "test_trajectories": 108,
+              "train_rows": 776,
+              "train_trajectories": 412
+            },
+            {
+              "fold": 1,
+              "test_gold_counts": {
+                "0": 131,
+                "1": 25,
+                "2": 36
+              },
+              "test_rows": 192,
+              "test_trajectories": 106,
+              "train_rows": 778,
+              "train_trajectories": 414
+            },
+            {
+              "fold": 2,
+              "test_gold_counts": {
+                "0": 147,
+                "1": 24,
+                "2": 26
+              },
+              "test_rows": 197,
+              "test_trajectories": 102,
+              "train_rows": 773,
+              "train_trajectories": 418
+            },
+            {
+              "fold": 3,
+              "test_gold_counts": {
+                "0": 141,
+                "1": 16,
+                "2": 33
+              },
+              "test_rows": 190,
+              "test_trajectories": 95,
+              "train_rows": 780,
+              "train_trajectories": 425
+            },
+            {
+              "fold": 4,
+              "test_gold_counts": {
+                "0": 131,
+                "1": 32,
+                "2": 34
+              },
+              "test_rows": 197,
+              "test_trajectories": 109,
+              "train_rows": 773,
+              "train_trajectories": 411
+            }
+          ]
+        }
+      },
+      "leave_one_benchmark_out": {
+        "merged_three_tier": {
+          "by_benchmark": {
+            "bfcl": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 3,
+                  "economical": 6,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 25,
+                  "economical": 214,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 0,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 87.5,
+              "exact_rows": 217,
+              "over_routed_rows": 25,
+              "over_routing_rate_percent": 10.080645,
+              "passed_trajectories": 124,
+              "row_weighted_trajectory_pass_rate_percent": 96.370968,
+              "rows": 248,
+              "safe_rows": 242,
+              "safe_step_rate_percent": 97.580645,
+              "trajectories": 130,
+              "trajectory_pass_rate_percent": 95.384615,
+              "under_routed_rows": 6,
+              "under_routing_rate_percent": 2.419355
+            },
+            "mtrag": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 0,
+                  "economical": 9,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 1,
+                  "economical": 182,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 1,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 94.300518,
+              "exact_rows": 182,
+              "over_routed_rows": 1,
+              "over_routing_rate_percent": 0.518135,
+              "passed_trajectories": 183,
+              "row_weighted_trajectory_pass_rate_percent": 94.818653,
+              "rows": 193,
+              "safe_rows": 183,
+              "safe_step_rate_percent": 94.818653,
+              "trajectories": 193,
+              "trajectory_pass_rate_percent": 94.818653,
+              "under_routed_rows": 10,
+              "under_routing_rate_percent": 5.181347
+            },
+            "pinchbench": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 0,
+                  "economical": 6,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 0,
+                  "economical": 41,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 1,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 85.416667,
+              "exact_rows": 41,
+              "over_routed_rows": 0,
+              "over_routing_rate_percent": 0.0,
+              "passed_trajectories": 7,
+              "row_weighted_trajectory_pass_rate_percent": 47.916667,
+              "rows": 48,
+              "safe_rows": 41,
+              "safe_step_rate_percent": 85.416667,
+              "trajectories": 12,
+              "trajectory_pass_rate_percent": 58.333333,
+              "under_routed_rows": 7,
+              "under_routing_rate_percent": 14.583333
+            },
+            "qmsum": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 0,
+                  "economical": 13,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 2,
+                  "economical": 130,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 0,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 89.655172,
+              "exact_rows": 130,
+              "over_routed_rows": 2,
+              "over_routing_rate_percent": 1.37931,
+              "passed_trajectories": 132,
+              "row_weighted_trajectory_pass_rate_percent": 91.034483,
+              "rows": 145,
+              "safe_rows": 132,
+              "safe_step_rate_percent": 91.034483,
+              "trajectories": 145,
+              "trajectory_pass_rate_percent": 91.034483,
+              "under_routed_rows": 13,
+              "under_routing_rate_percent": 8.965517
+            },
+            "swebench": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 0,
+                  "economical": 74,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 0,
+                  "economical": 94,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 168,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 27.97619,
+              "exact_rows": 94,
+              "over_routed_rows": 0,
+              "over_routing_rate_percent": 0.0,
+              "passed_trajectories": 0,
+              "row_weighted_trajectory_pass_rate_percent": 0.0,
+              "rows": 336,
+              "safe_rows": 94,
+              "safe_step_rate_percent": 27.97619,
+              "trajectories": 40,
+              "trajectory_pass_rate_percent": 0.0,
+              "under_routed_rows": 242,
+              "under_routing_rate_percent": 72.02381
+            }
+          },
+          "cluster_bootstrap_95_ci": {
+            "exact_rate_percent": {
+              "lower_95": 63.075233,
+              "upper_95": 73.832548
+            },
+            "safe_step_rate_percent": {
+              "lower_95": 66.099824,
+              "upper_95": 76.924665
+            },
+            "trajectory_pass_rate_percent": {
+              "lower_95": 82.5,
+              "upper_95": 88.653846
+            }
+          },
+          "confusion": {
+            "balanced": {
+              "balanced": 3,
+              "economical": 108,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 28,
+              "economical": 661,
+              "strongest": 0
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 170,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 68.453608,
+          "exact_rows": 664,
+          "over_routed_rows": 28,
+          "over_routing_rate_percent": 2.886598,
+          "passed_trajectories": 446,
+          "row_weighted_trajectory_pass_rate_percent": 59.484536,
+          "rows": 970,
+          "safe_rows": 692,
+          "safe_step_rate_percent": 71.340206,
+          "trajectories": 520,
+          "trajectory_pass_rate_percent": 85.769231,
+          "under_routed_rows": 278,
+          "under_routing_rate_percent": 28.659794
+        },
+        "split_details": {
+          "elapsed_seconds": 6.512,
+          "splits": [
+            {
+              "held_out_benchmark": "bfcl",
+              "test_rows": 248,
+              "train_rows": 722
+            },
+            {
+              "held_out_benchmark": "mtrag",
+              "test_rows": 193,
+              "train_rows": 777
+            },
+            {
+              "held_out_benchmark": "pinchbench",
+              "test_rows": 48,
+              "train_rows": 922
+            },
+            {
+              "held_out_benchmark": "qmsum",
+              "test_rows": 145,
+              "train_rows": 825
+            },
+            {
+              "held_out_benchmark": "swebench",
+              "test_rows": 336,
+              "train_rows": 634
+            }
+          ]
+        }
+      }
+    },
+    "ordinal_logistic": {
+      "final_model": {
+        "artifact": "ordinal_logistic_model.json",
+        "learned_leaf_count": null,
+        "trainable_parameter_count": 50
+      },
+      "grouped_oof": {
+        "merged_three_tier": {
+          "by_benchmark": {
+            "bfcl": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 0,
+                  "economical": 9,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 1,
+                  "economical": 238,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 0,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 95.967742,
+              "exact_rows": 238,
+              "over_routed_rows": 1,
+              "over_routing_rate_percent": 0.403226,
+              "passed_trajectories": 122,
+              "row_weighted_trajectory_pass_rate_percent": 92.33871,
+              "rows": 248,
+              "safe_rows": 239,
+              "safe_step_rate_percent": 96.370968,
+              "trajectories": 130,
+              "trajectory_pass_rate_percent": 93.846154,
+              "under_routed_rows": 9,
+              "under_routing_rate_percent": 3.629032
+            },
+            "mtrag": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 3,
+                  "economical": 6,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 3,
+                  "economical": 180,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 1,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 94.818653,
+              "exact_rows": 183,
+              "over_routed_rows": 3,
+              "over_routing_rate_percent": 1.554404,
+              "passed_trajectories": 186,
+              "row_weighted_trajectory_pass_rate_percent": 96.373057,
+              "rows": 193,
+              "safe_rows": 186,
+              "safe_step_rate_percent": 96.373057,
+              "trajectories": 193,
+              "trajectory_pass_rate_percent": 96.373057,
+              "under_routed_rows": 7,
+              "under_routing_rate_percent": 3.626943
+            },
+            "pinchbench": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 3,
+                  "economical": 3,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 12,
+                  "economical": 29,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 1,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 66.666667,
+              "exact_rows": 32,
+              "over_routed_rows": 12,
+              "over_routing_rate_percent": 25.0,
+              "passed_trajectories": 8,
+              "row_weighted_trajectory_pass_rate_percent": 60.416667,
+              "rows": 48,
+              "safe_rows": 44,
+              "safe_step_rate_percent": 91.666667,
+              "trajectories": 12,
+              "trajectory_pass_rate_percent": 66.666667,
+              "under_routed_rows": 4,
+              "under_routing_rate_percent": 8.333333
+            },
+            "qmsum": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 0,
+                  "economical": 13,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 2,
+                  "economical": 130,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 0,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 89.655172,
+              "exact_rows": 130,
+              "over_routed_rows": 2,
+              "over_routing_rate_percent": 1.37931,
+              "passed_trajectories": 132,
+              "row_weighted_trajectory_pass_rate_percent": 91.034483,
+              "rows": 145,
+              "safe_rows": 132,
+              "safe_step_rate_percent": 91.034483,
+              "trajectories": 145,
+              "trajectory_pass_rate_percent": 91.034483,
+              "under_routed_rows": 13,
+              "under_routing_rate_percent": 8.965517
+            },
+            "swebench": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 17,
+                  "economical": 0,
+                  "strongest": 57
+                },
+                "economical": {
+                  "balanced": 33,
+                  "economical": 0,
+                  "strongest": 61
+                },
+                "strongest": {
+                  "balanced": 19,
+                  "economical": 0,
+                  "strongest": 149
+                }
+              },
+              "exact_rate_percent": 49.404762,
+              "exact_rows": 166,
+              "over_routed_rows": 151,
+              "over_routing_rate_percent": 44.940476,
+              "passed_trajectories": 32,
+              "row_weighted_trajectory_pass_rate_percent": 79.761905,
+              "rows": 336,
+              "safe_rows": 317,
+              "safe_step_rate_percent": 94.345238,
+              "trajectories": 40,
+              "trajectory_pass_rate_percent": 80.0,
+              "under_routed_rows": 19,
+              "under_routing_rate_percent": 5.654762
+            }
+          },
+          "cluster_bootstrap_95_ci": {
+            "exact_rate_percent": {
+              "lower_95": 73.365809,
+              "upper_95": 81.336608
+            },
+            "safe_step_rate_percent": {
+              "lower_95": 92.796359,
+              "upper_95": 96.300005
+            },
+            "trajectory_pass_rate_percent": {
+              "lower_95": 89.807692,
+              "upper_95": 94.423077
+            }
+          },
+          "confusion": {
+            "balanced": {
+              "balanced": 23,
+              "economical": 31,
+              "strongest": 57
+            },
+            "economical": {
+              "balanced": 51,
+              "economical": 577,
+              "strongest": 61
+            },
+            "strongest": {
+              "balanced": 19,
+              "economical": 2,
+              "strongest": 149
+            }
+          },
+          "exact_rate_percent": 77.216495,
+          "exact_rows": 749,
+          "over_routed_rows": 169,
+          "over_routing_rate_percent": 17.42268,
+          "passed_trajectories": 480,
+          "row_weighted_trajectory_pass_rate_percent": 87.010309,
+          "rows": 970,
+          "safe_rows": 918,
+          "safe_step_rate_percent": 94.639175,
+          "trajectories": 520,
+          "trajectory_pass_rate_percent": 92.307692,
+          "under_routed_rows": 52,
+          "under_routing_rate_percent": 5.360825
+        },
+        "official_four_tier": {
+          "balanced_as_mid": {
+            "by_benchmark": {
+              "bfcl": {
+                "api_errors": 0,
+                "cost_savings_score": 99.9743830586628,
+                "cost_score_cases_used": 239,
+                "exact_match": 238,
+                "pass_rate": 0.9637096774193549,
+                "passed": 239,
+                "router_accounting": {
+                  "D_usd": 3.3156913834500004,
+                  "N_usd": 3.1410193700000018,
+                  "accounting_savings_score_percent": 94.73195803681068,
+                  "evaluable_step_count": 248,
+                  "exact_match_rate_percent": 93.07692307692308,
+                  "exact_match_trajectories": 121,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 93.88501165329586,
+                  "pass_rate_percent": 93.84615384615384,
+                  "passed_trajectories": 122,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 130
+                },
+                "sampled": 248,
+                "tier_match_accuracy": 0.9596774193548387,
+                "valid_response_rate": 1.0
+              },
+              "mtrag": {
+                "api_errors": 0,
+                "cost_savings_score": 99.9011532125206,
+                "cost_score_cases_used": 186,
+                "exact_match": 183,
+                "pass_rate": 0.9637305699481865,
+                "passed": 186,
+                "router_accounting": {
+                  "D_usd": 3.970793554479997,
+                  "N_usd": 3.8365312899999977,
+                  "accounting_savings_score_percent": 96.61875484993371,
+                  "evaluable_step_count": 193,
+                  "exact_match_rate_percent": 94.81865284974093,
+                  "exact_match_trajectories": 183,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 95.93682156483108,
+                  "pass_rate_percent": 96.37305699481865,
+                  "passed_trajectories": 186,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 193
+                },
+                "sampled": 193,
+                "tier_match_accuracy": 0.9481865284974094,
+                "valid_response_rate": 1.0
+              },
+              "pinchbench": {
+                "api_errors": 0,
+                "cost_savings_score": 98.24817518248175,
+                "cost_score_cases_used": 42,
+                "exact_match": 30,
+                "pass_rate": 0.875,
+                "passed": 42,
+                "router_accounting": {
+                  "D_usd": 2.20795911983,
+                  "N_usd": 1.2854307020000002,
+                  "accounting_savings_score_percent": 58.218048081387074,
+                  "evaluable_step_count": 48,
+                  "exact_match_rate_percent": 33.333333333333336,
+                  "exact_match_trajectories": 4,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 52.73934936046236,
+                  "pass_rate_percent": 66.66666666666667,
+                  "passed_trajectories": 8,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 12
+                },
+                "sampled": 48,
+                "tier_match_accuracy": 0.625,
+                "valid_response_rate": 1.0
+              },
+              "qmsum": {
+                "api_errors": 0,
+                "cost_savings_score": 99.90723562152134,
+                "cost_score_cases_used": 132,
+                "exact_match": 130,
+                "pass_rate": 0.9103448275862069,
+                "passed": 132,
+                "router_accounting": {
+                  "D_usd": 4.107302848680002,
+                  "N_usd": 3.8315567399999986,
+                  "accounting_savings_score_percent": 93.28644322469131,
+                  "evaluable_step_count": 145,
+                  "exact_match_rate_percent": 89.65517241379311,
+                  "exact_match_trajectories": 130,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 91.32536613236836,
+                  "pass_rate_percent": 91.03448275862068,
+                  "passed_trajectories": 132,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 145
+                },
+                "sampled": 145,
+                "tier_match_accuracy": 0.896551724137931,
+                "valid_response_rate": 1.0
+              },
+              "swebench": {
+                "api_errors": 0,
+                "cost_savings_score": 24.98642042368278,
+                "cost_score_cases_used": 158,
+                "exact_match": 156,
+                "pass_rate": 0.9136904761904762,
+                "passed": 307,
+                "router_accounting": {
+                  "D_usd": 0.044068094029999956,
+                  "N_usd": -1.0744099029999996,
+                  "accounting_savings_score_percent": -2438.067555788958,
+                  "evaluable_step_count": 336,
+                  "exact_match_rate_percent": 0.0,
+                  "exact_match_trajectories": 0,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": -791.8558519296527,
+                  "pass_rate_percent": 62.5,
+                  "passed_trajectories": 25,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 40
+                },
+                "sampled": 336,
+                "tier_match_accuracy": 0.4642857142857143,
+                "valid_response_rate": 1.0
+              }
+            },
+            "router_accounting": {
+              "D_usd": 13.645815000470028,
+              "N_usd": 11.020128199000027,
+              "accounting_savings_score_percent": 80.75829987890383,
+              "evaluable_step_count": 970,
+              "exact_match_rate_percent": 84.23076923076923,
+              "exact_match_trajectories": 438,
+              "fallback_output_tokens": 500,
+              "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+              "overall_score_percent": 85.31686919040384,
+              "pass_rate_percent": 90.96153846153847,
+              "passed_trajectories": 473,
+              "skipped_step_count": 0,
+              "total_trajectories": 520
+            },
+            "router_to_official_tier_id": {
+              "balanced": 1,
+              "economical": 0,
+              "strongest": 3
+            },
+            "scores_v2": {
+              "by_benchmark": {
+                "bfcl": {
+                  "D_usd": 3.46049175,
+                  "N_usd": 3.1410193700000018,
+                  "cost_savings_score_percent": 90.7680063100859,
+                  "failed_retry_baseline_usd": 0.18212950000000003,
+                  "failed_trajectory_count": 8,
+                  "row_count": 248,
+                  "step_count": 248,
+                  "weight_in_global_cost_savings": 0.2556701030927835
+                },
+                "mtrag": {
+                  "D_usd": 4.114025000000002,
+                  "N_usd": 3.8365312899999977,
+                  "cost_savings_score_percent": 93.25493379354758,
+                  "failed_retry_baseline_usd": 0.15371875,
+                  "failed_trajectory_count": 7,
+                  "row_count": 193,
+                  "step_count": 193,
+                  "weight_in_global_cost_savings": 0.19896907216494844
+                },
+                "pinchbench": {
+                  "D_usd": 2.41320775,
+                  "N_usd": 1.2854307020000002,
+                  "cost_savings_score_percent": 53.26647496470207,
+                  "failed_retry_baseline_usd": 0.9877592499999999,
+                  "failed_trajectory_count": 4,
+                  "row_count": 48,
+                  "step_count": 48,
+                  "weight_in_global_cost_savings": 0.049484536082474224
+                },
+                "qmsum": {
+                  "D_usd": 4.25871875,
+                  "N_usd": 3.8315567399999986,
+                  "cost_savings_score_percent": 89.96970602954231,
+                  "failed_retry_baseline_usd": 0.28761875000000003,
+                  "failed_trajectory_count": 13,
+                  "row_count": 145,
+                  "step_count": 145,
+                  "weight_in_global_cost_savings": 0.14948453608247422
+                },
+                "swebench": {
+                  "D_usd": 3.3790735000000023,
+                  "N_usd": -1.0744099029999996,
+                  "cost_savings_score_percent": -31.795990912893696,
+                  "failed_retry_baseline_usd": 1.4791724999999998,
+                  "failed_trajectory_count": 15,
+                  "row_count": 336,
+                  "step_count": 336,
+                  "weight_in_global_cost_savings": 0.3463917525773196
+                }
+              },
+              "case_exact_count": 737,
+              "case_exact_match_percent": 75.97938144329896,
+              "case_pass_count": 906,
+              "case_pass_rate_percent": 93.4020618556701,
+              "combined_score_percent": 74.49165283837965,
+              "cost_savings_score_percent": 46.83259073496189,
+              "error_rows": 0,
+              "note": "cost_savings_score_percent is macro-averaged across benchmarks by each benchmark's total row count (same scope as case_pass_rate). All gold tiers are included; D_b = Σ baseline_cost over every evaluable step. Numerator is trajectory-level: passed trajectories (no error AND every step pred>=gold) contribute N_b += baseline_cost - pred_cost per step; failed trajectories contribute N_b -= pred_cost per step, which under D = Σ baseline encodes the failed-trajectory user bill = Σ pred_cost + Σ baseline_cost (router's chain wasted + one full always-high re-run of every step). No additional retry penalty is applied on top. trajectory_pass_rate_percent uses row-weighted denominator: a row counts toward the numerator iff its entire trajectory passes.",
+              "passed_trajectories": 473,
+              "rows_in_passed_trajectories": 793,
+              "total_rows": 970,
+              "total_trajectories": 520,
+              "trajectory_pass_rate_percent": 81.75257731958763
+            },
+            "section_11": {
+              "assumed_completion_tokens_per_routing_step": 1000000,
+              "baseline_nominal_cost_per_step_usd": 25.0,
+              "baseline_tier": "high",
+              "cost_formula": "save_gt = baseline.cost - optimal_path.cost per §11.2 (nominal USD)",
+              "cost_savings_score": 84.80233223442225,
+              "cost_score_cases_used": 757,
+              "note": "Sums are nominal USD under uniform T per step. If real completion_tokens v_i vary by case, §11.2 uses v_i in each cost; ratio equals current only when all v_i are equal.",
+              "pass_rate": 0.934020618556701,
+              "passed": 906,
+              "sum_save_gt_usd": 18351.5,
+              "sum_save_test_usd": 15562.5,
+              "total": 970
+            }
+          },
+          "balanced_as_mid_high": {
+            "by_benchmark": {
+              "bfcl": {
+                "api_errors": 0,
+                "cost_savings_score": 99.92314917598839,
+                "cost_score_cases_used": 239,
+                "exact_match": 238,
+                "pass_rate": 0.9637096774193549,
+                "passed": 239,
+                "router_accounting": {
+                  "D_usd": 3.3156913834500004,
+                  "N_usd": 3.1405821899100017,
+                  "accounting_savings_score_percent": 94.71877285039128,
+                  "evaluable_step_count": 248,
+                  "exact_match_rate_percent": 93.07692307692308,
+                  "exact_match_trajectories": 121,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 93.88061659115606,
+                  "pass_rate_percent": 93.84615384615384,
+                  "passed_trajectories": 122,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 130
+                },
+                "sampled": 248,
+                "tier_match_accuracy": 0.9596774193548387,
+                "valid_response_rate": 1.0
+              },
+              "mtrag": {
+                "api_errors": 0,
+                "cost_savings_score": 99.50576606260296,
+                "cost_score_cases_used": 186,
+                "exact_match": 180,
+                "pass_rate": 0.9637305699481865,
+                "passed": 186,
+                "router_accounting": {
+                  "D_usd": 3.970793554479997,
+                  "N_usd": 3.8288395434599973,
+                  "accounting_savings_score_percent": 96.4250468055726,
+                  "evaluable_step_count": 193,
+                  "exact_match_rate_percent": 93.26424870466322,
+                  "exact_match_trajectories": 180,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 95.35411750168483,
+                  "pass_rate_percent": 96.37305699481865,
+                  "passed_trajectories": 186,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 193
+                },
+                "sampled": 193,
+                "tier_match_accuracy": 0.9326424870466321,
+                "valid_response_rate": 1.0
+              },
+              "pinchbench": {
+                "api_errors": 0,
+                "cost_savings_score": 94.66042154566745,
+                "cost_score_cases_used": 44,
+                "exact_match": 31,
+                "pass_rate": 0.9166666666666666,
+                "passed": 44,
+                "router_accounting": {
+                  "D_usd": 2.20795911983,
+                  "N_usd": 1.29892468215,
+                  "accounting_savings_score_percent": 58.82919980194243,
+                  "evaluable_step_count": 48,
+                  "exact_match_rate_percent": 33.333333333333336,
+                  "exact_match_trajectories": 4,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 52.94306660064748,
+                  "pass_rate_percent": 66.66666666666667,
+                  "passed_trajectories": 8,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 12
+                },
+                "sampled": 48,
+                "tier_match_accuracy": 0.6458333333333334,
+                "valid_response_rate": 1.0
+              },
+              "qmsum": {
+                "api_errors": 0,
+                "cost_savings_score": 99.72170686456401,
+                "cost_score_cases_used": 132,
+                "exact_match": 130,
+                "pass_rate": 0.9103448275862069,
+                "passed": 132,
+                "router_accounting": {
+                  "D_usd": 4.107302848680002,
+                  "N_usd": 3.8287222758799984,
+                  "accounting_savings_score_percent": 93.21743287350887,
+                  "evaluable_step_count": 145,
+                  "exact_match_rate_percent": 89.65517241379311,
+                  "exact_match_trajectories": 130,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": 91.30236268197422,
+                  "pass_rate_percent": 91.03448275862068,
+                  "passed_trajectories": 132,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 145
+                },
+                "sampled": 145,
+                "tier_match_accuracy": 0.896551724137931,
+                "valid_response_rate": 1.0
+              },
+              "swebench": {
+                "api_errors": 0,
+                "cost_savings_score": 25.75991756826378,
+                "cost_score_cases_used": 168,
+                "exact_match": 159,
+                "pass_rate": 0.9434523809523809,
+                "passed": 317,
+                "router_accounting": {
+                  "D_usd": 0.044068094029999956,
+                  "N_usd": -0.4689058004700001,
+                  "accounting_savings_score_percent": -1064.048288883985,
+                  "evaluable_step_count": 336,
+                  "exact_match_rate_percent": 0.0,
+                  "exact_match_trajectories": 0,
+                  "fallback_output_tokens": 500,
+                  "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+                  "overall_score_percent": -328.0160962946616,
+                  "pass_rate_percent": 80.0,
+                  "passed_trajectories": 32,
+                  "skipped_step_count": 0,
+                  "total_trajectories": 40
+                },
+                "sampled": 336,
+                "tier_match_accuracy": 0.4732142857142857,
+                "valid_response_rate": 1.0
+              }
+            },
+            "router_accounting": {
+              "D_usd": 13.645815000470028,
+              "N_usd": 11.628162890930025,
+              "accounting_savings_score_percent": 85.214132615234,
+              "evaluable_step_count": 970,
+              "exact_match_rate_percent": 83.65384615384616,
+              "exact_match_trajectories": 435,
+              "fallback_output_tokens": 500,
+              "note": "100 * N / D; trajectory-level pass/fail. Pass: N += baseline_cost - pred_cost; Fail: N -= pred_cost.",
+              "overall_score_percent": 87.05855702559082,
+              "pass_rate_percent": 92.3076923076923,
+              "passed_trajectories": 480,
+              "skipped_step_count": 0,
+              "total_trajectories": 520
+            },
+            "router_to_official_tier_id": {
+              "balanced": 2,
+              "economical": 0,
+              "strongest": 3
+            },
+            "scores_v2": {
+              "by_benchmark": {
+                "bfcl": {
+                  "D_usd": 3.46049175,
+                  "N_usd": 3.1405821899100017,
+                  "cost_savings_score_percent": 90.75537284289152,
+                  "failed_retry_baseline_usd": 0.18212950000000003,
+                  "failed_trajectory_count": 8,
+                  "row_count": 248,
+                  "step_count": 248,
+                  "weight_in_global_cost_savings": 0.2556701030927835
+                },
+                "mtrag": {
+                  "D_usd": 4.114025000000002,
+                  "N_usd": 3.8288395434599973,
+                  "cost_savings_score_percent": 93.06796977315392,
+                  "failed_retry_baseline_usd": 0.15371875,
+                  "failed_trajectory_count": 7,
+                  "row_count": 193,
+                  "step_count": 193,
+                  "weight_in_global_cost_savings": 0.19896907216494844
+                },
+                "pinchbench": {
+                  "D_usd": 2.41320775,
+                  "N_usd": 1.29892468215,
+                  "cost_savings_score_percent": 53.82564688639012,
+                  "failed_retry_baseline_usd": 0.9877592499999999,
+                  "failed_trajectory_count": 4,
+                  "row_count": 48,
+                  "step_count": 48,
+                  "weight_in_global_cost_savings": 0.049484536082474224
+                },
+                "qmsum": {
+                  "D_usd": 4.25871875,
+                  "N_usd": 3.8287222758799984,
+                  "cost_savings_score_percent": 89.90314929531326,
+                  "failed_retry_baseline_usd": 0.28761875000000003,
+                  "failed_trajectory_count": 13,
+                  "row_count": 145,
+                  "step_count": 145,
+                  "weight_in_global_cost_savings": 0.14948453608247422
+                },
+                "swebench": {
+                  "D_usd": 3.3790735000000023,
+                  "N_usd": -0.4689058004700001,
+                  "cost_savings_score_percent": -13.87675646800816,
+                  "failed_retry_baseline_usd": 0.8756572500000002,
+                  "failed_trajectory_count": 8,
+                  "row_count": 336,
+                  "step_count": 336,
+                  "weight_in_global_cost_savings": 0.3463917525773196
+                }
+              },
+              "case_exact_count": 738,
+              "case_exact_match_percent": 76.08247422680412,
+              "case_pass_count": 918,
+              "case_pass_rate_percent": 94.63917525773196,
+              "combined_score_percent": 77.68722890628149,
+              "cost_savings_score_percent": 53.01695686223938,
+              "error_rows": 0,
+              "note": "cost_savings_score_percent is macro-averaged across benchmarks by each benchmark's total row count (same scope as case_pass_rate). All gold tiers are included; D_b = Σ baseline_cost over every evaluable step. Numerator is trajectory-level: passed trajectories (no error AND every step pred>=gold) contribute N_b += baseline_cost - pred_cost per step; failed trajectories contribute N_b -= pred_cost per step, which under D = Σ baseline encodes the failed-trajectory user bill = Σ pred_cost + Σ baseline_cost (router's chain wasted + one full always-high re-run of every step). No additional retry penalty is applied on top. trajectory_pass_rate_percent uses row-weighted denominator: a row counts toward the numerator iff its entire trajectory passes.",
+              "passed_trajectories": 480,
+              "rows_in_passed_trajectories": 844,
+              "total_rows": 970,
+              "total_trajectories": 520,
+              "trajectory_pass_rate_percent": 87.01030927835052
+            },
+            "section_11": {
+              "assumed_completion_tokens_per_routing_step": 1000000,
+              "baseline_nominal_cost_per_step_usd": 25.0,
+              "baseline_tier": "high",
+              "cost_formula": "save_gt = baseline.cost - optimal_path.cost per §11.2 (nominal USD)",
+              "cost_savings_score": 83.99806363122933,
+              "cost_score_cases_used": 769,
+              "note": "Sums are nominal USD under uniform T per step. If real completion_tokens v_i vary by case, §11.2 uses v_i in each cost; ratio equals current only when all v_i are equal.",
+              "pass_rate": 0.9463917525773196,
+              "passed": 918,
+              "sum_save_gt_usd": 18591.5,
+              "sum_save_test_usd": 15616.5,
+              "total": 970
+            }
+          }
+        },
+        "split_details": {
+          "elapsed_seconds": 2.607,
+          "folds": [
+            {
+              "fold": 0,
+              "test_gold_counts": {
+                "0": 139,
+                "1": 14,
+                "2": 41
+              },
+              "test_rows": 194,
+              "test_trajectories": 108,
+              "train_rows": 776,
+              "train_trajectories": 412
+            },
+            {
+              "fold": 1,
+              "test_gold_counts": {
+                "0": 131,
+                "1": 25,
+                "2": 36
+              },
+              "test_rows": 192,
+              "test_trajectories": 106,
+              "train_rows": 778,
+              "train_trajectories": 414
+            },
+            {
+              "fold": 2,
+              "test_gold_counts": {
+                "0": 147,
+                "1": 24,
+                "2": 26
+              },
+              "test_rows": 197,
+              "test_trajectories": 102,
+              "train_rows": 773,
+              "train_trajectories": 418
+            },
+            {
+              "fold": 3,
+              "test_gold_counts": {
+                "0": 141,
+                "1": 16,
+                "2": 33
+              },
+              "test_rows": 190,
+              "test_trajectories": 95,
+              "train_rows": 780,
+              "train_trajectories": 425
+            },
+            {
+              "fold": 4,
+              "test_gold_counts": {
+                "0": 131,
+                "1": 32,
+                "2": 34
+              },
+              "test_rows": 197,
+              "test_trajectories": 109,
+              "train_rows": 773,
+              "train_trajectories": 411
+            }
+          ]
+        }
+      },
+      "leave_one_benchmark_out": {
+        "merged_three_tier": {
+          "by_benchmark": {
+            "bfcl": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 0,
+                  "economical": 6,
+                  "strongest": 3
+                },
+                "economical": {
+                  "balanced": 68,
+                  "economical": 131,
+                  "strongest": 40
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 0,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 52.822581,
+              "exact_rows": 131,
+              "over_routed_rows": 111,
+              "over_routing_rate_percent": 44.758065,
+              "passed_trajectories": 124,
+              "row_weighted_trajectory_pass_rate_percent": 96.370968,
+              "rows": 248,
+              "safe_rows": 242,
+              "safe_step_rate_percent": 97.580645,
+              "trajectories": 130,
+              "trajectory_pass_rate_percent": 95.384615,
+              "under_routed_rows": 6,
+              "under_routing_rate_percent": 2.419355
+            },
+            "mtrag": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 0,
+                  "economical": 9,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 1,
+                  "economical": 182,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 1,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 94.300518,
+              "exact_rows": 182,
+              "over_routed_rows": 1,
+              "over_routing_rate_percent": 0.518135,
+              "passed_trajectories": 183,
+              "row_weighted_trajectory_pass_rate_percent": 94.818653,
+              "rows": 193,
+              "safe_rows": 183,
+              "safe_step_rate_percent": 94.818653,
+              "trajectories": 193,
+              "trajectory_pass_rate_percent": 94.818653,
+              "under_routed_rows": 10,
+              "under_routing_rate_percent": 5.181347
+            },
+            "pinchbench": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 3,
+                  "economical": 3,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 18,
+                  "economical": 23,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 1,
+                  "economical": 0,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 54.166667,
+              "exact_rows": 26,
+              "over_routed_rows": 18,
+              "over_routing_rate_percent": 37.5,
+              "passed_trajectories": 9,
+              "row_weighted_trajectory_pass_rate_percent": 72.916667,
+              "rows": 48,
+              "safe_rows": 44,
+              "safe_step_rate_percent": 91.666667,
+              "trajectories": 12,
+              "trajectory_pass_rate_percent": 75.0,
+              "under_routed_rows": 4,
+              "under_routing_rate_percent": 8.333333
+            },
+            "qmsum": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 1,
+                  "economical": 12,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 6,
+                  "economical": 126,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 0,
+                  "economical": 0,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 87.586207,
+              "exact_rows": 127,
+              "over_routed_rows": 6,
+              "over_routing_rate_percent": 4.137931,
+              "passed_trajectories": 133,
+              "row_weighted_trajectory_pass_rate_percent": 91.724138,
+              "rows": 145,
+              "safe_rows": 133,
+              "safe_step_rate_percent": 91.724138,
+              "trajectories": 145,
+              "trajectory_pass_rate_percent": 91.724138,
+              "under_routed_rows": 12,
+              "under_routing_rate_percent": 8.275862
+            },
+            "swebench": {
+              "confusion": {
+                "balanced": {
+                  "balanced": 2,
+                  "economical": 72,
+                  "strongest": 0
+                },
+                "economical": {
+                  "balanced": 7,
+                  "economical": 87,
+                  "strongest": 0
+                },
+                "strongest": {
+                  "balanced": 17,
+                  "economical": 151,
+                  "strongest": 0
+                }
+              },
+              "exact_rate_percent": 26.488095,
+              "exact_rows": 89,
+              "over_routed_rows": 7,
+              "over_routing_rate_percent": 2.083333,
+              "passed_trajectories": 0,
+              "row_weighted_trajectory_pass_rate_percent": 0.0,
+              "rows": 336,
+              "safe_rows": 96,
+              "safe_step_rate_percent": 28.571429,
+              "trajectories": 40,
+              "trajectory_pass_rate_percent": 0.0,
+              "under_routed_rows": 240,
+              "under_routing_rate_percent": 71.428571
+            }
+          },
+          "cluster_bootstrap_95_ci": {
+            "exact_rate_percent": {
+              "lower_95": 52.624044,
+              "upper_95": 62.245192
+            },
+            "safe_step_rate_percent": {
+              "lower_95": 66.568841,
+              "upper_95": 77.617748
+            },
+            "trajectory_pass_rate_percent": {
+              "lower_95": 83.269231,
+              "upper_95": 89.038462
+            }
+          },
+          "confusion": {
+            "balanced": {
+              "balanced": 6,
+              "economical": 102,
+              "strongest": 3
+            },
+            "economical": {
+              "balanced": 100,
+              "economical": 549,
+              "strongest": 40
+            },
+            "strongest": {
+              "balanced": 18,
+              "economical": 152,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 57.216495,
+          "exact_rows": 555,
+          "over_routed_rows": 143,
+          "over_routing_rate_percent": 14.742268,
+          "passed_trajectories": 449,
+          "row_weighted_trajectory_pass_rate_percent": 60.824742,
+          "rows": 970,
+          "safe_rows": 698,
+          "safe_step_rate_percent": 71.958763,
+          "trajectories": 520,
+          "trajectory_pass_rate_percent": 86.346154,
+          "under_routed_rows": 272,
+          "under_routing_rate_percent": 28.041237
+        },
+        "split_details": {
+          "elapsed_seconds": 2.628,
+          "splits": [
+            {
+              "held_out_benchmark": "bfcl",
+              "test_rows": 248,
+              "train_rows": 722
+            },
+            {
+              "held_out_benchmark": "mtrag",
+              "test_rows": 193,
+              "train_rows": 777
+            },
+            {
+              "held_out_benchmark": "pinchbench",
+              "test_rows": 48,
+              "train_rows": 922
+            },
+            {
+              "held_out_benchmark": "qmsum",
+              "test_rows": 145,
+              "train_rows": 825
+            },
+            {
+              "held_out_benchmark": "swebench",
+              "test_rows": 336,
+              "train_rows": 634
+            }
+          ]
+        }
+      }
+    }
+  },
+  "selection": {
+    "criterion": "mean TwinRouterBench official combined score across both middle-tier mappings",
+    "mean_official_combined_scores": {
+      "ordinal_boosted_trees": 74.49038939629455,
+      "ordinal_logistic": 76.08944087233057
+    },
+    "winner": "ordinal_logistic"
+  }
+}

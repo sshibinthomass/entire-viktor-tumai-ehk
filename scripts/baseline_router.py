@@ -8,7 +8,12 @@ Usage: python scripts/baseline_router.py export/   -> writes results/routes.json
 """
 import json, sys
 from pathlib import Path
-from load_trajectories import iter_requests, group_trajectories, est_tokens
+from load_trajectories import (
+    est_tokens,
+    group_trajectories,
+    is_generated_synthetic,
+    iter_requests,
+)
 from cost_model import trajectory_cost, logged_route, load_pricing
 
 # Cheaper sibling per family. Anonymized ids: within claude, sonnet is assumed the
@@ -34,7 +39,9 @@ def route_trajectory(calls):
 def main():
     export = sys.argv[1] if len(sys.argv) > 1 else "export"
     pricing = load_pricing()
-    groups = group_trajectories(r for _, _, r in iter_requests(export))
+    requests = [r for _, _, r in iter_requests(export)]
+    generated = sum(is_generated_synthetic(r) for r in requests)
+    groups = group_trajectories(r for r in requests if not is_generated_synthetic(r))
     Path("results").mkdir(exist_ok=True)
     out = open("results/routes.jsonl", "w")
     tot_logged = tot_routed = 0.0
@@ -48,6 +55,8 @@ def main():
                               "cost_routed_usd": round(c_routed, 6),
                               "switches": sum(1 for i in range(1, len(routed)) if routed[i] != routed[i-1])}) + "\n")
     out.close()
+    if generated:
+        print(f"excluded generated synthetic requests: {generated}")
     print(f"logged cost (est. input tokens, assumed prices):  ${tot_logged:,.4f}")
     print(f"routed cost:  ${tot_routed:,.4f}  ({(tot_routed/tot_logged-1):+.1%}, cache-aware)")
     print("NOTE: no outputs/usage in the export — token counts are estimates, output cost excluded,")

@@ -1,0 +1,275 @@
+{
+  "learned_second_opinion_loaded": true,
+  "policy_version": "hybrid-v3-optimized-guarded-2026-08-22",
+  "twin": {
+    "escalation_reasons": {
+      "complex_software_debugging_or_testing": 14,
+      "compound_high_risk_or_destructive_work": 58,
+      "long_dependent_cross_scope_work": 2,
+      "ood:formal_security_or_specialist_domain": 31,
+      "ood:outside_calibrated_request_shape": 13,
+      "ood:spatial_or_layout_sensitive_work": 57,
+      "within_economical_threshold_margin": 26
+    },
+    "metrics": {
+      "by_benchmark": {
+        "bfcl": {
+          "confusion": {
+            "balanced": {
+              "balanced": 0,
+              "economical": 7,
+              "strongest": 2
+            },
+            "economical": {
+              "balanced": 69,
+              "economical": 165,
+              "strongest": 5
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 66.532258,
+          "exact_rows": 165,
+          "over_routed_rows": 76,
+          "over_routing_rate_percent": 30.645161,
+          "passed_trajectories": 124,
+          "row_weighted_trajectory_pass_rate_percent": 93.548387,
+          "rows": 248,
+          "safe_rows": 241,
+          "safe_step_rate_percent": 97.177419,
+          "trajectories": 130,
+          "trajectory_pass_rate_percent": 95.384615,
+          "under_routed_rows": 7,
+          "under_routing_rate_percent": 2.822581
+        },
+        "mtrag": {
+          "confusion": {
+            "balanced": {
+              "balanced": 6,
+              "economical": 1,
+              "strongest": 2
+            },
+            "economical": {
+              "balanced": 73,
+              "economical": 69,
+              "strongest": 41
+            },
+            "strongest": {
+              "balanced": 1,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 38.860104,
+          "exact_rows": 75,
+          "over_routed_rows": 116,
+          "over_routing_rate_percent": 60.103627,
+          "passed_trajectories": 191,
+          "row_weighted_trajectory_pass_rate_percent": 98.963731,
+          "rows": 193,
+          "safe_rows": 191,
+          "safe_step_rate_percent": 98.963731,
+          "trajectories": 193,
+          "trajectory_pass_rate_percent": 98.963731,
+          "under_routed_rows": 2,
+          "under_routing_rate_percent": 1.036269
+        },
+        "pinchbench": {
+          "confusion": {
+            "balanced": {
+              "balanced": 1,
+              "economical": 5,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 9,
+              "economical": 23,
+              "strongest": 9
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 1,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 50.0,
+          "exact_rows": 24,
+          "over_routed_rows": 18,
+          "over_routing_rate_percent": 37.5,
+          "passed_trajectories": 8,
+          "row_weighted_trajectory_pass_rate_percent": 60.416667,
+          "rows": 48,
+          "safe_rows": 42,
+          "safe_step_rate_percent": 87.5,
+          "trajectories": 12,
+          "trajectory_pass_rate_percent": 66.666667,
+          "under_routed_rows": 6,
+          "under_routing_rate_percent": 12.5
+        },
+        "qmsum": {
+          "confusion": {
+            "balanced": {
+              "balanced": 7,
+              "economical": 6,
+              "strongest": 0
+            },
+            "economical": {
+              "balanced": 50,
+              "economical": 64,
+              "strongest": 18
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 0
+            }
+          },
+          "exact_rate_percent": 48.965517,
+          "exact_rows": 71,
+          "over_routed_rows": 68,
+          "over_routing_rate_percent": 46.896552,
+          "passed_trajectories": 139,
+          "row_weighted_trajectory_pass_rate_percent": 95.862069,
+          "rows": 145,
+          "safe_rows": 139,
+          "safe_step_rate_percent": 95.862069,
+          "trajectories": 145,
+          "trajectory_pass_rate_percent": 95.862069,
+          "under_routed_rows": 6,
+          "under_routing_rate_percent": 4.137931
+        },
+        "swebench": {
+          "confusion": {
+            "balanced": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 74
+            },
+            "economical": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 94
+            },
+            "strongest": {
+              "balanced": 0,
+              "economical": 0,
+              "strongest": 168
+            }
+          },
+          "exact_rate_percent": 50.0,
+          "exact_rows": 168,
+          "over_routed_rows": 168,
+          "over_routing_rate_percent": 50.0,
+          "passed_trajectories": 40,
+          "row_weighted_trajectory_pass_rate_percent": 100.0,
+          "rows": 336,
+          "safe_rows": 336,
+          "safe_step_rate_percent": 100.0,
+          "trajectories": 40,
+          "trajectory_pass_rate_percent": 100.0,
+          "under_routed_rows": 0,
+          "under_routing_rate_percent": 0.0
+        }
+      },
+      "confusion": {
+        "balanced": {
+          "balanced": 14,
+          "economical": 19,
+          "strongest": 78
+        },
+        "economical": {
+          "balanced": 201,
+          "economical": 321,
+          "strongest": 167
+        },
+        "strongest": {
+          "balanced": 1,
+          "economical": 1,
+          "strongest": 168
+        }
+      },
+      "exact_rate_percent": 51.85567,
+      "exact_rows": 503,
+      "failure_aware_savings_proxy_percent": 49.169072,
+      "over_routed_rows": 446,
+      "over_routing_rate_percent": 45.979381,
+      "passed_trajectories": 502,
+      "row_weighted_trajectory_pass_rate_percent": 95.56701,
+      "rows": 970,
+      "safe_rows": 949,
+      "safe_step_rate_percent": 97.835052,
+      "trajectories": 520,
+      "trajectory_pass_rate_percent": 96.538462,
+      "under_routed_rows": 21,
+      "under_routing_rate_percent": 2.164948
+    },
+    "warning": "full-data deployment fit on its source benchmark; diagnostic only"
+  },
+  "viktor": {
+    "escalation_reasons": {
+      "complex_software_debugging_or_testing": 90,
+      "compound_high_risk_or_destructive_work": 157,
+      "long_dependent_cross_scope_work": 8,
+      "ood:formal_security_or_specialist_domain": 17,
+      "ood:outside_calibrated_request_shape": 45,
+      "ood:spatial_or_layout_sensitive_work": 26,
+      "within_economical_threshold_margin": 61,
+      "within_strongest_threshold_margin": 24
+    },
+    "ood_reasons": {
+      "cross_domain_reasoning": 1,
+      "formal_security_or_specialist_domain": 123,
+      "outside_calibrated_request_shape": 98,
+      "spatial_or_layout_sensitive_work": 92
+    },
+    "quality_warning": "Viktor has no counterfactual quality labels; these are routing-distribution diagnostics only",
+    "scope": {
+      "clean_trajectories": 1000,
+      "mixed_model_groups_excluded": 0,
+      "real_requests": 1000,
+      "routing_unit": "first request; one sticky choice for the full trajectory"
+    },
+    "score": {
+      "max": 100,
+      "mean": 40.395,
+      "median": 40.0,
+      "min": 0
+    },
+    "tier_counts": {
+      "frozen_v2": {
+        "balanced": 623,
+        "economical": 331,
+        "strongest": 46
+      },
+      "hybrid_v3": {
+        "balanced": 482,
+        "economical": 268,
+        "strongest": 250
+      },
+      "learned_second_opinion": {
+        "balanced": 12,
+        "economical": 988
+      }
+    },
+    "v2_rows_v3_columns": {
+      "balanced": {
+        "balanced": 408,
+        "economical": 11,
+        "strongest": 204
+      },
+      "economical": {
+        "balanced": 74,
+        "economical": 257,
+        "strongest": 0
+      },
+      "strongest": {
+        "balanced": 0,
+        "economical": 0,
+        "strongest": 46
+      }
+    }
+  }
+}

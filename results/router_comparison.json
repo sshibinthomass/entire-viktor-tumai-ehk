@@ -1,0 +1,107 @@
+{
+  "assumptions": {
+    "baseline_information_warning": "starter baseline uses total future trajectory input size, which is unavailable at initial routing time",
+    "claude_tier_warning": "fable/sonnet/opus order is also treated as an assumption.",
+    "cost_basis": "assumed input prices, item-prefix cache-aware, output cost excluded",
+    "gpt_tier_warning": "sol/terra/luna order is a test-only assumption; default prices are identical.",
+    "model_ladders": {
+      "claude": {
+        "balanced": "claude-sonnet-5",
+        "economical": "claude-fable-5",
+        "strongest": "claude-opus-5"
+      },
+      "gpt": {
+        "balanced": "gpt-5.6-terra",
+        "economical": "gpt-5.6-sol",
+        "strongest": "gpt-5.6-luna"
+      }
+    },
+    "quality": "not estimated in this comparison; route agreement is not quality",
+    "routing_unit": "one sticky model per clean trajectory",
+    "task_text": "live text after final </system>, otherwise final Thread info block, otherwise full user text",
+    "token_basis": "serialized characters / 4; estimated, not measured"
+  },
+  "by_family": {
+    "claude": {
+      "baseline_cost": 96.059096,
+      "baseline_vs_logged": -0.262666,
+      "deterministic_cost": 48.942171,
+      "deterministic_vs_logged": -0.624328,
+      "logged_cost": 130.278999,
+      "trajectories": 755
+    },
+    "gpt": {
+      "baseline_cost": 16.042872,
+      "baseline_vs_logged": 0.0,
+      "deterministic_cost": 16.042872,
+      "deterministic_vs_logged": 0.0,
+      "logged_cost": 16.042872,
+      "trajectories": 245
+    }
+  },
+  "cost_usd": {
+    "baseline": 112.101968,
+    "baseline_vs_logged": -0.233867,
+    "deterministic": 64.985043,
+    "deterministic_vs_baseline": -0.420304,
+    "deterministic_vs_logged": -0.555876,
+    "logged": 146.321871
+  },
+  "route_records": "results\\router_comparison_routes.jsonl",
+  "routing": {
+    "baseline_changed": 352,
+    "both_changed": 245,
+    "deterministic_changed": 680,
+    "deterministic_model_counts": {
+      "claude-fable-5": 256,
+      "claude-opus-5": 34,
+      "claude-sonnet-5": 465,
+      "gpt-5.6-luna": 12,
+      "gpt-5.6-sol": 75,
+      "gpt-5.6-terra": 158
+    },
+    "logged_model_counts": {
+      "claude-fable-5": 71,
+      "claude-opus-4-6": 2,
+      "claude-opus-4-8": 69,
+      "claude-opus-5": 331,
+      "claude-sonnet-4-6": 1,
+      "claude-sonnet-5": 281,
+      "gpt-5.6-luna": 20,
+      "gpt-5.6-sol": 112,
+      "gpt-5.6-terra": 113
+    },
+    "only_baseline_changed": 107,
+    "only_deterministic_changed": 435,
+    "same_full_route": 326,
+    "same_full_route_fraction": 0.326,
+    "target_tier_counts": {
+      "balanced": 623,
+      "economical": 331,
+      "strongest": 46
+    }
+  },
+  "scope": {
+    "clean_trajectories": 1000,
+    "excluded_mixed_model_groups": 0,
+    "generated_synthetic_requests_excluded": 153,
+    "multi_call_trajectories": 0,
+    "requests": 1000,
+    "single_call_trajectories": 1000
+  },
+  "scores": {
+    "max": 100,
+    "mean": 39.72,
+    "mean_components": {
+      "context": 7.965,
+      "execution": 9.38,
+      "reasoning": 8.1,
+      "scope": 11.29,
+      "special_requirements": 2.17
+    },
+    "median": 40.0,
+    "min": 5,
+    "p25": 25,
+    "p75": 50
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "config": {
+    "analytic_intent_weight": 15,
+    "chained_action_weight": 10,
+    "compare_intent_weight": 15,
+    "context_unit": 5,
+    "debug_intent_weight": 30,
+    "deep_intent_weight": 25,
+    "economical_threshold": 40,
+    "history_weight": 5,
+    "light_intent_weight": 5,
+    "reasoning_modifier_weight": 0,
+    "scope_unit": 5,
+    "simple_action_weight": 0,
+    "software_engineering_interaction": 5,
+    "special_requirement_unit": 5,
+    "specialist_interaction": 0,
+    "strongest_threshold": 75,
+    "testing_weight": 5
+  },
+  "evaluation_artifact": "evaluation_summary.json",
+  "policy_type": "optimized_deterministic_v3",
+  "policy_version": "complexity-v3-twin-nested-2026-08-22",
+  "score_components": [
+    "context",
+    "intent",
+    "reasoning modifier",
+    "action and testing",
+    "scope",
+    "special requirements",
+    "software-engineering interaction",
+    "specialist interaction"
+  ],
+  "training_provenance": {
+    "question_bank_sha256": "7e2870b5e2e5c801f6444c05a4311c9c9010e965016f6938f0bb5abc226252d0",
+    "rows": 970,
+    "trajectories": 520
+  }
+}

@@ -1,0 +1,3 @@
+model,exact_rate_percent,safe_step_rate_percent,under_routing_rate_percent,over_routing_rate_percent,row_weighted_trajectory_pass_rate_percent,mean_official_combined_score_percent
+ordinal_logistic,77.216495,94.639175,5.360825,17.42268,87.010309,76.08944087233057
+ordinal_boosted_trees,78.762887,94.43299,5.56701,15.670103,84.948454,74.49038939629455
