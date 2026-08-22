@@ -60,7 +60,15 @@ class TriggerSpace:
     it to +0.554, at equal weight +0.368) because the skill set is close to a
     tenant id. The tool list never helped either. So neither is here."""
 
-    def __init__(self, n_dims=80, seed=0):
+    # n_dims=40 is tuned, and it is the ONE hyperparameter change that survived a
+    # nested check (scripts/tune.py). Cross-fitted rho against observed effort:
+    #     dims  20     30     40     60     80    120
+    #     rho  .540   .556   .561   .510   .514   .499
+    # A genuine peak, and dims=40 beat dims=80 on 5 of 5 random seeds by a mean of
+    # +0.072. Everything else the grid search "found" was selection bias - tuning
+    # K and the TF-IDF settings showed +0.081 apparent gain and -0.011 nested, with
+    # the inner folds picking k=32/16/20 on the three splits. See tune.py.
+    def __init__(self, n_dims=40, seed=0):
         self.n_dims, self.seed = n_dims, seed
 
     def fit(self, rows):
