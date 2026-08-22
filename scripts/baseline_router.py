@@ -6,8 +6,12 @@ everything else stays on the logged model. Deliberately simple — an honest flo
 
 Usage: python scripts/baseline_router.py export/   -> writes results/routes.jsonl
 """
-import json, sys
+import json
+import sys
+from collections.abc import Sequence
 from pathlib import Path
+
+from abstract_router import AbstractRouter, Request
 from load_trajectories import iter_requests, group_trajectories, est_tokens
 from cost_model import trajectory_cost, logged_route, load_pricing
 
@@ -17,41 +21,90 @@ from cost_model import trajectory_cost, logged_route, load_pricing
 # gets long-context work) before trusting it.
 CHEAP = {"claude": "claude-fable-5", "gpt": "gpt-5.6-sol"}
 
-def cheap_for(model):
+def cheap_for(model: str) -> str:
     return CHEAP["claude"] if model.startswith("claude") else CHEAP["gpt"]
 
 SMALL_TRAJECTORY = 15_000  # est. input tokens; ~40% of real trajectories fall under this
 
-def route_trajectory(calls):
-    """Baseline route: send WHOLE small trajectories to the cheap sibling, keep the rest
-    on the logged model. Whole-trajectory routing respects the one-model-per-trajectory
-    premise and never pays the cache-reset penalty for a mid-task switch."""
-    total = sum(est_tokens(c["input"]) for c in calls)
-    if total < SMALL_TRAJECTORY:
-        return [cheap_for(c["model"]) for c in calls]
-    return [c["model"] for c in calls]
+class BaselineRouter(AbstractRouter):
+    """Route small trajectories to a cheaper sibling model."""
 
-def main():
+    def route_trajectory(self, calls: Sequence[Request]) -> list[str]:
+        """Send whole small trajectories to the cheap sibling.
+
+        Whole-trajectory routing respects the one-model-per-trajectory premise
+        and never pays the cache-reset penalty for a mid-task switch.
+        """
+        total = sum(est_tokens(call["input"]) for call in calls)
+        if total < SMALL_TRAJECTORY:
+            return [cheap_for(call["model"]) for call in calls]
+        return [call["model"] for call in calls]
+
+    def run(self, export: str | Path = "export") -> None:
+        """Route all trajectories in ``export`` and write the cost report."""
+        pricing = load_pricing()
+        groups = group_trajectories(
+            request for _, _, request in iter_requests(export)
+        )
+        output_path = Path("results/routes.jsonl")
+        output_path.parent.mkdir(exist_ok=True)
+        total_logged = total_routed = 0.0
+
+        with output_path.open("w") as output:
+            for key, calls in groups.items():
+                logged = logged_route(calls)
+                routed = self.route_trajectory(calls)
+                cost_logged, _ = trajectory_cost(calls, logged, pricing)
+                cost_routed, _ = trajectory_cost(calls, routed, pricing)
+                total_logged += cost_logged
+                total_routed += cost_routed
+                output.write(
+                    json.dumps(
+                        {
+                            "trajectory": key,
+                            "n_calls": len(calls),
+                            "logged_model": logged[0],
+                            "route": routed,
+                            "cost_logged_usd": round(cost_logged, 6),
+                            "cost_routed_usd": round(cost_routed, 6),
+                            "switches": sum(
+                                1
+                                for index in range(1, len(routed))
+                                if routed[index] != routed[index - 1]
+                            ),
+                        }
+                    )
+                    + "\n"
+                )
+
+        print(
+            "logged cost (est. input tokens, assumed prices):  "
+            f"${total_logged:,.4f}"
+        )
+        print(
+            f"routed cost:  ${total_routed:,.4f}  "
+            f"({(total_routed / total_logged - 1):+.1%}, cache-aware)"
+        )
+        print(
+            "NOTE: no outputs/usage in the export — token counts are estimates, "
+            "output cost excluded,"
+        )
+        print(
+            "and this baseline has NO outcome estimate. Constructing one is the "
+            "challenge."
+        )
+        print(f"wrote {output_path}")
+
+
+def route_trajectory(calls: Sequence[Request]) -> list[str]:
+    """Compatibility wrapper for callers of the original module function."""
+    return BaselineRouter().route_trajectory(calls)
+
+
+def main() -> None:
     export = sys.argv[1] if len(sys.argv) > 1 else "export"
-    pricing = load_pricing()
-    groups = group_trajectories(r for _, _, r in iter_requests(export))
-    Path("results").mkdir(exist_ok=True)
-    out = open("results/routes.jsonl", "w")
-    tot_logged = tot_routed = 0.0
-    for key, calls in groups.items():
-        logged = logged_route(calls); routed = route_trajectory(calls)
-        c_logged, _ = trajectory_cost(calls, logged, pricing)
-        c_routed, _ = trajectory_cost(calls, routed, pricing)
-        tot_logged += c_logged; tot_routed += c_routed
-        out.write(json.dumps({"trajectory": key, "n_calls": len(calls), "logged_model": logged[0],
-                              "route": routed, "cost_logged_usd": round(c_logged, 6),
-                              "cost_routed_usd": round(c_routed, 6),
-                              "switches": sum(1 for i in range(1, len(routed)) if routed[i] != routed[i-1])}) + "\n")
-    out.close()
-    print(f"logged cost (est. input tokens, assumed prices):  ${tot_logged:,.4f}")
-    print(f"routed cost:  ${tot_routed:,.4f}  ({(tot_routed/tot_logged-1):+.1%}, cache-aware)")
-    print("NOTE: no outputs/usage in the export — token counts are estimates, output cost excluded,")
-    print("and this baseline has NO outcome estimate. Constructing one is the challenge.")
-    print("wrote results/routes.jsonl")
+    BaselineRouter().run(export)
 
-if __name__ == "__main__": main()
+
+if __name__ == "__main__":
+    main()
