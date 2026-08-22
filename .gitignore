@@ -4,3 +4,4 @@ env/
 export/
 *.tar.gz
 *.zip
+export_linked
