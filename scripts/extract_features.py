@@ -25,7 +25,7 @@ LEAKAGE
   items. Those features are dropped unless --allow-leaky is passed.
 
 Usage:
-    python scripts/difficulty_features.py export_linked/ -o results/features.jsonl
+    python scripts/extract_features.py export_linked/ -o results/features.jsonl
 """
 import argparse
 import hashlib

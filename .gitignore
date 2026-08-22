@@ -8,7 +8,7 @@ export_linked
 # Derived from the export, so covered by the same no-redistribution rule:
 # features.jsonl carries _trigger_text / _skills_text (real trace text) and the
 # fitted artifact carries a TF-IDF vocabulary built from it. Regenerate with
-# scripts/difficulty_features.py + scripts/fit_router.py.
+# scripts/extract_features.py + scripts/fit_router.py.
 results/features.jsonl
 results/features.csv
 *.pkl

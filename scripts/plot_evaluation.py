@@ -2,10 +2,10 @@
 """Plot what evaluate.py reports. Six panels.
 
     A  cost vs heavy-work capture - the Pareto view, four policies
-    B  per-band cost delta - where the router wins and where it loses
+    B  per-rank cost delta - where the router wins and where it loses
     C  break-even - how much extra output kills the saving
     D  where the money is - input composition vs output, plus cache headroom
-    E  band calibration - does a higher band mean more work?
+    E  rank calibration - does a higher archetype rank mean more work?
     F  bootstrap - the interval, not the point estimate
 
 Recomputed with the same functions evaluate.py uses, so the chart cannot drift
@@ -22,7 +22,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from evaluate import BASELINE_SMALL, capture_of, cost_of
+from evaluate import (BASELINE_SMALL, capture, cost_of, heavy_at_cheapest,
+                      top_used)
 from fit_router import K, crossfit_ranks, effort_ranks, load_rows
 from router import load_pricing, price_of, route_one, tier_of
 
@@ -50,6 +51,7 @@ def main():
 
     rank = crossfit_ranks(rows, groups, effort_ranks(tout), K)
     routed = [route_one(r, int(k), pricing)[0] for r, k in zip(rows, rank)]
+    used_top = top_used(routed)   # top tier actually selected, not the top defined
     baseline = [(("claude-sonnet-5" if m.startswith("claude") else "gpt-5.6-luna")
                  if t < BASELINE_SMALL else m) for m, t in zip(logged, tin)]
     allcheap = ["gpt-5.6-luna"] * n
@@ -66,7 +68,7 @@ def main():
            ("all -> luna", allcheap, RED, (12, 4)),
            ("router.py", routed, GREEN, (-4, 14))]
     for name, ms, colr, off in pts:
-        x, y = cost_of(ms, tin, tout, pricing), capture_of(ms, tout)[1]
+        x, y = cost_of(ms, tin, tout, pricing), capture(ms, tout, used_top)
         axA.scatter([x], [y], s=200, color=colr, zorder=5,
                     edgecolor="white", linewidth=1.6)
         axA.annotate("{}\n${:.0f}  {:.0%}".format(name, x, y), (x, y),
@@ -80,7 +82,7 @@ def main():
                   fontweight="bold", loc="left", pad=8)
     axA.grid(alpha=0.25)
 
-    # ---------------- B: per-band delta ----------------
+    # ---------------- B: per-rank delta ----------------
     axB = fig.add_subplot(gs[0, 1])
     bands, deltas, counts = [], [], []
     for b in range(K):
@@ -164,7 +166,7 @@ def main():
                   fontsize=11, fontweight="bold", loc="left", pad=8)
     axD.grid(axis="y", alpha=0.25)
 
-    # ---------------- E: band calibration ----------------
+    # ---------------- E: rank calibration ----------------
     axE = fig.add_subplot(gs[1, 1])
     bs, meds, ns = [], [], []
     for b in range(K):
@@ -221,7 +223,7 @@ def main():
     print("wrote {}".format(a.out))
     print("cost {:+.1%} [{:+.1f}%, {:+.1f}%]   capture {:.1%}"
           .format(cost_of(routed, tin, tout, pricing) / c_log - 1, lo, hi,
-                  capture_of(routed, tout)[1]))
+                  capture(routed, tout, used_top)))
 
 
 if __name__ == "__main__":
