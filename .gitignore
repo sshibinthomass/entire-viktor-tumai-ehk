@@ -4,3 +4,5 @@ env/
 export/
 *.tar.gz
 *.zip
+**/__pycache__/**
+benchmarks/livebench-coding/

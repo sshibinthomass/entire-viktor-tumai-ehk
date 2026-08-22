@@ -19,7 +19,7 @@ from cost_model import trajectory_cost, logged_route, load_pricing
 # mid tier and fable the small tier; the gpt-5.6 variants (sol/terra/luna) have no
 # published tier order. ASSUMPTION — check the reconstructed traces (e.g. which model
 # gets long-context work) before trusting it.
-CHEAP = {"claude": "claude-fable-5", "gpt": "gpt-5.6-sol"}
+CHEAP = {"claude": "claude-sonnet-4-6", "gpt": "gpt-5.6-luna"}
 
 def cheap_for(model: str) -> str:
     return CHEAP["claude"] if model.startswith("claude") else CHEAP["gpt"]
@@ -35,10 +35,17 @@ class BaselineRouter(AbstractRouter):
         Whole-trajectory routing respects the one-model-per-trajectory premise
         and never pays the cache-reset penalty for a mid-task switch.
         """
+
+
         total = sum(est_tokens(call["input"]) for call in calls)
         if total < SMALL_TRAJECTORY:
-            return [cheap_for(call["model"]) for call in calls]
-        return [call["model"] for call in calls]
+            routed = [cheap_for(call["model"]) for call in calls]
+        else:
+            routed = [call["model"] for call in calls]
+
+        # selected_models = ", ".join(dict.fromkeys(routed)) or "none"
+        # print(f"route_trajectory selected model(s): {selected_models}")
+        return routed
 
     def run(self, export: str | Path = "export") -> None:
         """Route all trajectories in ``export`` and write the cost report."""

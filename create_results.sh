@@ -1,0 +1,1 @@
+python scripts/plot_frontier.py results/routes.jsonl
