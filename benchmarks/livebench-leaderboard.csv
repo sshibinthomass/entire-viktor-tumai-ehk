@@ -1,0 +1,45 @@
+Model,Organization,Global Average,Reasoning Average
+Claude Fable 5 Max Effort,Anthropic,82.97,89.65
+GPT-5.6 Sol Max Effort,OpenAI,81.05,91.65
+GPT-5.5 Thinking xHigh Effort,OpenAI,80.19,89.65
+Claude 5 Opus Thinking Max Effort,Anthropic,80.08,91.21
+Smaug-Agentic,Abacus.AI,79.51,90.27
+Kimi K3,Moonshot AI,79.19,90.67
+Gemini 3.7 Flash High,Google,78.83,87.80
+Qwen 3.8 Max,Alibaba,78.46,88.21
+Grok 4.6,xAI,78.04,90.51
+GPT-5.4 Thinking xHigh Effort,OpenAI,77.97,88.12
+Muse Spark 1.2 xHigh Effort,Meta,77.95,90.00
+GPT-5.6 Terra Max Effort,OpenAI,77.94,90.63
+DeepSeek V4 Pro 0813,DeepSeek,77.44,85.84
+Gemini 3.1 Pro Preview High,Google,76.95,84.00
+DeepSeek V4 Flash Vision Exp,DeepSeek,76.76,85.40
+Claude 4.7 Opus Thinking xHigh Effort,Anthropic,76.53,87.19
+Claude 4.8 Opus Thinking Max Effort,Anthropic,76.22,89.19
+Claude Sonnet 5 xHigh Effort,Anthropic,76.04,88.69
+Grok 4.5,xAI,75.77,87.17
+Muse Spark 1.1 xHigh Effort,Meta,75.30,87.73
+Qwen3.8 27B,Alibaba,75.27,80.03
+Gemini 3.5 Flash High,Google,74.64,82.00
+GPT-5.2 High,OpenAI,74.63,83.21
+Claude 4.6 Opus Thinking High Effort,Anthropic,74.52,88.67
+DeepSeek V4 Flash 0731,DeepSeek,74.17,86.63
+GPT-5.2 Codex,OpenAI,73.98,77.71
+Gemini 3.6 Flash High,Google,73.59,85.15
+GPT-5.6 Luna Max Effort,OpenAI,73.56,85.64
+GLM-5.2,Z.AI,73.16,78.63
+Qwen 3.7 Max,Alibaba,73.14,83.34
+Claude 4.6 Sonnet Thinking Medium Effort,Anthropic,72.99,84.77
+Claude 4.5 Opus Thinking High Effort,Anthropic,72.58,80.09
+Inkling xHigh Effort,Thinking Machines,71.92,78.35
+Kimi K2.6 Thinking,Moonshot AI,70.54,79.38
+GPT-5.4 Nano xHigh,OpenAI,69.58,81.10
+ox-alpha-max,Stealth,69.24,76.59
+Qwen 3.6 Plus,Alibaba,68.91,75.83
+Kimi K2.7 Code,Moonshot AI,68.41,82.81
+Grok Build 0.1,xAI,67.78,76.37
+Minimax M3,Minimax,67.26,74.48
+GPT-5.4 Mini xHigh,OpenAI,66.37,71.32
+Qwen 3.6 27B,Alibaba,64.03,70.28
+Gemini 3.5 Flash-Lite High,Google,63.94,60.19
+Grok 4.3,xAI,62.25,70.82

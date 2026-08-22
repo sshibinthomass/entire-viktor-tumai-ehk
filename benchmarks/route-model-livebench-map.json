@@ -1,0 +1,11 @@
+{
+  "claude-fable-5": "Claude Fable 5 Max Effort",
+  "claude-opus-4-6": "Claude 4.6 Opus Thinking High Effort",
+  "claude-opus-4-8": "Claude 4.8 Opus Thinking Max Effort",
+  "claude-opus-5": "Claude 5 Opus Thinking Max Effort",
+  "claude-sonnet-4-6": "Claude 4.6 Sonnet Thinking Medium Effort",
+  "claude-sonnet-5": "Claude Sonnet 5 xHigh Effort",
+  "gpt-5.6-luna": "GPT-5.6 Luna Max Effort",
+  "gpt-5.6-sol": "GPT-5.6 Sol Max Effort",
+  "gpt-5.6-terra": "GPT-5.6 Terra Max Effort"
+}
