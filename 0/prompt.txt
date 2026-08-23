@@ -1,0 +1,1 @@
+create a .csv with tool_name, rating, reason for the rating in D:\Github-Projects\entire-viktor-tumai-ehk\.claude\worktrees\trajectories-router-data-2eb29b\outputs
