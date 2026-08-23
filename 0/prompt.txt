@@ -1,0 +1,1 @@
+Can you also read through the tool description and add that score as well to tell how difficult tasks the tools solve
