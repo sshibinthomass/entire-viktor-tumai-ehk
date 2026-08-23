@@ -201,6 +201,14 @@ Data loads dynamically from `dashboard/data.js` — rerun `python run_pipeline.p
   +1.33 retry streak on matched hard tasks (difference-in-differences).
   Directionally supportive, **not significant at n=953** — the "served"
   assumption stays an assumption, stated as such.
+- **Policy comparison on the frontier** (dashboard + deck): our frontier is
+  drawn against the two references the challenge illustrates — expected
+  **random routing** (dashed, pure expectation, no RNG) and the **logged
+  dispatch** (what actually ran, repriced via the inferred tiers), plus the
+  always-top-tier dot. Result: the logged dispatch sits at 89.9 % served /
+  69.2 % cost; at that same budget our τ-frontier serves **93.4 %**
+  (token-weighted 80.4 % vs 75.4 %) — strict domination on both quality
+  definitions.
 - **The 5-minute defense deck** (`dashboard/present.html`): follows the
   make-presentation template (brand, fixed slide order, keys/fullscreen) but
   every number and chart is **computed live** from `data.js`/`findings.js` —

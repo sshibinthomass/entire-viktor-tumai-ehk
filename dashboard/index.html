@@ -198,8 +198,11 @@ its own outcome.</div>
       <div id="confChart"></div></div>
     <div class="card wide"><h2>Cost&ndash;quality frontier</h2>
       <div class="desc" id="frontDesc"></div>
-      <div class="legend"><span class="k"><span class="sw" style="background:var(--s1)"></span>Served (per task)</span>
-        <span class="k"><span class="sw" style="background:var(--s2)"></span>Served (token-weighted)</span></div>
+      <div class="legend"><span class="k"><span class="sw" style="background:var(--s1)"></span>Our router (per task)</span>
+        <span class="k"><span class="sw" style="background:var(--s2)"></span>Our router (token-weighted)</span>
+        <span class="k"><span class="sw" style="background:repeating-linear-gradient(90deg,var(--ink-3) 0 4px,transparent 4px 7px)"></span>Random routing (expected)</span>
+        <span class="k"><span class="sw" style="background:var(--s3);border-radius:50%"></span>Logged dispatch</span>
+        <span class="k"><span class="sw" style="background:var(--tier3);border-radius:50%"></span>Always top tier</span></div>
       <div id="frontChart"></div></div>
     <div class="card"><h2>Router score vs observed difficulty</h2>
       <div class="legend"><span class="k"><span class="sw" style="background:var(--s1)"></span>Matched</span>
@@ -456,6 +459,36 @@ function computeAll() {
         exact: exact/N, adj: adj/N, under: under/N, over: over/N, rho, ...pol };
 }
 
+// reference policies for the comparison overlay ------------------------------
+const TIER_OF_MODEL = {};
+((window.VIKTOR_FINDINGS || {}).modelTiers?.models || []).forEach(m =>
+  TIER_OF_MODEL[m.model] = m.tier);
+
+function randomLine(diffs, Cm) {
+  // expected (cost, served) of random tier assignment, sweeping the mix from
+  // all-T1 through uniform to all-T3 — no RNG, pure expectation
+  const pts = [];
+  for (let m = 0; m <= 1.0001; m += 0.05) {
+    let p;
+    if (m <= 0.5) { const t = m * 2; p = [1 - t * 2 / 3, t / 3, t / 3]; }
+    else { const t = (m - 0.5) * 2; p = [(1 - t) / 3, (1 - t) / 3, 1 / 3 + t * 2 / 3]; }
+    let cost = 0, top = 0, served = 0;
+    for (let i = 0; i < N; i++) {
+      cost += p[0] * Cm[i][0] + p[1] * Cm[i][1] + p[2] * Cm[i][2];
+      top += Cm[i][2];
+      served += p[0] * (diffs[i] <= 1 ? 1 : 0) + p[1] * (diffs[i] <= 2 ? 1 : 0) + p[2];
+    }
+    pts.push([cost / top, served / N]);
+  }
+  return pts;
+}
+
+function loggedPolicy(diffs, Cm) {
+  if (!Object.keys(TIER_OF_MODEL).length) return null;
+  const tiers = R.map(r => TIER_OF_MODEL[r.model] || 3);
+  return evalPolicy(tiers, diffs, Cm);
+}
+
 // frontier: sweep the active method's own knob; each point = (costShare, served, wServed)
 function frontier() {
   const { diffs, Cm, hRank } = C;
@@ -676,12 +709,16 @@ function scatChart(el) {
 
 function frontChart(el) {
   const { pts, knob } = frontier();
+  const rnd = randomLine(C.diffs, C.Cm);
+  const lg = loggedPolicy(C.diffs, C.Cm);
   document.getElementById('frontDesc').innerHTML =
-    `Sweeping <b>${knob}</b> for the active method. Served = router tier &ge; observed difficulty; the
-     token-weighted line weights each task by its Tier-3 cost — a policy that games the count metric
-     by starving big tasks drops here. Cost relative to all-Tier-3. Dots on both lines mark the current setting.`;
+    `Sweeping <b>${knob}</b> for the active method, against the two references the challenge names:
+     expected <b>random routing</b> (dashed) and the <b>logged dispatch</b> (what actually ran, repriced
+     via the inferred tiers). Served = tier &ge; observed difficulty; cost relative to all-Tier-3.
+     Dots on our lines mark the current setting.`;
   const W = 1000, H = 270, L = 46, Rm = 16, T = 14, B = 34;
-  const ymin = Math.max(0, Math.min(0.5, ...pts.map(p => p[2]))) - 0.02;
+  const ymin = Math.max(0, Math.min(0.5, ...pts.map(p => p[2]),
+    ...rnd.map(p => p[1]), lg ? lg.served : 1)) - 0.02;
   const x = v => L + v * (W - L - Rm);
   const y = v => H - B - (Math.max(v, ymin) - ymin) / (1 - ymin) * (H - T - B);
   let grid = '';
@@ -705,8 +742,23 @@ function frontChart(el) {
   const cur = (col, v) => `<circle cx="${x(Math.min(C.costShare,1))}" cy="${y(v)}" r="6.5" fill="${col}"
       stroke="${css('--ink-1')}" stroke-width="2"
       data-tip="<b>Current setting</b><br>${fmtPct(v)} at ${fmtPct(C.costShare)} cost"/>`;
+  // references: expected random routing (dashed), logged dispatch, all-top-tier
+  let rndPath = '';
+  rnd.forEach((p, i) => { rndPath += (i ? 'L' : 'M') + x(p[0]).toFixed(1) + ' ' + y(p[1]).toFixed(1); });
+  const refs = `
+    <path d="${rndPath}" fill="none" stroke="${css('--ink-3')}" stroke-width="2"
+      stroke-dasharray="6 5" data-tip="<b>Random routing (expected)</b><br>tiers assigned by chance at each mix — the floor any real router must clear"/>
+    ${lg ? `<circle cx="${x(Math.min(lg.costShare,1))}" cy="${y(lg.served)}" r="7.5" fill="${css('--s3')}"
+      stroke="${css('--surface-1')}" stroke-width="2.5"
+      data-tip="<b>Logged dispatch</b> (what actually ran, repriced via inferred tiers)<br>${fmtPct(lg.served)} served at ${fmtPct(lg.costShare)} cost &middot; weighted ${fmtPct(lg.wServed)}<br><span class='t3'>tier map from infer_tiers.py; low-confidence ids included</span>"/>
+      <text class="val" x="${x(Math.min(lg.costShare,1))+11}" y="${y(lg.served)+4}">logged</text>` : ''}
+    <circle cx="${x(1)}" cy="${y(1)}" r="7.5" fill="${css('--tier3')}"
+      stroke="${css('--surface-1')}" stroke-width="2.5"
+      data-tip="<b>Always top tier</b><br>100% served at 100% cost — the deck's 'always the frontier model' dot"/>
+    <text class="val" x="${x(1)-11}" y="${y(1)+4}" text-anchor="end">always top tier</text>`;
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}">${grid}
     <line x1="${L}" y1="${H-B}" x2="${W-Rm}" y2="${H-B}" stroke="${css('--axis')}"/>
+    ${refs}
     ${line(css('--s2'), 2, 'token-weighted served')}
     ${line(css('--s1'), 1, 'served (per task)')}
     ${cur(css('--s1'), C.served)}${cur(css('--s2'), C.wServed)}
