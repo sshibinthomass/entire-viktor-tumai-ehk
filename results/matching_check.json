@@ -1,34 +1,41 @@
 {
   "table": {
     "easy_low_tier": {
-      "n": 178,
-      "err_rate": 0.0496,
-      "retry_streak": 3.9
+      "n": 81,
+      "err_rate": 0.0598,
+      "retry_streak": 3.35
     },
     "easy_high_tier": {
-      "n": 394,
-      "err_rate": 0.0521,
-      "retry_streak": 3.52
+      "n": 226,
+      "err_rate": 0.0511,
+      "retry_streak": 1.95
     },
     "hard_low_tier": {
-      "n": 120,
-      "err_rate": 0.0478,
-      "retry_streak": 7.89
+      "n": 82,
+      "err_rate": 0.1234,
+      "retry_streak": 6.7
     },
     "hard_high_tier": {
-      "n": 261,
-      "err_rate": 0.0442,
-      "retry_streak": 6.18
+      "n": 123,
+      "err_rate": 0.0473,
+      "retry_streak": 2.57
     }
   },
+  "design": "tier map fit on even-half trajectories (infer_tiers.py), validated on this odd half only; both interactions bootstrapped with 5000 resamples on unrounded arrays",
   "interaction": {
-    "extra_err_rate_of_low_tier_on_hard": 0.0061,
+    "extra_err_rate_of_low_tier_on_hard": 0.0674,
     "err_ci95": [
-      -0.0172,
-      0.0301
+      0.0247,
+      0.1083
     ],
-    "extra_retry_streak_of_low_tier_on_hard": 1.33,
-    "significant": false
+    "err_significant": true,
+    "extra_retry_streak_of_low_tier_on_hard": 2.727,
+    "streak_ci95": [
+      1.561,
+      3.99
+    ],
+    "streak_significant": true,
+    "n_boot": 5000
   },
-  "verdict": "INCONCLUSIVE at n=953 \u2014 the served penalty stays an assumption; state it as such"
+  "verdict": "SUPPORTED on both metrics: under-routing has a measurable cost"
 }

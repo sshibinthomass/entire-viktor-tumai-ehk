@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>[Team Name] — Viktor Challenge</title>
+<title>Team EHK — Viktor Challenge</title>
 <style>
   :root{--violet:#6748FD;--navy:#150079;--peach:#FFBD9E;--ink:#0d0d1a;--paper:#fbfaff;
         --grid:#e4e1f4;--muted:#6d67a3}
@@ -46,9 +46,9 @@
 <!-- 1 · TITLE -->
 <section class="slide dark active">
   <div class="kicker">Viktor Challenge · TUM.ai · Build the Router</div>
-  <h1>[Team Name]</h1>
+  <h1>Team EHK</h1>
   <p class="big" id="t-claim">…</p>
-  <p>[Members — fill in]. Every number on these slides is computed live from the same
+  <p>Shibin Thomas. Every number on these slides is computed live from the same
      pipeline outputs the demo dashboard uses.</p>
 </section>
 
@@ -80,7 +80,8 @@
          we benchmarked.</p>
       <p style="margin-top:1.2vh"><b>Null result worth naming:</b> the logged dispatch was
          <i>not</i> difficulty-aware (flat served-difficulty across models). That headroom
-         is what the router exploits.</p></div>
+         is what the router exploits.</p>
+      <div id="trace-snip" style="margin-top:1.2vh"></div></div>
   </div>
 </section>
 
@@ -104,14 +105,16 @@
     <div class="card"><h3>Method</h3>
       <p>Difficulty graded from the full trajectory by a frozen rule-based evaluator;
          router validated <b>out-of-fold</b> (GroupKFold by workspace, nested config
-         selection — measured selection bias ≈ 1pt). Matched cross-model check:
+         selection over the full grid — measured selection bias
+         <span id="h-bias">…</span>). Matched cross-model check:
          <span id="h-match">…</span></p></div>
     <div class="card"><h3>Cache trap</h3>
       <p id="h-cache">…</p></div>
     <div class="card"><h3>Weakest point</h3>
       <p>Difficulty = <i>observed effort</i> on chars/4 token estimates under assumed
-         prices. Two reasonable evaluator configs agree only ~93% with each other —
-         nothing above that ceiling is measurable. Quote the ratios, not the dollars.</p></div>
+         prices. Perturbed evaluator configs agree only <span id="h-agree">…</span> with
+         the frozen one — nothing above that ceiling is measurable. Quote the ratios,
+         not the dollars.</p></div>
   </div>
 </section>
 
@@ -125,21 +128,27 @@
 
 <div class="pageno"><span id="pg">1</span> / 6</div>
 <div class="foot">Viktor challenge · TUM.ai</div>
-<div class="hint">← → navigate · f fullscreen · numbers computed live from pipeline data</div>
+<div class="hint">← → navigate · f fullscreen · p pause the τ replay · numbers computed live from pipeline data</div>
 
 <script src="data.js"></script>
 <script src="findings.js"></script>
+<script src="previews.js" onerror="/* previews are local-only (gitignored): optional */"></script>
 <script>
 'use strict';
 const D = window.VIKTOR_DATA, F = window.VIKTOR_FINDINGS || {}, M = D.meta, R = D.rows, N = R.length;
 const DEF = M.defaults;
+{ const P = window.VIKTOR_PREVIEWS || {};
+  for (const r of R) { const p = P[String(r.id)]; if (p) { r.trigger = p[0]; r.preview = p[1]; } } }
 
 // ---------- minimal math (mirrors the dashboard; defaults only) ----------
-function ranksOf(vals){const n=vals.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>vals[a]-vals[b]);
-  const out=new Float64Array(n);let i=0;
-  while(i<n){let j=i;while(j+1<n&&vals[idx[j+1]]===vals[idx[i]])j++;
-    const avg=(i+j)/2;for(let k=i;k<=j;k++)out[idx[k]]=avg;i=j+1}
-  const mx=n-1||1;for(let k=0;k<n;k++)out[k]/=mx;return out}
+function ranksOf(vals){ // right-ECDF — same transform as rank_utils.py and the lab
+  const n=vals.length,sorted=Array.from(vals).sort((a,b)=>a-b);
+  const out=new Float64Array(n);
+  if(!n||sorted[0]===sorted[n-1]){out.fill(0.5);return out}
+  for(let k=0;k<n;k++){let lo=0,hi=n;
+    while(lo<hi){const m=(lo+hi)>>1;if(sorted[m]<=vals[k])lo=m+1;else hi=m}
+    out[k]=lo/n}
+  return out}
 function quantile(sorted,q){const x=q*(sorted.length-1),lo=Math.floor(x),hi=Math.ceil(x);
   return sorted[lo]+(sorted[hi]-sorted[lo])*(x-lo)}
 const evScores=(()=>{const w=DEF.evWeights;let tw=0;for(const k in w)tw+=w[k];
@@ -197,10 +206,37 @@ document.getElementById('c-weak').textContent=
        action verbs). Peach = marks easy (broad toolsets, mid-thread triggers).</p>`;
 })();
 
+// ---------- slide 3: one REAL trace showing the signal (license-safe: the
+// verbatim text loads from the gitignored previews.js at present time only) ----------
+(function(){
+  const el=document.getElementById('trace-snip');
+  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  // pick a hard, dense task the router got right (max entity-ish preview length among D3 hits)
+  let pick=-1;
+  for(let i=0;i<N;i++)
+    if(diffs[i]===3&&CUM[i][1]<0.5&&R[i].preview&&(pick<0||R[i].feat.usr_n_pii_refs>R[pick].feat.usr_n_pii_refs))pick=i;
+  if(pick>=0){
+    const r=R[pick];
+    el.innerHTML=`<h3 style="font-size:1.1vw">The signal on one real trace</h3>
+      <p style="font-size:1.05vw;color:var(--muted)"><code>${esc(r.trigger||'task')}</code>
+      “${esc(r.preview.slice(0,120))}…” — ${r.feat.usr_n_pii_refs} entities,
+      ${r.feat.usr_n_action_verbs} action verbs, ${r.feat.usr_n_questions} questions
+      → routed <b>Tier 3</b>; trajectory later showed ${r.ev.n_tool_calls} tool calls.</p>`;
+  } else {
+    el.innerHTML=`<p style="font-size:1.05vw;color:var(--muted)">(Run
+      <code>run_pipeline.py</code> locally to load a real trace snippet here — verbatim
+      dataset text is never committed.)</p>`;
+  }
+})();
+
 // ---------- slide 4: live frontier + animated knob replay ----------
-const front={pts:[],cur:0,timer:null,dir:-1,tau:0.995};
+const front={pts:[],cur:0,timer:null,dir:-1,opIdx:0};
 (function(){
   for(let t=0.30;t<=0.996;t+=0.01)front.pts.push({tau:t,...policy(tauTiers(t))});
+  // index of the quoted operating point (τ = pipeline default)
+  front.opIdx=front.pts.reduce((b,p,i)=>
+    Math.abs(p.tau-DEF.tau)<Math.abs(front.pts[b].tau-DEF.tau)?i:b,0);
+  front.cur=front.opIdx;
 })();
 // references: expected random routing, and the logged dispatch repriced by inferred tiers
 const RND=(()=>{const pts=[];
@@ -213,9 +249,21 @@ const RND=(()=>{const pts=[];
       served+=s;ws+=s*Cm[i][2];wt+=Cm[i][2]}
     pts.push([cost/top,served/N,ws/wt])}
   return pts})();
+// logged dispatch is graded WITHOUT the error/streak metrics (they also drove
+// the tier inference — using them here would mechanically depress logged served%)
 const LOGGED=(()=>{const map={};((F.modelTiers||{}).models||[]).forEach(m=>map[m.model]=m.tier);
   if(!Object.keys(map).length)return null;
-  return policy(R.map(r=>map[r.model]||3))})();
+  const w={...DEF.evWeights,n_tool_errors:0,max_repeat_streak:0};
+  let tw=0;for(const k in w)tw+=w[k];
+  const sc=R.map(r=>{let s=0;M.evNames.forEach((k,c)=>s+=(w[k]||0)*r.evRank[c]);return s/tw});
+  const so=[...sc].sort((a,b)=>a-b);
+  const c1=quantile(so,DEF.evCuts[0]),c2=quantile(so,DEF.evCuts[1]);
+  const dd=R.map((r,i)=>r.ev.n_tool_calls>=DEF.overrides.tool_calls_t3?3:(sc[i]<=c1?1:sc[i]<=c2?2:3));
+  const tiers=R.map(r=>map[r.model]||3);
+  let cost=0,top=0,served=0,ws=0,wt=0;
+  for(let i=0;i<N;i++){cost+=Cm[i][tiers[i]-1];top+=Cm[i][2];
+    const ok=tiers[i]>=dd[i];if(ok)served++;wt+=Cm[i][2];if(ok)ws+=Cm[i][2]}
+  return {cost:cost/top,served:served/N,ws:ws/wt}})();
 function drawFrontier(){
   const W=980,H=340,L=64,Rm=20,T=16,B=44;
   const ymin=0.15;
@@ -229,6 +277,10 @@ function drawFrontier(){
     return `<path d="${p}" fill="none" stroke="${col}" stroke-width="3.5" stroke-linejoin="round"/>`};
   const cur=front.pts[front.cur];
   const dot=(key,col)=>`<circle cx="${x(cur.cost)}" cy="${y(cur[key])}" r="10" fill="${col}" stroke="var(--paper)" stroke-width="3"/>`;
+  // the quoted operating point (τ = default) is PINNED on the chart, replay or not
+  const op=front.pts[front.opIdx];
+  const pin=`<circle cx="${x(op.cost)}" cy="${y(op.served)}" r="15" fill="none" stroke="var(--violet)" stroke-width="3" stroke-dasharray="5 4"/>
+    <text x="${x(op.cost)}" y="${y(op.served)-22}" text-anchor="middle" style="fill:var(--violet);font-weight:700">τ=${op.tau.toFixed(2)}: ${(op.served*100).toFixed(0)}% @ ${(op.cost*100).toFixed(0)}%</text>`;
   const rndPath=k=>RND.map((p,i)=>(i?'L':'M')+x(p[0]).toFixed(1)+' '+y(p[k]).toFixed(1)).join('');
   const refs=`
     <path d="${rndPath(1)}" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-dasharray="8 7" opacity=".8"/>
@@ -244,6 +296,7 @@ function drawFrontier(){
       <line x1="${L}" y1="${H-B}" x2="${W-Rm}" y2="${H-B}" stroke="var(--muted)"/>
       ${refs}
       ${line('ws','var(--peach)')}${line('served','var(--violet)')}
+      ${pin}
       ${dot('ws','var(--peach)')}${dot('served','var(--violet)')}
       <text x="${x(front.pts[2].cost)}" y="${y(front.pts[2].served)-16}" style="fill:var(--violet)">our router (per task)</text>
       <text x="${x(front.pts[2].cost)}" y="${y(front.pts[2].ws)+30}" style="fill:#d98a5f">our router (token-weighted)</text>
@@ -255,32 +308,48 @@ function drawFrontier(){
   document.getElementById('f-knob').textContent='τ = '+cur.tau.toFixed(2);
 }
 function startReplay(){
+  // ONE full sweep of the τ knob, then the dot parks on the quoted operating
+  // point (τ = default) — the replay never quotes a point it doesn't land on.
   stopReplay();
   front.cur=front.pts.length-1;front.dir=-1;
+  let bounced=false;
   front.timer=setInterval(()=>{
     front.cur+=front.dir;
-    if(front.cur<=0||front.cur>=front.pts.length-1)front.dir*=-1;
+    if(front.cur<=0){front.dir=1;bounced=true}
+    if(bounced&&front.cur>=front.opIdx){front.cur=front.opIdx;stopReplay()}
     drawFrontier();
   },90);
 }
 function stopReplay(){if(front.timer){clearInterval(front.timer);front.timer=null}}
 drawFrontier();
 
-// ---------- slide 5: findings text ----------
+// ---------- slide 5: findings text (every number from a committed artifact) ----------
 (function(){
+  const sgn=v=>(v>=0?'+':'')+v;
   if(F.matching&&F.matching.interaction){
     const I=F.matching.interaction;
+    const sig=s=>s?'significant':'CI includes zero';
     document.getElementById('h-match').innerHTML=
-      `low-tier models show +${(I.extra_err_rate_of_low_tier_on_hard*100).toFixed(1)}pt errors and
-       +${I.extra_retry_streak_of_low_tier_on_hard} retry streak on matched hard tasks —
-       <b>directionally supportive, not significant at n=${N}</b>. We say so.`}
-  if(F.cacheTrap){
-    const g=F.cacheTrap.policies['per-call cheap-tool-loops']||{};
+      `on the held-out half, low-tier models show ${sgn(+(I.extra_err_rate_of_low_tier_on_hard*100).toFixed(1))}pt
+       errors (${sig(I.err_significant)}) and ${sgn(I.extra_retry_streak_of_low_tier_on_hard)} retry
+       streak (${sig(I.streak_significant)}) on matched hard tasks. <b>${F.matching.verdict||''}</b>`}
+  if(F.finalValidation&&F.finalValidation.selection_bias_pts!=null)
+    document.getElementById('h-bias').textContent=
+      sgn(F.finalValidation.selection_bias_pts)+'pt';
+  if(F.tuning&&F.tuning.evaluator_label_agreement)
+    document.getElementById('h-agree').textContent=
+      '~'+Math.round(F.tuning.evaluator_label_agreement.mean*100)+'%';
+  if(F.cacheTrap&&F.cacheTrap.modeled_full_trajectory){
+    const MD=F.cacheTrap.modeled_full_trajectory;
     document.getElementById('h-cache').innerHTML=
-      `A per-call "cheap model for tool loops" policy claims <b>${g.savings_naive_pct}% saved</b> under
-       naive costing. Priced with cache resets over full trajectories it pays
-       <b>~$${Math.round(F.cacheTrap.model_based_full_penalty_usd)}</b> in resets — over half the
-       all-top-tier budget. Our per-task policy pays <b>zero</b> resets by construction.`}
+      `A per-call "cheap model for tool loops" policy claims <b>${Math.round(MD.naive_claimed_savings_pct)}% saved</b> under
+       naive costing. <b>MODELED</b> with cache resets over full trajectories (assumptions in
+       <code>cache_trap.py</code>) it pays <b>~$${Math.round(MD.cache_reset_penalty_usd)}</b> in resets
+       — ${Math.round(MD.penalty_share_of_input_budget_pct)}% of the all-top-tier <i>input</i> budget —
+       so the honest figure is ${MD.corrected_savings_pct<0
+         ?`<b>negative</b>: it costs ~${Math.abs(Math.round(MD.corrected_savings_pct))}% MORE than all-top-tier`
+         :`~${Math.round(MD.corrected_savings_pct)}% saved`}.
+       Our per-task policy pays <b>zero</b> resets by construction.`}
 })();
 
 // ---------- navigation ----------
@@ -291,7 +360,9 @@ const show=n=>{s[i].classList.remove('active');i=(n+s.length)%s.length;s[i].clas
 addEventListener('keydown',e=>{
   if(['ArrowRight',' ','PageDown'].includes(e.key))show(i+1);
   if(['ArrowLeft','PageUp'].includes(e.key))show(i-1);
-  if(e.key==='f')document.documentElement.requestFullscreen()});
+  if(e.key==='f')document.documentElement.requestFullscreen();
+  if(e.key==='p'&&s[i].id==='frontier-slide'){ // pause/resume the τ replay
+    front.timer?stopReplay():startReplay()}});
 addEventListener('click',e=>{if(!e.target.closest('a'))show(i+1)});
 </script>
 </body>

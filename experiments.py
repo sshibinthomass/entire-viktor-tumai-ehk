@@ -9,9 +9,18 @@ unless a dispatch variant says otherwise.
 Reported per candidate: exact, balanced accuracy (mean per-class recall — the
 honest 'confusion diagonal' number), adjacent, Spearman, D3 recall.
 
+Dispatch is TRAIN-FOLD CALIBRATED (cut_dispatch_oof): each outer fold's tier
+cuts come from that fold's TRAIN labels and scores only. The pooled
+'known-marginals' number (cuts from the full label vector — what you would get
+if deployment marginals were known) is reported alongside for reference; the
+deployable number is the one to quote.
+
+results/exp_cache.npz holds verbatim first-user text and MUST stay gitignored
+(the dataset is challenge-use-only). It is rebuilt automatically when missing.
+
 Usage:
   python experiments.py build     # featurize once -> results/exp_cache.npz
-  python experiments.py run       # run the ladder from the cache
+  python experiments.py run       # run the ladder (auto-builds the cache)
 """
 import json
 import sys
@@ -79,10 +88,25 @@ def metrics(tiers, D, e=None, score=None):
 
 
 def cut_dispatch(score, D):
-    """Marginal-matched percentile cuts (the label mix decides the tier mix)."""
+    """Marginal-matched percentile cuts from the FULL label vector.
+
+    TRANSDUCTIVE: every task's tier depends on the true label mix of the whole
+    set, including test labels. Only quote this as 'agreement given known
+    deployment marginals' — the deployable number comes from cut_dispatch_oof."""
     p1, p2 = (D == 1).mean(), (D <= 2).mean()
     q1, q2 = np.quantile(score, p1), np.quantile(score, p2)
     return np.where(score <= q1, 1, np.where(score <= q2, 2, 3))
+
+
+def cut_dispatch_oof(score, D, folds):
+    """Deployable dispatch: each fold's cuts calibrated on TRAIN labels/scores."""
+    score = np.asarray(score)
+    tiers = np.zeros(len(D), dtype=int)
+    for tr, te in folds:
+        p1, p2 = (D[tr] == 1).mean(), (D[tr] <= 2).mean()
+        q1, q2 = np.quantile(score[tr], p1), np.quantile(score[tr], p2)
+        tiers[te] = np.where(score[te] <= q1, 1, np.where(score[te] <= q2, 2, 3))
+    return tiers
 
 
 def show(name, tiers, D, e=None, score=None):
@@ -208,6 +232,10 @@ def f_tfidf():
 
 # ------------------------------------------------------------------ run
 def run():
+    if not CACHE.exists():
+        print(f"{CACHE} missing — building it first (it holds dataset text and "
+              f"is gitignored on purpose)")
+        build()
     z = np.load(CACHE, allow_pickle=True)
     X, D, e, groups, texts = z["X"], z["D"], z["e"], z["groups"], list(z["texts"])
     n = len(D)
@@ -219,8 +247,9 @@ def run():
 
     def eval_probs(name, P, score=None):
         s = score if score is not None else 1 - (P[:, 0] + (P[:, 0] + P[:, 1])) / 2
-        results[name] = {"P": P, "score": s,
-                         "m": show(name, cut_dispatch(s, D), D, e, s)}
+        m = show(name, cut_dispatch_oof(s, D, folds), D, e, s)
+        m["exact_known_marginals"] = float((cut_dispatch(s, D) == D).mean())
+        results[name] = {"P": P, "score": s, "m": m}
 
     print(f"n={n}  label mix {[int((D==k).sum()) for k in (1,2,3)]}  "
           f"always-T1 exact = {(D==1).mean():.1%}\n")
@@ -285,7 +314,7 @@ def run():
 
     # ---- dispatch variants on the best-balanced candidate
     best = max(results, key=lambda k: results[k]["m"]["exact"])
-    print(f"\nbest by exact: {best} — dispatch variants on it:")
+    print(f"\nbest by exact (deployable dispatch): {best} — dispatch variants on it:")
     P = results[best]["P"]
     show("  expected-L1-cost dispatch",
          np.array([np.argmin([sum(abs(t - d) * P[i, d - 1] for d in (1, 2, 3))
@@ -293,15 +322,14 @@ def run():
          results[best]["score"])
     show("  argmax dispatch", P.argmax(1) + 1, D, e, results[best]["score"])
     # blend with heuristic (50/50 in rank space)
-    from router.tiering import composite_scores, rank_matrix
-    feats_dicts = None  # heuristic score from base ranks
+    from router.tiering import composite_scores
     Rb = np.zeros((n, len(BASE_FEATS)))
     for j in range(len(BASE_FEATS)):
         Rb[:, j] = fold_ranks(X[:, base_idx[j]], X[:, base_idx[j]])
     h = composite_scores(Rb, BASE_FEATS)
     sb = 0.5 * fold_ranks(results[best]["score"], results[best]["score"]) + \
          0.5 * fold_ranks(h, h)
-    show("  50/50 heuristic blend + cuts", cut_dispatch(sb, D), D, e, sb)
+    show("  50/50 heuristic blend + cuts", cut_dispatch_oof(sb, D, folds), D, e, sb)
 
     with open("results/experiments_report.json", "w", encoding="utf-8") as f:
         json.dump({k: v["m"] for k, v in results.items()}, f, indent=2)

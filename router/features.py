@@ -24,9 +24,16 @@ USR_TAGS = ["auto_read_learnings", "auto_read_execution_log", "auto_read_channel
             "summary_so_far"]
 
 SKILL_RE = re.compile(r"^\-\s\*\*([a-zA-Z0-9_\- ]+)\*\*", re.M)
-HDR_RE = re.compile(r"\[((?:Slack|Microsoft Teams|Email|Cron|Scheduled|New)[^\]\n]{0,160})\]")
+# anchored at line start: the trigger header opens the message body, and an
+# unanchored match fired on bracketed mentions anywhere in the text
+HDR_RE = re.compile(r"^\[((?:Slack|Microsoft Teams|Email|Cron|Scheduled|New)[^\]\n]{0,160})\]", re.M)
 PII_RE = re.compile(r"PII_[A-Z_]+_\d+")
-ATTACH_RE = re.compile(r"\(([a-z]+/[a-zA-Z0-9.+-]+)\)")
+# real MIME types only — the old ([a-z]+/...) matched prose like "(and/or)"
+ATTACH_RE = re.compile(r"\((?:application|image|text|audio|video|font|model|message|multipart)"
+                       r"/[a-zA-Z0-9.+-]+\)")
+# extension starts with a letter and follows a filename character, so decimals
+# like "3.14" and bare ".5" don't count
+FILE_EXT_RE = re.compile(r"[\w-]\.([A-Za-z][A-Za-z0-9]{1,3})\b")
 
 # imperative verbs that usually open a multi-step build/analysis ask
 ACTION_RE = re.compile(r"\b(create|build|write|generate|analy[sz]e|summari[sz]e|research|"
@@ -118,7 +125,7 @@ def extract(req):
         "n_tools": len(tools),
         "tools_tokens": est_tokens(json.dumps(tools)),
         "tool_slack": int(any("slack" in (n or "") for n in tool_names)),
-        "tool_msteams": int(any("msteams" in (n or "") or "_channel" in (n or "")
+        "tool_msteams": int(any("msteams" in (n or "") or "teams" in (n or "")
                                 for n in tool_names)),
         "tool_subagent": int("submit_subagent_result" in tool_names),
         "tool_memory_search": int("memory_search" in tool_names),
@@ -134,7 +141,7 @@ def extract(req):
         "usr_n_deliverable_kw": len(re.findall(
             r"\b(report|pdf|pptx?|deck|slide|email|summar\w+|dashboard|csv|xlsx?"
             r"|document|invoice|spreadsheet|presentation)\b", user0, re.I)),
-        "usr_n_file_ext": len(re.findall(r"\.\w{2,4}\b", user0)),
+        "usr_n_file_ext": len(FILE_EXT_RE.findall(user0)),
         "usr_n_numbers": len(re.findall(r"\b\d[\d,.]*\b", user0)),
         "usr_has_deadline": int(bool(re.search(
             r"\b(today|tomorrow|asap|deadline|by (mon|tue|wed|thu|fri|end)|eod|eow)\b",

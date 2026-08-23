@@ -1,30 +1,44 @@
-# Viktor Challenge Starter — Build the Router
+# Viktor Challenge — Build the Router
 
-Starter kit for the **Viktor Challenge** at the TUM.ai hackathon (Munich, 22–23 Aug 2026).
-From real LLM-request logs, build a router that picks the right model for every call —
-then prove it works, even though the log shows only the model that ran, and no outputs or token counts.
+Our solution for the **Viktor Challenge** at the TUM.ai hackathon (Munich, 22–23 Aug 2026):
+a two-part **tier router + trajectory evaluator** with an honest off-policy evaluation.
+The full writeup is in [SOLUTION.md](SOLUTION.md); the license-containment status is in
+[docs/LICENSE_CONTAINMENT.md](docs/LICENSE_CONTAINMENT.md).
 
-## Quick start (5 minutes)
+## Reproduce from a clean checkout
 
 ```bash
-# 1. No dataset yet? Generate a synthetic sample with the same shape:
-python scripts/make_synthetic_sample.py            # writes ./export/
+# 0. dependencies (numpy / scipy / scikit-learn — see pyproject.toml)
+python -m venv .venv && .venv/Scripts/pip install -e .        # or: uv sync
 
-# 2. Got the real dataset links (shipped at kickoff)? Then instead: the export ships
-#    as trajectories_v1_<index>.jsonl.tar.gz archives — download, verify the posted
-#    SHA-256, then:  mkdir -p export && tar xzf trajectories_v1_01.jsonl.tar.gz -C export/
+# 1. dataset (challenge use only — NEVER commit it): extract the posted archives
+#    into export/ ; no dataset yet? scripts/make_synthetic_sample.py fakes the shape
+mkdir -p export && tar xzf trajectories_v1_01.jsonl.tar.gz -C export/
 
-# 3. Sanity-check the export, reconstruct trajectories, print stats:
+# 2. sanity-check + reconstruct trajectories (grouping key + nesting validator):
 python scripts/load_trajectories.py export/
 
-# 4. Run the baseline heuristic router + cache-aware cost report:
-python scripts/baseline_router.py export/
+# 3. assign ids (writes export_linked/, never touches export/):
+python scripts/enrich_dataset.py export/ export_linked/
 
-# 5. Turn results into a cost–quality frontier CSV (+ PNG if matplotlib is installed):
-python scripts/plot_frontier.py results/routes.jsonl
+# 4. the whole solution, in dependency order:
+python run_pipeline.py                    # features -> tiers -> grades -> dashboard data
+python experiments.py run                 # method ladder (auto-builds its cache)
+python exp_text.py                        # text-model sweep
+python exp_final.py                       # nested validation -> THE quotable number
+python tune_router.py                     # cost-quality frontier benchmark
+python sweep_defaults.py                  # the sweeps behind the shipped defaults
+python infer_tiers.py && python cache_trap.py && python matching_check.py
+python build_findings.py                  # bundle findings for dashboard + deck
+python freeze_router.py                   # deployable frozen-router artifact
+
+# 5. held-out chunk (when it drops) — zero refitting:
+python apply_frozen.py export_linked/trajectories_v1_02.jsonl
 ```
 
-Python 3.10+, standard library only (matplotlib optional for the PNG).
+Open the lab and the deck with `python -m http.server 8017 -d dashboard`
+(or the `dashboard` entry in `.claude/launch.json`): `index.html` is the
+interactive lab, `present.html` the 5-minute deck.
 
 ## Using a coding agent
 

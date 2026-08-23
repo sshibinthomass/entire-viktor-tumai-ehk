@@ -14,9 +14,13 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GroupKFold
 
-from experiments import (CACHE, ALL_FEATS, rank_fold, cut_dispatch, show, align)
+from experiments import (CACHE, ALL_FEATS, rank_fold, cut_dispatch,
+                         cut_dispatch_oof, show, align, build)
 from router.ml import fold_ranks
 
+if not CACHE.exists():
+    print(f"{CACHE} missing — building it first")
+    build()
 z = np.load(CACHE, allow_pickle=True)
 X, D, e, groups = z["X"], z["D"], z["e"], z["groups"]
 texts, sys_texts, tool_texts = list(z["texts"]), list(z["sys_texts"]), list(z["tool_texts"])
@@ -63,7 +67,8 @@ def score_of(P):
 
 def run(name, P):
     s = score_of(P)
-    m = show(name, cut_dispatch(s, D), D, e, s)
+    m = show(name, cut_dispatch_oof(s, D, folds), D, e, s)  # deployable dispatch
+    m["exact_known_marginals"] = float((cut_dispatch(s, D) == D).mean())
     return P, m
 
 

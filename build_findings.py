@@ -17,6 +17,9 @@ PARTS = {
     "cacheTrap": "results/cache_trap.json",
     "matching": "results/matching_check.json",
     "finalValidation": "results/final_validation.json",
+    "comparison": "results/comparison.json",
+    "sweeps": "results/sweeps.json",
+    "tuning": "results/tuning_report.json",
 }
 
 

@@ -1,8 +1,9 @@
 # Solution: Tier Router + Trajectory Evaluator
 
 Two independent systems, judged against each other, with a live lab to tune every
-hyperparameter. Built on `export_linked/trajectories_v1_01.jsonl`
-(1,000 requests → 953 reconstructed trajectories).
+hyperparameter. Built on the full enriched export (`export_linked/`, both chunks:
+1,153 requests → **1,025 reconstructed trajectories**; chunk 01 is ~1 logged call
+per task, chunk 00 carries the 25 genuine multi-call trajectories).
 
 ```
                  routing time                        hindsight
@@ -10,7 +11,7 @@ hyperparameter. Built on `export_linked/trajectories_v1_01.jsonl`
 task ──►│ PART 1 · ROUTER           │      │ PART 2 · EVALUATOR         │◄── full
         │ first user msg + system   │      │ tool calls, LLM calls,     │    trajectory
         │ prompt + tools ONLY       │      │ reasoning tokens, errors…  │
-        │ → Tier 1 / 2 / 3          │      │ → Difficulty 1 / 2 / 3     │
+        │ → Tier 1 / 2 / 3          │      │ → Difficulty 1 / 2 / 3    │
         └────────────┬──────────────┘      └─────────────┬──────────────┘
                      └────────────► compare ◄────────────┘
                 agreement · confusion · under-routing · cost–quality frontier
@@ -23,230 +24,251 @@ everything inside the deepest logged call (which embeds the full history). Neith
 ever uses the logged `model` id as ground truth — the historical dispatch policy is
 unknown and would leak provider bias, not difficulty.
 
+## Trajectory reconstruction is a checked invariant, not an assumption
+
+The export has no trajectory ids. `scripts/load_trajectories.py` groups requests by
+a hash of the **system prompt + full first user text** and then a **nesting
+validator** asserts each call's input is an item-level prefix of the next, splitting
+any group that fails. This matters more than it sounds: an earlier key (first 2,000
+chars of the user text only) silently merged *distinct* tasks that share an opening
+template — 19 of its 24 "multi-call trajectories" mixed models, which is exactly the
+premise violation the loader is supposed to flag. Under the fixed key, all 25 real
+multi-call trajectories nest perfectly and every one ran on a single model — the
+one-model-per-trajectory premise holds *exactly* once reconstruction is right.
+
 ## Part 1 — Router (`router/`)
 
-`router/features.py` extracts ~29 routing-time features from exactly three sources:
+`router/features.py` extracts ~42 routing-time features from exactly three sources:
 the system prompt, the first user message, and the tool definitions. They are
-percentile-ranked (robust to heavy-tailed token counts) and grouped into four signed
+rank-transformed with the repo's **one canonical transform** (`rank_utils.py`,
+right-ECDF, fit per CV fold on train rows; the dashboard ports the same semantics
+to JS, so lab and benchmarks agree to the digit) and grouped into four signed
 groups — **the signs are the routing insight**, measured against observed effort:
 
 | group | sign | what it holds | why |
 |---|---|---|---|
-| `ask` | + | entity refs, questions, action verbs, coordination markers, URLs, length, attachments, media | a dense ask is hard (`usr_n_pii_refs` alone: ρ ≈ +0.37) |
+| `ask` | + | entity refs, questions, action verbs, coordination markers, URLs, length, attachments, media | a dense ask is hard (`usr_n_pii_refs` alone: ρ ≈ +0.39) |
 | `harness` | + | system-prompt sections, feature flags, skills, subagent tool | a heavily configured workspace hosts complex work |
-| `breadth` | − | number of tools, tools tokens, background/memory tools | broad generic toolsets go with quick conversational turns (ρ ≈ −0.21) |
-| `midthread` | − | truncated context, auto-read blocks, thread-activity trigger | mid-thread nudges mean most work already happened (ρ ≈ −0.23) |
+| `breadth` | − | number of tools, tools tokens, background/memory tools | broad generic toolsets go with quick conversational turns (ρ ≈ −0.17) |
+| `midthread` | − | truncated context, auto-read blocks, thread-activity trigger | mid-thread nudges mean most work already happened (ρ ≈ −0.19) |
 
-`router/tiering.py` turns the signed weighted group score into tiers, two
-label-free ways:
+`router/ml.py` adds the supervised head: **word(1–2) + char_wb(3–5) TF-IDF of the
+first user message, concatenated with the numeric rank features, into cumulative
+ordinal logistic regression** — trained on **evaluator labels** (never the logged
+model id), producing per-task sufficiency probabilities P(D≤1), P(D≤2). All shipped
+probabilities are **out-of-fold** under GroupKFold(5) on the workspace fingerprint
+(710 distinct workspaces; the fingerprint joins parts-list system content — an
+earlier bug collapsed 76% of rows into one group and degenerated the folds; every
+number below postdates that fix).
 
-- **score** — cut the composite at dataset percentiles (default p55 / p85)
-- **kmeans** — k-means (k = 3) in the same weighted rank space, clusters ordered by
-  mean composite (unsupervised structure discovery; sign is irrelevant to the
-  clustering itself since reflections preserve distances)
-
-`router/ml.py` adds the supervised head that won the two-round method ladder:
-**word(1–2) + char_wb(3–5) TF-IDF of the first user message, concatenated with the
-numeric rank features (23 group features + 19 v2 lexical/structural features),
-into cumulative ordinal logistic regression** — trained on **evaluator labels**
-(never the logged model id), producing per-task sufficiency probabilities
-P(D≤1), P(D≤2). Three dispatch rules turn probabilities into tiers:
+Three dispatch rules turn probabilities into tiers (all sweeps committed —
+`sweep_defaults.py` → `results/sweeps.json`):
 
 - **blend + cuts** (production default) — α·rank(ML difficulty) + (1−α)·heuristic,
-  cut at percentiles. The balanced winner: improves BOTH the per-task and the
-  token-weighted frontier over the heuristic.
+  cut at percentiles. α = 0.85; the exact-agreement surface is flat between
+  α 0.75–1.0 (65–66%), so the default sits mid-plateau rather than on a lucky peak.
 - **τ-sufficiency** — cheapest tier with P(D≤t) ≥ τ. Size-blind; the cheapest way
-  to 90 % served.
-- **λ-Bayes** — argmin_t cost$(t) + λ·P(D>t). Best tasks-per-dollar; *known
-  weakness:* it buys count-served by starving token-heavy tasks (watch the
-  weighted-served tile).
+  to a served-% target.
+- **λ-Bayes** — argmin_t ĉost(t) + λ·P(D>t), where **ĉost is a routing-time
+  prediction** (OOF regressors on the same routing features). The earlier version
+  plugged each task's *realized* cost into this rule — unknowable at dispatch, so
+  those numbers were an oracle upper bound, not a router. Both variants are in the
+  benchmark, labeled; the oracle rows are excluded from winner selection.
+
+**Deployment path (`freeze_router.py` / `apply_frozen.py`):** the interactive
+pipeline is transductive by design (ranks and cuts recomputed per batch — right for
+analysis, not a router). The freeze step serializes every learned transform
+(feature ECDFs, TF-IDF vocabularies, logit coefficients, fixed cut values, cost
+regressors, and the evaluator yardstick) so a held-out chunk — or a **single task**
+— is routed with zero refitting. Demonstrated by freezing on chunk 01 and applying
+to chunk 00 (`results/heldout_chunk00.json`; n=25 and heavily shifted — a mechanism
+demo, not a headline; the real held-out run awaits chunk 02).
 
 ## Part 2 — Evaluator (`evaluator/`)
 
 `evaluator/metrics.py` counts effort inside the deepest call of each trajectory:
-LLM responses (contiguous runs of model-emitted items + the final unlogged one),
-tool calls, tool errors, model-generated tokens, reasoning tokens, tool-output
-tokens, context size, distinct tools, max same-tool retry streak, user turns,
-logged-call count.
+LLM responses, tool calls, tool errors, model-generated tokens, reasoning tokens,
+tool-output tokens, context size, distinct tools, max same-tool retry streak
+(resets on user/assistant turns), user turns, logged-call count. Tool errors use
+word-boundary matching with negation handling ("12 passed, 0 failed" and
+`"errors": []` no longer count) over the head *and tail* of each output
+(tracebacks end outputs); spot-check with `scripts/check_error_markers.py` —
+reviewed samples are dominated by genuine tracebacks/timeouts with residual noise
+from code listings that mention errors. Image placeholders are counted at a stated
+1,000 tokens (the redacted URL is ~6).
 
-`evaluator/difficulty.py` grades rule-based difficulty:
+`evaluator/difficulty.py` grades rule-based difficulty: percentile-rank each metric
+(canonical ECDF; constant metrics rank a neutral 0.5), weighted mean, cut at
+p55/p85, hard overrides to D3 (≥5 tool errors or ≥40 tool calls). An optional
+**per-tier residualization** (`run_pipeline.py --residualize`) subtracts each
+inferred model tier's median rank from the two policy-sensitive metrics — the
+correction for "weaker models retry more" that the matched check quantifies.
 
-1. percentile-rank each metric across the dataset
-2. difficulty score = weighted mean (defaults: tool calls .22, LLM calls .18,
-   generated tokens .16, context .10, errors .10, …)
-3. cut at percentiles (default p55 / p85) → **Difficulty 1/2/3**
-4. hard overrides promote pathologies to D3 (≥5 tool errors, or ≥40 tool calls)
+## Benchmarks (all OOF, GroupKFold(workspace), frozen evaluator, cache-aware costs)
 
-## Deep analysis & tuning (`tune_router.py`)
+Reference points: oracle (tier = difficulty) serves 100% at 66.2% of all-Tier-3
+cost; always-T2 serves 84.5% at 40% cost. Full table in
+`results/tuning_report.json`; the deployable-vs-oracle λ distinction is explicit:
 
-Everything below is **out-of-fold** under GroupKFold(5) on the workspace
-fingerprint (random splits leak tenant identity), against the **frozen** default
-evaluator, under **cache-aware** costs. Reference points: oracle (tier =
-difficulty) serves 100 % at 64.6 % cost; always-T2 serves 85 % at 40 % cost.
-
-| method | frontier AUC | served @50 % budget | cost @90 % served | weighted AUC |
+| method | frontier AUC | served @50% budget | cost @90% served | weighted AUC |
 |---|---|---|---|---|
-| heuristic (score/default) | 0.861 | 0.818 | 0.730 | **0.715** |
-| heuristic, CV-tuned weights | 0.843 | 0.802 | 0.766 | 0.691 |
-| k-means / GMM | 0.45 / 0.58 | — | — | 0.36 / 0.40 |
-| ordlog + τ-sufficiency | 0.869 | 0.867 | **0.577** | 0.682 |
-| ordlog + λ-Bayes | 0.893 | 0.858 | 0.717 | 0.588 |
-| TF-IDF+logreg + λ-Bayes | **0.903** | 0.865 | 0.642 | 0.613 |
-| **blend α=0.5 + cuts** | 0.871 | 0.833 | 0.690 | **0.727** |
-| random baseline | 0.842 | 0.794 | 0.771 | 0.675 |
+| heuristic (score/default) | 0.856 | 0.811 | 0.739 | 0.707 |
+| heuristic, CV-tuned weights | 0.850 | 0.800 | 0.711 | 0.682 |
+| k-means / GMM | 0.48 / 0.55 | — | — | 0.37 / 0.40 |
+| ordlog + τ-sufficiency | 0.876 | 0.832 | 0.644 | **0.714** |
+| ordlog + λ-Bayes (predicted cost) | 0.881 | 0.855 | 0.608 | 0.641 |
+| **TF-IDF+logreg + λ-Bayes (predicted cost)** | **0.892** | 0.845 | **0.590** | 0.690 |
+| *TF-IDF+logreg + λ-Bayes (oracle cost)* | *0.913* | *0.891* | *0.574* | *0.640* |
+| random baseline (100 perms) | 0.849 [0.839, 0.862] | 0.829 | 0.712 | 0.642 |
 
-Findings that drive the shipped defaults:
+Honest reading of that table:
 
-1. **Group-weight tuning overfits.** Per-fold optima disagree wildly and the OOF
-   AUC lands *below* the hand-set defaults (0.843 vs 0.861; in-search 0.874 → the
-   gap is measured selection bias). The defaults stay.
-2. **Clustering is dominated** — it finds workspace structure, not difficulty.
-3. **λ-Bayes games the count metric**: best per-task AUC, but weighted AUC
-   collapses (0.59–0.61) because it starves the few token-heavy tasks that
-   dominate cost. Legitimate if the objective is strictly tasks-per-dollar;
-   reported with its weakness named.
-4. **The blend (α = 0.5) is the balanced winner** — the only method that beats the
-   heuristic on *both* the per-task and the token-weighted frontier, so it is the
-   pipeline default. τ-sufficiency is the pick when a served-% target must be hit
-   cheaply (90 % served at ~58 % of all-T3 cost vs 73 % for the heuristic).
-5. **Robustness:** across 30 randomly perturbed evaluators (weights ×0.5–2, cuts
-   ±5 pts) the winner's served@50 %budget moves 0.865 → 0.859 ± 0.018. Not an
-   artifact of one weighting.
+1. **Raw AUC flatters everyone.** 55% of tasks are D1 and any tier serves them, so
+   even random routing scores 0.849 ± 0.011. The separation lives at the
+   quality-critical end — cost@90%-served: random needs 71% of the all-T3 budget,
+   the deployable λ router 59% — and in the token-weighted metric.
+2. **Oracle vs deployable λ is a measured 2.1-point AUC gap** (0.913 → 0.892):
+   that is the price of not knowing each task's size in advance, and the reason
+   the oracle rows are labeled, not headlined.
+3. **Group-weight tuning still overfits** (0.850 OOF vs 0.856 defaults; in-search
+   0.872 → the gap is measured selection bias). The hand-set defaults stay.
+4. **Clustering is dominated** — it finds workspace structure, not difficulty.
+5. **Robustness:** across 30 perturbed evaluators (weights ×0.5–2, cuts ±5pts) the
+   winner's served@50%-budget moves to 0.838 ± 0.015 (min 0.81), and the perturbed
+   evaluators agree with the frozen labels **94.9%** on average — that agreement
+   bounds any router; nothing above it is measurable.
 
-### Round 2: breaking the feature ceiling (`experiments.py`, `exp_text.py`, `exp_final.py`)
+### The quotable agreement numbers (train-calibrated dispatch — no test-label leakage)
 
-Diagnosis first: always-T1 alone scores 55 % exact (D1 is 55 % of labels), tasks
-within 0.03 of a difficulty cut agree at coin-flip rates, and every numeric-only
-learner (ridge, HGB-regressor, stacks) plateaued at 55–57 % — a feature ceiling,
-not a model problem. Ruled out honestly: workspace priors (median 1 task per
-workspace in this export — LOO signal is nil), natural-breaks cuts (changes the
-task, not the quality), argmax dispatch (−6 pts: uncertainty collapses to T2),
-boosted trees (overfit 953 rows: 50–56 %), nested stacking (58.6 %).
-
-What broke the ceiling: **text**. The method ladder (all OOF, GroupKFold):
+Dispatch cuts are calibrated **inside each training fold** (`cut_dispatch_oof`);
+the old pooled-marginal cuts used the test set's label mix and are now quoted only
+as a labeled reference ("known deployment marginals"). Method ladder
+(`experiments.py`, deployable exact / known-marginals reference):
 
 | candidate | exact | balanced | D3 recall |
 |---|---|---|---|
-| ordlog, base numeric features | 57.7 % | 50.2 % | 37.8 % |
-| ordlog, + v2 lexical features | 58.6 % | 51.3 % | 39.2 % |
-| LightGBM / XGBoost / CatBoost / mord | 50–58 % | 40–51 % | 19–38 % |
-| TF-IDF(SVD-80) + LR | 61.9 % | 54.6 % | 42.7 % |
-| **word+char TF-IDF + numeric, ordinal LR** | **62.4 %** | **55.1 %** | **43.4 %** |
+| ordlog, base numeric features | 57.9% / 58.0% | 50.9% | 41.9% |
+| ordlog, + v2 lexical features | 60.5% / 61.1% | 54.2% | 47.5% |
+| HistGradientBoosting | 62.0% / 62.6% | 55.0% | 44.4% |
+| **word+char TF-IDF + numeric LR** | **66.2% / 66.0%** | **60.1%** | **53.1%** |
+| nested stack | 64.8% / 65.5% | 57.8% | 49.4% |
 
-**Honest final number (nested selection — the config is re-picked by inner CV
-inside every training fold, so zero grid optimism): 61.4 % exact, 54.2 %
-balanced, 95.6 % adjacent, D3 recall 43.4 %, ρ 0.577.** All five folds picked
-the same config independently; measured selection bias ≈ 1 pt. Versus the
-round-1 baseline: exact 56.0→61.4 %, balanced 48→54 %, confusion diagonal
-378/106/50 → 400/123/62, two-tier misses 59 → 42. Chance with these marginals
-is 41.5 %; two reasonable evaluator configurations agree ~93 % with each other,
-which bounds any router.
+**Honest final number (nested selection over the FULL 30-config grid, deployable
+cuts): see `results/final_validation.json`** — the inner CV re-picks the config
+inside every training fold, the outer cuts come from train labels only, and the
+grid-selection bias is *measured* (best pooled-grid config minus the nested
+number), not asserted. The earlier "zero grid optimism" claim was wrong twice: the
+old 8-config grid had been pre-filtered on the same folds, and the old fold-pick
+sentence ("all five folds picked the same config") did not match its own artifact.
 
-Recommended operating points (dashboard defaults; cache-aware costs):
+Recommended operating points (defaults; cache-aware costs; from
+`results/sweeps.json` + `results/comparison.json`):
 
-- **Balanced (default):** blend α=0.85 (ML head + heuristic), cuts p55/p85 →
-  exact agreement 61.4 %, adjacent 95.8 %, Spearman 0.583, 80.9 % served, 66.2 %
-  token-weighted, 48.6 % cost saved.
-- **Quality-safe:** ML τ = 0.80 → 91.9 % served, 8.1 % under-routed, 36.7 % saved
-  (77.0 % token-weighted).
-- **Max tasks-per-dollar:** ML λ = $0.30 → 81.7 % served at 78.2 % saved
-  (weighted served 42.9 % — the named sacrifice).
+- **Balanced (default):** blend α=0.85, cuts p55/p85 → **65.3% exact, 97.1%
+  adjacent, Spearman 0.693, 82.2% served (68.8% token-weighted), 45.5% cost
+  saved** — 53.6% saved if Tier 3 is priced at the fable-5 row instead of opus-5
+  (tier-price sensitivity in `comparison.json`).
+- **Quality-safe:** ML τ = 0.80 → **94.7% served at 72.5% of all-T3 cost**
+  (89.4% token-weighted), 5.3% under-routed.
+- **Max tasks-per-dollar:** λ-Bayes on predicted costs — best cost@90%-served
+  (0.59) of any deployable method; its known weakness (starving token-heavy
+  tasks) is visible in the weighted column and named on the deck.
 
-## Judging the router
-
-`run_pipeline.py` joins both parts per trajectory and reports agreement,
-confusion, under/over-routing, served (per-task and token-weighted) and cost
-under both cost models; `results/comparison.json` holds the numbers,
-`results/tuning_report.json` the full benchmark with every frontier.
-
-The **cost–quality frontier** (headline artifact) sweeps the active method's own
-knob and plots estimated cost against both served definitions — the dashboard
-recomputes it live.
-
-## The lab (`dashboard/index.html`)
-
-Serve `dashboard/` statically (`python -m http.server -d dashboard`, or the
-`dashboard` entry in `.claude/launch.json`) and open it. Everything recomputes
-client-side in ~10 ms per change:
-
-- router: 5 methods (blend / heuristic cuts / ML τ / ML λ / k-means), α, τ, λ,
-  4 group weights, 2 tier cuts, k-means seed
-- evaluator: 10 metric weights, 2 difficulty cuts, 2 override thresholds
-- cost model (cache-aware vs naive) + pricing per tier ($/1M in, cached & out)
-- live outputs: stat tiles, score histograms with cut lines, tier mix, confusion
-  matrix, cost–quality frontier with the current operating point, router-vs-observed
-  scatter (every task hoverable), per-feature signal chart, largest-disagreement
-  table, CSV export
-
-Data loads dynamically from `dashboard/data.js` — rerun `python run_pipeline.py`
-(new export chunk, new features) and reload the page; no dashboard edits needed.
-
-## Deck-requirement closures (round 3)
+## Deck-requirement closures
 
 - **Inferred model tier order** (`infer_tiers.py` → `results/model_tiers.json`):
-  within matched difficulty buckets, weaker models show more tool errors and
-  longer retry streaks. Bootstrap-stable extremes: fable-5 / opus-5 top (94 %),
-  luna bottom (100 %); fuzzy middle flagged honestly. Independent of the price
-  sheet, yet reproduces its extremes. **Null result worth naming:** served
-  difficulty is flat across models — the logged dispatch was not
+  within matched routing-difficulty quintiles, weaker models show more tool errors
+  and longer retry streaks. Bootstrap-stable extremes: **claude-sonnet-5 /
+  claude-opus-5 least struggle (T3, 99%/96% stable), gpt-5.6-luna most (T1, 94%)**;
+  the middle band (fable-5 at 57%, opus-4-8 at 62%) is flagged as genuinely fuzzy —
+  terciles force three ids per tier regardless of spread. **Null result worth
+  naming:** served difficulty is flat across models — the logged dispatch was not
   difficulty-aware; that headroom is what the router exploits.
-- **The cache trap, demonstrated** (`cache_trap.py` → `results/cache_trap.json`):
-  a per-call "cheap model for tool loops" policy claims 96 % savings under naive
-  costing; priced with cache resets over full trajectories it pays ~$148 in
-  resets alone — over half the ~$259 all-Tier-3 input budget. The measured
-  multi-call subset is a floor (sampling hides switch points); per-task routing
-  pays zero resets by construction.
-- **Matched cross-model check** (`matching_check.py` →
-  `results/matching_check.json`): low-tier models show +0.6 pt error rate and
-  +1.33 retry streak on matched hard tasks (difference-in-differences).
-  Directionally supportive, **not significant at n=953** — the "served"
-  assumption stays an assumption, stated as such.
-- **Policy comparison on the frontier** (dashboard + deck): our frontier is
-  drawn against the two references the challenge illustrates — expected
-  **random routing** (dashed, pure expectation, no RNG) and the **logged
-  dispatch** (what actually ran, repriced via the inferred tiers), plus the
-  always-top-tier dot. Result: the logged dispatch sits at 89.9 % served /
-  69.2 % cost; at that same budget our τ-frontier serves **93.4 %**
-  (token-weighted 80.4 % vs 75.4 %) — strict domination on both quality
-  definitions.
-- **The 5-minute defense deck** (`dashboard/present.html`): follows the
-  make-presentation template (brand, fixed slide order, keys/fullscreen) but
-  every number and chart is **computed live** from `data.js`/`findings.js` —
-  including an auto-playing τ-sweep replay on the frontier slide. Team
-  name/members are the only fill-in slots left.
-- **Dashboard explainability layer**: every tile, slider, method, cost model,
-  chart and finding now explains itself on hover (delegated tooltip layer);
-  pipeline findings render as three cards below the live charts.
+- **Matched cross-model check** (`matching_check.py`, circularity-guarded: tier map
+  fit on the even half of trajectories, validated on the odd half only; both
+  interactions bootstrapped, 5,000 resamples on unrounded arrays): on matched hard
+  tasks, low-tier models show **+6.7pt error rate (95% CI [+2.5, +10.8]) and +2.7
+  extra retry streak (95% CI [+1.6, +4.0]) — both significant.** Verdict:
+  **SUPPORTED on both metrics — under-routing has a measurable cost.** (The earlier
+  writeup called this "not significant" after testing only one of the two effects.)
+- **The cache trap** (`cache_trap.py` → `results/cache_trap.json`), measured and
+  modeled layers separated: on the 25 genuinely multi-call trajectories the
+  per-call policies produce real switches (25–36) and naive costing overstates the
+  greedy policy's savings by 35pts (48.5% → 13.2%). **MODELED** over all 1,025
+  trajectories (three stated assumptions), a cheap-for-tool-loops policy pays
+  ~$160 in cache resets against a **$221 all-Tier-3 input-only budget** — its
+  naive savings claim goes *negative* once resets are priced. Per-task routing
+  pays zero resets by construction. Dollar figures are input-only and labeled so;
+  tier-price sensitivity included.
+- **Policy comparison on the frontier** (dashboard + deck): the frontier is drawn
+  against expected **random routing** (analytic expectation, per quality metric)
+  and the **logged dispatch repriced under our inferred tier map** — graded
+  *without* the error/streak metrics for that comparison, since those metrics also
+  drove the tier inference (grading with them would mechanically depress logged
+  served%). The tooltip carries a tercile-boundary sensitivity. We claim "better
+  under our inferred tier map and fair grading", not "strict domination".
+- **The 5-minute deck** (`dashboard/present.html`): fixed slide order, every number
+  computed live from `data.js`/`findings.js` (committed artifacts) — including the
+  slide-5 selection-bias and evaluator-agreement numbers that used to be hardcoded.
+  The τ=0.80 operating point is pinned on the frontier; the replay does one sweep
+  and parks on it ('p' pauses). Slide 3 shows the signal on one real trace
+  (loaded from the gitignored local previews — verbatim dataset text is never
+  committed).
+- **Judge-model rescoring** (`judge_rescore.py`, starter idea 3): matched
+  low-vs-high-tier call pairs are built from recovered replies (call i's output
+  lives in call i+1's input) — 8 pairs exist at the current data size; scoring
+  them needs the team's own API key and is the highest-ceiling next step for the
+  off-policy special prize.
 
-Reproduction order:
-`run_pipeline.py` → `infer_tiers.py` → `cache_trap.py` → `matching_check.py`
-→ `build_findings.py`; then open `dashboard/index.html` (lab) and
-`dashboard/present.html` (deck) — both work statically, no server needed.
+## Reproduction
+
+```
+scripts/enrich_dataset.py export/ export_linked/   (ids + nesting validation)
+run_pipeline.py → experiments.py run → exp_text.py → exp_final.py
+tune_router.py → sweep_defaults.py
+infer_tiers.py → cache_trap.py → matching_check.py → build_findings.py
+freeze_router.py  (→ apply_frozen.py for held-out chunks / single tasks)
+```
+
+A clean checkout works: dependencies are declared in `pyproject.toml`, no path is
+hardcoded, `experiments.py` rebuilds its cache automatically, and the raw export
+is never modified. Files that embed dataset text (`export*/`,
+`dashboard/previews.js`, `results/exp_cache.npz`, `results/frozen_router.pkl`)
+are gitignored — the dataset is challenge-use-only (see
+`docs/LICENSE_CONTAINMENT.md`).
 
 ## Honesty notes (the known weaknesses)
 
 - **Effort ≠ difficulty.** The evaluator measures observed effort; a task can be
-  long-and-easy or short-and-hard. Effort is also shaped by the model that ran it
-  (weaker models retry more), so the yardstick is partly policy-dependent.
-- **All token counts are chars/4 estimates** — the export has no `usage`.
-- **Pricing is an assumption** (anonymized model ids), and the cost estimate
-  ignores prompt-cache discounts; a model switch resetting the cache would make
-  naive per-call savings look better than they are. Quote relative comparisons,
-  not absolute dollars.
-- **`reasoning_tokens` exist only for the gpt family** — its default weight is
-  small on purpose; raise it and you grade providers, not tasks.
-- **Sampling truncation.** The deepest *logged* call can still be mid-task, so all
-  effort counts are lower bounds; ~1 call per task means history size is noisy.
+  long-and-easy or short-and-hard. Effort is also shaped by the model that ran it —
+  now *quantified* by the matched check (significant on both metrics) and
+  correctable via `--residualize`; the default pipeline stays unresidualized so the
+  headline and the correction are separately inspectable.
+- **All token counts are chars/4 estimates** — the export has no `usage`. Context
+  tokens include JSON overhead, generated tokens don't; images are counted at an
+  assumed 1,000 tokens. Fine under ranking; stated wherever dollars are quoted.
+- **Pricing is an assumption** (anonymized ids). Headline savings carry a
+  tier-price sensitivity (opus-priced vs fable-priced Tier 3). Quote ratios, not
+  dollars.
+- **`reasoning_tokens` exist only for the gpt family** — its weight stays small on
+  purpose; raise it and you grade providers, not tasks.
+- **Sampling truncation.** ~1 logged call per task in chunk 01: the deepest logged
+  call may be mid-task, so effort counts are lower bounds, and the cache-trap
+  *measured* table is a floor (the modeled layer exists because of this, with its
+  assumptions stated).
+- **The evaluator ceiling:** perturbed evaluator configs agree 94.9% with the
+  frozen one — router agreement above that is unmeasurable.
 
 ## Files
 
-- `router/features.py`, `router/tiering.py`, `router/ml.py` — Part 1
+- `router/features.py`, `router/tiering.py`, `router/ml.py`, `rank_utils.py` — Part 1
 - `evaluator/metrics.py`, `evaluator/difficulty.py` — Part 2
-- `run_pipeline.py` — end-to-end; writes `results/router_features.jsonl`,
-  `results/evaluator_metrics.jsonl`, `results/tiers.jsonl`,
-  `results/comparison.json`, `dashboard/data.js`
-- `tune_router.py` — round-1 frontier benchmark (`results/tuning_report.json`)
-- `experiments.py`, `exp_text.py` — round-2 method ladder
-  (`results/experiments_report.json`, `results/exp_text_report.json`)
-- `exp_final.py` — nested honest validation (`results/final_validation.json`)
-- `dashboard/index.html` — the interactive lab
+- `scripts/load_trajectories.py` (reconstruction + nesting validator),
+  `scripts/enrich_dataset.py` (ids), `scripts/cost_model.py`
+- `run_pipeline.py` — end-to-end; `tune_router.py` — frontier benchmark;
+  `experiments.py` / `exp_text.py` / `exp_final.py` — method ladder + nested
+  validation; `sweep_defaults.py` — the sweeps behind the defaults
+- `infer_tiers.py`, `matching_check.py`, `cache_trap.py`, `judge_rescore.py` —
+  off-policy analyses; `build_findings.py` — bundles them for the UI
+- `freeze_router.py` / `apply_frozen.py` — the deployable router
+- `dashboard/index.html` — the interactive lab; `dashboard/present.html` — the deck

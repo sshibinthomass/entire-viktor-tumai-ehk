@@ -22,12 +22,12 @@ Honesty: probabilities shipped to results/dashboard are OUT-OF-FOLD
 model that never saw that task's outcome.
 """
 import hashlib
-import json
 import re
 
 import numpy as np
 
-from .features import FEATURE_GROUPS, ML_EXTRA_FEATURES, PII_RE
+from rank_utils import ecdf_ranks
+from .features import FEATURE_GROUPS, ML_EXTRA_FEATURES, PII_RE, _content
 
 FEAT_NAMES = ([f for g in FEATURE_GROUPS.values() for f in g["features"]]
               + ML_EXTRA_FEATURES)
@@ -48,17 +48,24 @@ def first_user_text(req, limit=12000):
 
 
 def workspace_of(req):
-    """Tenant fingerprint (skill set of the system prompt) for grouped CV."""
-    sysp = next((i.get("content") for i in req["input"] if i.get("role") == "system"), "") or ""
-    if not isinstance(sysp, str):
-        sysp = json.dumps(sysp)
+    """Tenant fingerprint (skill set of the system prompt) for grouped CV.
+
+    The system content can be a plain string OR a parts list; joining the parts
+    (same logic as the feature extractor) keeps the fingerprint identical across
+    both formats. The old version json.dumps'd parts lists, escaped the
+    newlines, matched nothing, and collapsed 76% of trajectories into one
+    md5("") group — degenerating the GroupKFold folds."""
+    sysp = next((_content(i) for i in req["input"] if i.get("role") == "system"), "")
     skills = ",".join(sorted(re.findall(r"^\-\s\*\*([a-zA-Z0-9_\- ]+)\*\*", sysp, re.M)))
+    if not skills:  # no skill block: fall back to the system text itself
+        skills = sysp
     return hashlib.md5(skills.encode()).hexdigest()[:8]
 
 
 def fold_ranks(train_vals, all_vals):
-    s = np.sort(np.asarray(train_vals, dtype=float))
-    return np.searchsorted(s, np.asarray(all_vals, dtype=float), side="right") / max(len(s), 1)
+    """Canonical rank transform (see rank_utils) — kept as an alias so existing
+    imports keep working."""
+    return ecdf_ranks(train_vals, all_vals)
 
 
 def _rank_matrix(feat_rows, tr_idx):
@@ -69,13 +76,18 @@ def _rank_matrix(feat_rows, tr_idx):
     return out
 
 
+def _cum_logit(Xtr, ybin, Xte, C=1.0):
+    """P(y=1) for one cumulative binary target; constant if the fold has one class."""
+    if len(np.unique(ybin)) < 2:
+        return np.full(Xte.shape[0], float(ybin[0]))
+    from sklearn.linear_model import LogisticRegression
+    return LogisticRegression(max_iter=3000, C=C).fit(Xtr, ybin).predict_proba(Xte)[:, 1]
+
+
 def _fit_ordinal(Xtr, ytr, Xte, C=1.0):
     """Two cumulative binary logits -> class probs, monotone-corrected."""
-    from sklearn.linear_model import LogisticRegression
-    p2 = LogisticRegression(max_iter=3000, C=C).fit(Xtr, (ytr >= 2).astype(int)) \
-        .predict_proba(Xte)[:, 1]
-    p3 = LogisticRegression(max_iter=3000, C=C).fit(Xtr, (ytr >= 3).astype(int)) \
-        .predict_proba(Xte)[:, 1]
+    p2 = _cum_logit(Xtr, (ytr >= 2).astype(int), Xte, C)
+    p3 = _cum_logit(Xtr, (ytr >= 3).astype(int), Xte, C)
     p3 = np.minimum(p2, p3)
     return np.column_stack([1 - p2, p2 - p3, p3])
 
@@ -89,6 +101,7 @@ def oof_cumulative_probs(feat_rows, labels, groups, texts=None, n_splits=5):
     n = len(feat_rows)
     labels = np.asarray(labels)
     cum = np.zeros((n, 2))
+    n_splits = min(n_splits, len(set(groups)))  # GroupKFold crashes on fewer groups
     for tr, te in GroupKFold(n_splits=n_splits).split(np.zeros(n), groups=groups):
         R = _rank_matrix(feat_rows, tr)
         if texts is not None:

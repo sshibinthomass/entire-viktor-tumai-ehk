@@ -16,6 +16,7 @@ re-run them client-side with different hyperparameters.
 """
 import numpy as np
 
+from rank_utils import self_ranks
 from .features import FEATURE_GROUPS
 
 DEFAULT_GROUP_WEIGHTS = {"ask": 1.5, "harness": 0.7, "breadth": 0.8, "midthread": 0.8}
@@ -23,18 +24,10 @@ DEFAULT_CUTS = (0.55, 0.85)  # composite percentiles: <=c1 Tier1, <=c2 Tier2, el
 
 
 def percentile_ranks(values):
-    """Average-rank percentile in [0, 1]; constant columns rank 0."""
-    v = np.asarray(values, dtype=float)
-    order = v.argsort(kind="stable")
-    ranks = np.empty(len(v))
-    ranks[order] = np.arange(len(v))
-    # average ties so binary flags don't split arbitrarily
-    for u in np.unique(v):
-        m = v == u
-        ranks[m] = ranks[m].mean()
-    if len(v) > 1 and v.max() > v.min():
-        return ranks / (len(v) - 1)
-    return np.zeros(len(v))
+    """Canonical right-ECDF ranks (rank_utils) — the SAME transform every
+    benchmark uses, so the shipped heuristic is the benchmarked one. Constant
+    columns rank to a neutral 0.5; vectorized (no per-unique-value loop)."""
+    return self_ranks(values)
 
 
 def rank_matrix(rows):

@@ -1,10 +1,18 @@
 .env
 .venv/
 env/
+
+# licensed dataset: challenge use only, NO redistribution — never commit any of it
 export/
+export_linked/
 *.tar.gz
 *.zip
-export_linked
+
+# derived artifacts that embed dataset text (previews, TF-IDF vocabulary, cached text)
+dashboard/previews.js
+results/exp_cache.npz
+results/frozen_*.pkl
+
 __pycache__/
 catboost_info/
-results/exp_cache.npz
+outputs/
