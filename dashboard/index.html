@@ -173,7 +173,7 @@ its own outcome.</div>
       (~T&middot;(n&minus;1)/2). Prices are an assumption — model ids are anonymized.</div>
     <div class="seg" id="costSeg">
       <button data-c="cache">Cache-aware</button>
-      <button data-c="naive">Naive</button>
+      <button data-c="naive">Cache-blind</button>
     </div>
     <div id="prices"></div>
     <button class="btn" id="exportCsv">Export tiers CSV</button>
@@ -201,7 +201,7 @@ its own outcome.</div>
       <div class="legend"><span class="k"><span class="sw" style="background:var(--s1)"></span>Our router (per task)</span>
         <span class="k"><span class="sw" style="background:var(--s2)"></span>Our router (token-weighted)</span>
         <span class="k"><span class="sw" style="background:repeating-linear-gradient(90deg,var(--ink-3) 0 4px,transparent 4px 7px)"></span>Random routing (dashed, one per metric)</span>
-        <span class="k"><span class="sw" style="background:var(--s3);border-radius:50%"></span>Logged dispatch</span>
+        <span class="k"><span class="sw" style="background:var(--s3);border-radius:50%"></span>Logged dispatch (under our inferred tier map)</span>
         <span class="k"><span class="sw" style="background:var(--surface-1);border:2px solid var(--ink-1);border-radius:50%"></span>Always top tier</span></div>
       <div id="frontChart"></div></div>
     <div class="card"><h2>Router score vs observed difficulty</h2>
@@ -233,9 +233,13 @@ its own outcome.</div>
 
 <script src="data.js"></script>
 <script src="findings.js"></script>
+<script src="previews.js" onerror="/* previews are local-only (gitignored): optional */"></script>
 <script>
 'use strict';
 const D = window.VIKTOR_DATA, M = D.meta, R = D.rows, N = R.length;
+// verbatim task text ships only in the gitignored previews.js (license: no redistribution)
+{ const P = window.VIKTOR_PREVIEWS || {};
+  for (const r of R) { const p = P[String(r.id)]; if (p) { r.trigger = p[0]; r.preview = p[1]; } } }
 const css = n => getComputedStyle(document.body).getPropertyValue(n).trim();
 
 // ---------- state ----------
@@ -257,15 +261,15 @@ function quantile(sortedArr, q) {
   const idx = q * (sortedArr.length - 1), lo = Math.floor(idx), hi = Math.ceil(idx);
   return sortedArr[lo] + (sortedArr[hi] - sortedArr[lo]) * (idx - lo);
 }
-function ranksOf(vals) { // average-rank percentiles in [0,1]
-  const n = vals.length, idx = Array.from({length: n}, (_, i) => i).sort((a, b) => vals[a] - vals[b]);
-  const out = new Float64Array(n); let i = 0;
-  while (i < n) {
-    let j = i; while (j + 1 < n && vals[idx[j + 1]] === vals[idx[i]]) j++;
-    const avg = (i + j) / 2; for (let k = i; k <= j; k++) out[idx[k]] = avg;
-    i = j + 1;
+function ranksOf(vals) { // right-ECDF ranks — EXACTLY rank_utils.ecdf_ranks in Python
+  const n = vals.length, sorted = Array.from(vals).sort((a, b) => a - b);
+  const out = new Float64Array(n);
+  if (!n || sorted[0] === sorted[n - 1]) { out.fill(0.5); return out; } // constant -> neutral
+  for (let k = 0; k < n; k++) {
+    let lo = 0, hi = n; // upper_bound(sorted, vals[k])
+    while (lo < hi) { const m = (lo + hi) >> 1; if (sorted[m] <= vals[k]) lo = m + 1; else hi = m; }
+    out[k] = lo / n;
   }
-  const mx = n - 1 || 1; for (let k = 0; k < n; k++) out[k] /= mx;
   return out;
 }
 function pearson(a, b) {
@@ -400,7 +404,9 @@ function evalPolicy(tiers, diffs, Cm) {
     if (ok) served++;
     wTot += Cm[i][2]; if (ok) wServed += Cm[i][2];
   }
-  return { costShare: cost / top, cost, top, served: served / N, wServed: wServed / wTot };
+  // top can be 0 if the user zeroes the Tier-3 prices — guard the divisions
+  return { costShare: cost / (top || 1), cost, top,
+           served: served / N, wServed: wServed / (wTot || 1) };
 }
 
 // dispatch rules
@@ -460,9 +466,34 @@ function computeAll() {
 }
 
 // reference policies for the comparison overlay ------------------------------
+const TIER_MODELS = (window.VIKTOR_FINDINGS || {}).modelTiers?.models || [];
 const TIER_OF_MODEL = {};
-((window.VIKTOR_FINDINGS || {}).modelTiers?.models || []).forEach(m =>
-  TIER_OF_MODEL[m.model] = m.tier);
+TIER_MODELS.forEach(m => TIER_OF_MODEL[m.model] = m.tier);
+// tercile-boundary sensitivity: the least-stable Tier-3 member demoted to T2
+const TIER_OF_MODEL_ALT = {...TIER_OF_MODEL};
+{ const t3 = TIER_MODELS.filter(m => m.tier === 3 && !m.low_confidence)
+    .sort((a, b) => a.bootstrap_stability - b.bootstrap_stability)[0];
+  if (t3) TIER_OF_MODEL_ALT[t3.model] = 2; }
+
+// FAIR-COMPARISON GRADING for the logged-dispatch point: tool errors and retry
+// streaks also drove the tier inference, so a model that logged errors would be
+// assigned a low tier AND have its trajectories graded harder — mechanically
+// depressing logged served%. For this one comparison, difficulty is graded
+// with those two metrics zeroed (weights renormalized) and the error override off.
+function gradeStruggleFree() {
+  const w = {...state.evW, n_tool_errors: 0, max_repeat_streak: 0};
+  let tw = 0; for (const k in w) tw += w[k];
+  const scores = new Float64Array(N);
+  for (let i = 0; i < N; i++) {
+    const rk = R[i].evRank; let s = 0;
+    M.evNames.forEach((k, c) => s += (w[k] || 0) * rk[c]);
+    scores[i] = s / (tw || 1);
+  }
+  const { tiers } = cutTiers(scores, state.evCuts);
+  for (let i = 0; i < N; i++)
+    if (R[i].ev.n_tool_calls >= state.ov.tool_calls_t3) tiers[i] = 3;
+  return tiers;
+}
 
 function randomLine(diffs, Cm) {
   // expected (cost, served, weighted-served) of random tier assignment,
@@ -484,10 +515,15 @@ function randomLine(diffs, Cm) {
   return pts;
 }
 
-function loggedPolicy(diffs, Cm) {
+function loggedPolicy(Cm) {
   if (!Object.keys(TIER_OF_MODEL).length) return null;
+  const diffsFair = gradeStruggleFree(); // see gradeStruggleFree: fairness fix
   const tiers = R.map(r => TIER_OF_MODEL[r.model] || 3);
-  return evalPolicy(tiers, diffs, Cm);
+  const main = evalPolicy(tiers, diffsFair, Cm);
+  const alt = evalPolicy(R.map(r => TIER_OF_MODEL_ALT[r.model] || 3), diffsFair, Cm);
+  // our current policy under the SAME struggle-free grading, for a fair sentence
+  const ours = evalPolicy(C.rTiers, diffsFair, Cm);
+  return { ...main, alt, ours };
 }
 
 // frontier: sweep the active method's own knob; each point = (costShare, served, wServed)
@@ -504,7 +540,9 @@ function frontier() {
     for (let k = 0; k < 40; k++) push(lambdaTiers(1e-4 * Math.pow(3e5, k / 39), Cm));
     return { pts, knob: 'λ' };
   }
-  // cut-based methods (score / blend / kmeans reference): sweep Tier-3 cut
+  // cut-based methods (score / blend): sweep the Tier-3 cut. k-means has no
+  // knob of its own — its "frontier" is the heuristic-cut reference sweep,
+  // labeled as such so the curve can't impersonate the k-means dots.
   const base = state.method === 'blend'
     ? Float64Array.from({length: N}, (_, i) =>
         state.alpha * mlDiffRank[i] + (1 - state.alpha) * hRank[i])
@@ -515,13 +553,19 @@ function frontier() {
     const cc2 = Math.min(c2, 1), q1 = quantile(sorted, cc2 * ratio), q2 = quantile(sorted, cc2);
     push(Array.from(base, s => s <= q1 ? 1 : s <= q2 ? 2 : 3));
   }
-  return { pts, knob: 'Tier-3 cut' };
+  return { pts, knob: state.method === 'kmeans'
+    ? 'Tier-3 cut (heuristic reference — k-means itself has no knob)' : 'Tier-3 cut' };
 }
 
 // ---------- svg helpers ----------
 const fmtPct = v => (100 * v).toFixed(1) + '%';
 const fmt$ = v => '$' + v.toFixed(2);
+const fmtSigned = v => (v >= 0 ? '+' : '') + v; // never prints '+-x'
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+// dataset text embedded INSIDE a data-tip needs a second encoding: the browser
+// decodes the attribute once, and tip.innerHTML parses the result once more —
+// single-encoded '<E>' placeholders vanished (and dataset markup would execute)
+const escT = s => esc(esc(s));
 const tip = document.getElementById('tip');
 // one delegated handler serves every [data-tip] element, static or re-rendered
 let tipEl = null;
@@ -571,9 +615,9 @@ const EXPLAIN = {
   'method_ml-lambda': 'Cost-sensitive Bayes dispatch. Maximum tasks-per-dollar; watch the Weighted-served tile drop.',
   method_kmeans: 'Unsupervised k-means (k=3) for comparison — it finds workspace structure, not difficulty (measurably dominated).',
   cost_cache: 'Bills prefix replay at the cached rate (~T·(n−1)/2 tokens). More realistic; per-task routing never pays a reset.',
-  cost_naive: 'Context×in-price + generated×out-price. Ignores caching entirely — fine for relative comparisons only.',
+  cost_naive: 'Cache-blind: context×in-price + generated×out-price, no caching at all — fine for relative comparisons only.',
   // tiles
-  tile_exact: 'Share of tasks where the router tier equals the observed difficulty. Chance with these class sizes ≈ 41.5%; always-Tier1 gets 55%.',
+  tile_exact: 'Share of tasks where the router tier equals the observed difficulty. D1 dominates the label mix, so always-Tier-1 alone scores the D1 share — compare against that floor, not against 33%.',
   tile_adjacent: 'Within one tier. Both sides quantize a continuum, so boundary misses of ±1 are expected.',
   tile_rho: 'Spearman rank correlation between the router score and the evaluator score — threshold-free skill measure.',
   tile_under: 'Tasks whose tier is BELOW observed difficulty — the quality risk. The τ method is built to push this down.',
@@ -582,7 +626,7 @@ const EXPLAIN = {
   tile_savings: 'Estimated spend of this policy vs sending everything to Tier 3, under the selected cost model. Assumed prices, chars/4 tokens.',
 };
 const CHART_TIPS = {
-  histRouter: 'Distribution of the router\'s difficulty score across all 953 tasks. Colors = the tier each region maps to.',
+  histRouter: 'Distribution of the router\'s difficulty score across all tasks. Colors = the tier each region maps to.',
   histEval: 'Distribution of observed difficulty (weighted percentile ranks of the effort metrics). Cuts are the D1|D2 and D2|D3 borders.',
   mixChart: 'How many tasks each side puts in each tier. Cut-based methods match the evaluator marginals by construction; τ/λ float free.',
   confChart: 'Rows = router decision, columns = what the trajectory revealed. Below the diagonal = under-routed (risk), above = over-routed (waste).',
@@ -690,7 +734,7 @@ function scatChart(el) {
     const relName = rel === 'm' ? 'matched' : rel === 'u' ? 'under-routed' : 'over-routed';
     dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${cols[rel]}"
       stroke="${css('--surface-1')}" stroke-width="2"
-      data-tip="<b>#${R[i].id}</b> ${esc(R[i].trigger)}<br><span class='t2'>${esc(R[i].preview.slice(0,110))}</span><br>
+      data-tip="<b>#${R[i].id}</b> ${escT(R[i].trigger)}<br><span class='t2'>${escT(R[i].preview.slice(0,110))}</span><br>
       <span class='t3'>router T${C.rTiers[i]} (${C.rS[i].toFixed(2)}) &middot; observed D${C.diffs[i]} (${C.eS[i].toFixed(2)}) &middot; ${relName}<br>
       P(D&le;1)=${CUM[i][0].toFixed(2)} P(D&le;2)=${CUM[i][1].toFixed(2)} &middot; ${R[i].ev.n_tool_calls} tool calls &middot; ${R[i].ev.n_tool_errors} errors &middot; ran on ${R[i].model}</span>"/>`;
   }
@@ -711,7 +755,7 @@ function scatChart(el) {
 function frontChart(el) {
   const { pts, knob } = frontier();
   const rnd = randomLine(C.diffs, C.Cm);
-  const lg = loggedPolicy(C.diffs, C.Cm);
+  const lg = loggedPolicy(C.Cm);
   // live gap vs random at the current budget — the honest comparison in one line
   const rOk = rnd.filter(p => p[0] <= C.costShare);
   const rBest = rOk.length ? Math.max(...rOk.map(p => p[1])) : 0;
@@ -760,7 +804,7 @@ function frontChart(el) {
       stroke-dasharray="2 5" opacity="0.8" data-tip="<b>Random routing (expected, token-weighted)</b><br>the same chance policy, big tasks weighted — compare with the orange line"/>
     ${lg ? `<circle cx="${x(Math.min(lg.costShare,1))}" cy="${y(lg.served)}" r="7.5" fill="${css('--s3')}"
       stroke="${css('--surface-1')}" stroke-width="2.5"
-      data-tip="<b>Logged dispatch</b> (what actually ran, repriced via inferred tiers)<br>${fmtPct(lg.served)} served at ${fmtPct(lg.costShare)} cost &middot; weighted ${fmtPct(lg.wServed)}<br><span class='t3'>tier map from infer_tiers.py; low-confidence ids included</span>"/>
+      data-tip="<b>Logged dispatch, under our inferred tier map</b> (what actually ran, repriced)<br>${fmtPct(lg.served)} served at ${fmtPct(lg.costShare)} cost &middot; weighted ${fmtPct(lg.wServed)}<br>our current policy on the SAME fair grading: ${fmtPct(lg.ours.served)} served at ${fmtPct(lg.ours.costShare)} cost (weighted ${fmtPct(lg.ours.wServed)})<br><span class='t3'>graded WITHOUT error/streak metrics (they also drove the tier inference); tercile sensitivity: demoting the least-stable T3 id moves this dot to ${fmtPct(lg.alt.served)} / ${fmtPct(lg.alt.costShare)}</span>"/>
       <text class="val" x="${x(Math.min(lg.costShare,1))}" y="${y(lg.served)-13}" text-anchor="middle">logged</text>` : ''}
     <circle cx="${x(1)}" cy="${y(1)}" r="7" fill="${css('--surface-1')}"
       stroke="${css('--ink-1')}" stroke-width="2.5"
@@ -836,7 +880,13 @@ function slider(parent, label, value, min, max, step, oninput, opts) {
   const b = d.querySelector('b'), inp = d.querySelector('input');
   const show = v => b.textContent = (opts && opts.fmt) ? opts.fmt(v) : (+v).toFixed(2);
   show(value);
-  inp.addEventListener('input', () => { show(+inp.value); oninput(+inp.value); schedule(); });
+  // setters may clamp (e.g. the two cut sliders can't cross): display what was
+  // actually applied, not the raw slider position
+  inp.addEventListener('input', () => {
+    const applied = oninput(+inp.value);
+    show(applied !== undefined ? applied : +inp.value);
+    schedule();
+  });
   parent.appendChild(d);
   return inp;
 }
@@ -867,6 +917,7 @@ function buildControls() {
          v => state.evCuts[0] = Math.min(v, state.evCuts[1] - 0.01));
   slider(boxes.ec, 'D2 | D3 cut (percentile)', state.evCuts[1], 0.1, 1, 0.01,
          v => state.evCuts[1] = Math.max(v, state.evCuts[0] + 0.01));
+  // (the cut setters above return the clamped value — the slider shows it)
   document.getElementById('ovErr').value = state.ov.errors_t3;
   document.getElementById('ovCalls').value = state.ov.tool_calls_t3;
   const pr = document.getElementById('prices'); pr.innerHTML = '';
@@ -915,12 +966,20 @@ document.getElementById('resetEv').addEventListener('click', () => {
   state.ov = {...defaults.overrides}; buildControls(); schedule();
 });
 document.getElementById('exportCsv').addEventListener('click', () => {
-  let csv = 'trajectory_id,router_tier,router_score,p_d1,p_d2,evaluator_difficulty,evaluator_score\n';
+  // record the exact knob settings that produced these tiers, so the export
+  // is reproducible instead of a bare number dump
+  let csv = `# method=${state.method} alpha=${state.alpha} tau=${state.tau} lambda=${state.lam.toFixed(4)}`
+    + ` costModel=${state.costModel} seed=${state.seed}\n`
+    + `# groupWeights=${JSON.stringify(state.gw)} routerCuts=${JSON.stringify(state.rCuts)}\n`
+    + `# evWeights=${JSON.stringify(state.evW)} evCuts=${JSON.stringify(state.evCuts)}`
+    + ` overrides=${JSON.stringify(state.ov)} prices=${JSON.stringify(state.prices)}\n`
+    + 'trajectory_id,router_tier,router_score,p_d1,p_d2,evaluator_difficulty,evaluator_score\n';
   for (let i = 0; i < N; i++)
     csv += `${R[i].id},${C.rTiers[i]},${C.rS[i].toFixed(4)},${CUM[i][0]},${CUM[i][1]},${C.diffs[i]},${C.eS[i].toFixed(4)}\n`;
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], {type: 'text/csv'}));
   a.download = 'tiers.csv'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000); // don't leak object URLs
 });
 
 // ---------- render ----------
@@ -996,40 +1055,49 @@ function renderFindings() {
           <td class="n"><span class="tierchip" style="background:${tierCols[r.tier]};color:${ink}">T${r.tier}</span></td>
           <td class="n">${r.low_confidence ? '—' : Math.round(r.bootstrap_stability*100) + '%'}</td></tr>`;
       }).join('') + `</table>
-      <div class="verdict">* n &lt; ${F.modelTiers.min_n}: low confidence. Extremes reproduce the assumed
-        price sheet independently (fable-5 top, luna bottom); the middle band is genuinely fuzzy.</div>`;
+      <div class="verdict">* n &lt; ${F.modelTiers.min_n}: low confidence. Terciles force three ids per
+        tier — read low-stability boundary members as fuzzy, not fixed. The matched check validates
+        this map on a held-out half (split-half design).</div>`;
   }
   if (F.cacheTrap) {
-    const P = F.cacheTrap.policies;
+    const P = F.cacheTrap.policies, MD = F.cacheTrap.modeled_full_trajectory;
     document.getElementById('fndCache').innerHTML =
       `<div class="headline">Per-call switching looks brilliant under naive costing — until
         resets are priced.</div>
       <table><tr><th>policy</th><th class="n">naive saved</th><th class="n">cache-aware saved</th><th class="n">switches</th></tr>` +
       Object.entries(P).map(([nm, p]) =>
-        `<tr data-tip="naive ${fmt$(p.usd_naive)} vs cache-aware ${fmt$(p.usd_cache_aware)} on the ${F.cacheTrap.n_trajectories} trajectories with ≥2 logged calls (input side only)">
+        `<tr data-tip="naive ${fmt$(p.usd_naive)} vs cache-aware ${fmt$(p.usd_cache_aware)} on the ${F.cacheTrap.n_trajectories} trajectories with ≥2 logged calls (MEASURED, input side only)">
           <td>${esc(nm)}</td><td class="n">${p.savings_naive_pct}%</td>
           <td class="n">${p.savings_cache_aware_pct}%</td><td class="n">${p.switches}</td></tr>`).join('') +
-      `</table>
-      <div class="verdict">Sampling hides switch points (~1 logged call/task), so the measured table is a
-        floor. Model-based full-trajectory estimate: the switching policy pays
-        <b>~$${Math.round(F.cacheTrap.model_based_full_penalty_usd)}</b> in cache resets — over half the
-        ~$259 it costs to send <i>everything</i> to Tier 3. Per-task routing pays zero resets.</div>`;
+      `</table>` + (MD ? `
+      <div class="verdict">The table is MEASURED but a floor — sampling hides switch points.
+        <b>MODELED</b> over full trajectories (assumptions stated in cache_trap.py): the switching
+        policy pays <b>~$${Math.round(MD.cache_reset_penalty_usd)}</b> in cache resets,
+        ${MD.penalty_share_of_input_budget_pct}% of the
+        ~$${Math.round(MD.all_tier3_input_budget_usd)} all-Tier-3 <i>input</i> budget — its
+        "naive ${Math.round(MD.naive_claimed_savings_pct)}% saved" corrects to
+        ${MD.corrected_savings_pct < 0
+          ? `<b>negative ${Math.abs(Math.round(MD.corrected_savings_pct))}%</b> (costs MORE than all-Tier-3)`
+          : `~${Math.round(MD.corrected_savings_pct)}%`}.
+        Per-task routing pays zero resets by construction.</div>` : '');
   }
   if (F.matching) {
     const T = F.matching.table, I = F.matching.interaction || {};
     const cell = c => c ? `${(c.err_rate*100).toFixed(1)}% err · ${c.retry_streak} streak <span style="color:var(--ink-3)">(n=${c.n})</span>` : '—';
+    const sig = s => s ? '<b>significant</b>' : 'not significant';
     document.getElementById('fndMatch').innerHTML =
       `<div class="headline">Do weak models actually struggle more on hard tasks? (validates the
-        'served' assumption)</div>
+        'served' assumption — tier map fit on one half, checked on the other)</div>
       <table><tr><th></th><th>low tier (T1–2)</th><th>high tier (T3)</th></tr>
         <tr><td>easy tasks</td><td>${cell(T.easy_low_tier)}</td><td>${cell(T.easy_high_tier)}</td></tr>
         <tr><td>hard tasks</td><td>${cell(T.hard_low_tier)}</td><td>${cell(T.hard_high_tier)}</td></tr>
       </table>
-      <div class="verdict">Interaction: low-tier models show <b>${I.extra_err_rate_of_low_tier_on_hard >= 0 ? '+' : ''}${(I.extra_err_rate_of_low_tier_on_hard*100).toFixed(2)}pt</b>
-        extra error rate (95% CI [${(I.err_ci95[0]*100).toFixed(1)}, ${(I.err_ci95[1]*100).toFixed(1)}])
-        and <b>+${I.extra_retry_streak_of_low_tier_on_hard}</b> retry streak on matched hard tasks.
-        Directionally supportive, <b>not significant at n=953</b> — so 'served' stays a stated
-        assumption, not a proven effect. That honesty is deliberate.</div>`;
+      <div class="verdict">Interactions (difference-in-differences, ${I.n_boot || 5000} bootstrap resamples):
+        error rate <b>${fmtSigned(+(I.extra_err_rate_of_low_tier_on_hard*100).toFixed(2))}pt</b>
+        (95% CI [${(I.err_ci95[0]*100).toFixed(1)}, ${(I.err_ci95[1]*100).toFixed(1)}], ${sig(I.err_significant)});
+        retry streak <b>${fmtSigned(I.extra_retry_streak_of_low_tier_on_hard)}</b>
+        (95% CI [${I.streak_ci95 ? I.streak_ci95[0] : '?'}, ${I.streak_ci95 ? I.streak_ci95[1] : '?'}], ${sig(I.streak_significant)}).
+        <br>Verdict: ${esc(F.matching.verdict || '—')}</div>`;
   }
 }
 
