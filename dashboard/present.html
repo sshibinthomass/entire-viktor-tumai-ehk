@@ -207,10 +207,11 @@ const RND=(()=>{const pts=[];
   for(let m=0;m<=1.0001;m+=0.05){let p;
     if(m<=0.5){const t=m*2;p=[1-t*2/3,t/3,t/3]}
     else{const t=(m-0.5)*2;p=[(1-t)/3,(1-t)/3,(1-t)/3+t]}
-    let cost=0,top=0,served=0;
+    let cost=0,top=0,served=0,ws=0,wt=0;
     for(let i=0;i<N;i++){cost+=p[0]*Cm[i][0]+p[1]*Cm[i][1]+p[2]*Cm[i][2];top+=Cm[i][2];
-      served+=p[0]*(diffs[i]<=1?1:0)+p[1]*(diffs[i]<=2?1:0)+p[2]}
-    pts.push([cost/top,served/N])}
+      const s=diffs[i]<=1?1:diffs[i]<=2?p[1]+p[2]:p[2];
+      served+=s;ws+=s*Cm[i][2];wt+=Cm[i][2]}
+    pts.push([cost/top,served/N,ws/wt])}
   return pts})();
 const LOGGED=(()=>{const map={};((F.modelTiers||{}).models||[]).forEach(m=>map[m.model]=m.tier);
   if(!Object.keys(map).length)return null;
@@ -223,18 +224,19 @@ function drawFrontier(){
   let grid='';
   for(const g of[.2,.4,.6,.8,1])grid+=`<line x1="${L}" y1="${y(g)}" x2="${W-Rm}" y2="${y(g)}" stroke="var(--grid)"/>
     <text x="${L-8}" y="${y(g)+4}" text-anchor="end">${Math.round(g*100)}%</text>`;
-  for(const g of[.25,.5,.75,1])grid+=`<text x="${x(g)}" y="${H-16}" text-anchor="middle">${Math.round(g*100)}%</text>`;
+  for(const g of[.25,.5,.75,1])grid+=`<text x="${x(g)}" y="${H-B+22}" text-anchor="middle">${Math.round(g*100)}%</text>`;
   const line=(key,col)=>{let p='';front.pts.forEach((pt,i)=>{p+=(i?'L':'M')+x(pt.cost).toFixed(1)+' '+y(pt[key]).toFixed(1)});
     return `<path d="${p}" fill="none" stroke="${col}" stroke-width="3.5" stroke-linejoin="round"/>`};
   const cur=front.pts[front.cur];
   const dot=(key,col)=>`<circle cx="${x(cur.cost)}" cy="${y(cur[key])}" r="10" fill="${col}" stroke="var(--paper)" stroke-width="3"/>`;
-  let rndPath='';RND.forEach((p,i)=>{rndPath+=(i?'L':'M')+x(p[0]).toFixed(1)+' '+y(p[1]).toFixed(1)});
+  const rndPath=k=>RND.map((p,i)=>(i?'L':'M')+x(p[0]).toFixed(1)+' '+y(p[k]).toFixed(1)).join('');
   const refs=`
-    <path d="${rndPath}" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-dasharray="8 7" opacity=".8"/>
-    <text x="${x(RND[Math.floor(RND.length*0.62)][0])+8}" y="${y(RND[Math.floor(RND.length*0.62)][1])+26}" style="font-style:italic">random routing</text>
+    <path d="${rndPath(1)}" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-dasharray="8 7" opacity=".8"/>
+    <path d="${rndPath(2)}" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="2 6" opacity=".7"/>
+    <text x="${x(RND[Math.floor(RND.length*0.62)][0])+8}" y="${y(RND[Math.floor(RND.length*0.62)][1])+26}" style="font-style:italic">random routing (per metric)</text>
     ${LOGGED?`<circle cx="${x(Math.min(LOGGED.cost,1))}" cy="${y(LOGGED.served)}" r="10" fill="var(--navy)" stroke="var(--paper)" stroke-width="3"/>
-      <text x="${x(Math.min(LOGGED.cost,1))+14}" y="${y(LOGGED.served)+5}">logged dispatch</text>`:''}
-    <circle cx="${x(1)}" cy="${y(1)}" r="10" fill="var(--peach)" stroke="var(--navy)" stroke-width="3.5"/>
+      <text x="${x(Math.min(LOGGED.cost,1))}" y="${y(LOGGED.served)-16}" text-anchor="middle">logged dispatch</text>`:''}
+    <circle cx="${x(1)}" cy="${y(1)}" r="10" fill="var(--paper)" stroke="var(--navy)" stroke-width="3.5"/>
     <text x="${x(1)-16}" y="${y(1)+5}" text-anchor="end">always the top model</text>`;
   document.getElementById('front-chart').innerHTML=
     `<svg viewBox="0 0 ${W} ${H}">
@@ -243,9 +245,9 @@ function drawFrontier(){
       ${refs}
       ${line('ws','var(--peach)')}${line('served','var(--violet)')}
       ${dot('ws','var(--peach)')}${dot('served','var(--violet)')}
-      <text x="${W-Rm}" y="${y(front.pts[front.pts.length-1].served)-12}" text-anchor="end" style="fill:var(--violet)">our router (per task)</text>
-      <text x="${W-Rm}" y="${y(front.pts[front.pts.length-1].ws)+22}" text-anchor="end" style="fill:#d98a5f">our router (token-weighted)</text>
-      <text x="${(W+L)/2}" y="${H-16}" text-anchor="middle" style="font-weight:400">est. cost vs sending everything to the top tier →</text>
+      <text x="${x(front.pts[2].cost)}" y="${y(front.pts[2].served)-16}" style="fill:var(--violet)">our router (per task)</text>
+      <text x="${x(front.pts[2].cost)}" y="${y(front.pts[2].ws)+30}" style="fill:#d98a5f">our router (token-weighted)</text>
+      <text x="${(W+L)/2}" y="${H-4}" text-anchor="middle" style="font-weight:400">est. cost vs sending everything to the top tier →</text>
     </svg>`;
   document.getElementById('f-served').textContent=(cur.served*100).toFixed(1)+'%';
   document.getElementById('f-wserved').textContent=(cur.ws*100).toFixed(1)+'%';
