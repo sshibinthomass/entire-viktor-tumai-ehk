@@ -16,3 +16,6 @@ results/frozen_*.pkl
 __pycache__/
 catboost_info/
 outputs/
+
+# per-dataset lab files: previews hold verbatim task text (see dashboard/previews.js)
+dashboard/data/*.previews.js

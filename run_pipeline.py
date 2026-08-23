@@ -49,6 +49,7 @@ from router.ml import (workspace_of, oof_cumulative_probs, blend_scores,
 from evaluator.metrics import trajectory_metrics
 from evaluator.difficulty import (grade, percentile_ranks, DEFAULT_WEIGHTS,
                                   DEFAULT_CUTS as EV_CUTS, DEFAULT_OVERRIDES)
+from scripts import dashboard_datasets
 
 ROOT = Path(__file__).parent
 DEFAULT_EXPORT = str(ROOT / "export_linked")  # a directory (all chunks) or one .jsonl file
@@ -342,6 +343,13 @@ def main():
         f.write("window.VIKTOR_PREVIEWS = ")
         json.dump(previews, f, separators=(",", ":"))
         f.write(";\n")
+    # per-dataset copies + manifest: the lab's dropdown lists every chunk the
+    # pipeline has been run on, so a new chunk registers itself (see
+    # scripts/dashboard_datasets.py). data.js above stays the fallback.
+    src = data["meta"]["source"]
+    dashboard_datasets.write(src, "data", data, "VIKTOR_DATA")
+    dashboard_datasets.write(src, "previews", previews, "VIKTOR_PREVIEWS")
+    sets = dashboard_datasets.rebuild_manifest()
 
     # ---- console report ----
     print(f"router method={a.method}  tiers: " +
@@ -360,7 +368,9 @@ def main():
           f"(cache-blind model: ${report['cost_cache_blind']}; chars/4 estimates)")
     print(f"tier-3 price sensitivity: savings {report['est_savings_pct']}% (opus-priced T3) "
           f"vs {rf['est_savings_pct']}% (fable-priced T3)")
-    print("wrote results/ + dashboard/data.js (+ dashboard/previews.js, local only)")
+    print(f"wrote results/ + dashboard/data.js + dashboard/data/{dashboard_datasets.slug_of(src)}.js "
+          f"(+ previews, local only); lab dropdown lists {len(sets)}: "
+          + ", ".join(d["id"] for d in sets))
 
 
 if __name__ == "__main__":

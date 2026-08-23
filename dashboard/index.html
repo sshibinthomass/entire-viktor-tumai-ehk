@@ -235,9 +235,30 @@ its own outcome.</div>
 </div>
 <div id="tip"></div>
 
-<script src="data.js"></script>
-<script src="findings.js"></script>
-<script src="previews.js" onerror="/* previews are local-only (gitignored): optional */"></script>
+<script src="datasets.js" onerror="/* no manifest yet: single-dataset mode */"></script>
+<script>
+// ---------- dataset selection ----------
+// datasets.js (written by run_pipeline.py) lists every chunk the pipeline has
+// been run on: [{id, source, n, label}]. Pick one with ?dataset=<id>, remembered
+// in localStorage. The chosen files are written with document.write so they load
+// synchronously, before the app script below reads window.VIKTOR_DATA — nothing
+// downstream has to know that datasets are switchable. With no manifest (fresh
+// checkout, or a dashboard/ copied on its own) this falls back to data.js.
+(function () {
+  const list = Array.isArray(window.VIKTOR_DATASETS) ? window.VIKTOR_DATASETS : [];
+  const want = new URLSearchParams(location.search).get('dataset')
+            || (function () { try { return localStorage.getItem('viktorDataset'); }
+                              catch (e) { return null; } })();
+  const pick = list.find(d => d.id === want) || list[0] || null;
+  window.VIKTOR_DATASET = pick;
+  const files = pick
+    ? ['data/' + pick.id + '.js', 'data/' + pick.id + '.findings.js',
+       'data/' + pick.id + '.previews.js']
+    : ['data.js', 'findings.js', 'previews.js'];
+  document.write(files.map(s =>
+    '<scr' + 'ipt src="' + s + '" onerror="void 0"></scr' + 'ipt>').join(''));
+})();
+</script>
 <script>
 'use strict';
 const D = window.VIKTOR_DATA, M = D.meta, R = D.rows, N = R.length;
@@ -1094,11 +1115,28 @@ function tiles() {
        <div class="lb">${l}</div><div class="vl">${v}</div><div class="ct">${c}</div></div>`).join('');
 }
 function chips() {
+  // the source chip becomes a picker as soon as the pipeline has been run on
+  // more than one chunk (datasets.js is regenerated on every run)
+  const sets = Array.isArray(window.VIKTOR_DATASETS) ? window.VIKTOR_DATASETS : [];
+  const cur = window.VIKTOR_DATASET;
+  const source = sets.length > 1
+    ? `dataset <select id="datasetPick" style="font:inherit;color:inherit;
+         background:transparent;border:0;cursor:pointer;outline:none">` +
+      sets.map(d => `<option value="${esc(d.id)}"${cur && d.id === cur.id ? ' selected' : ''}
+         style="color:#111;background:#fff">${esc(d.label)}</option>`).join('') + '</select>'
+    : esc(M.source);
   document.getElementById('chips').innerHTML = [
-    `${N} trajectories`, esc(M.source),
+    `${N} trajectories`, source,
     'tokens = chars/4 estimates', 'router never sees the logged model',
     'ML probs: out-of-fold (GroupKFold by workspace)',
   ].map(c => `<span class="chip">${c}</span>`).join('');
+  const pick = document.getElementById('datasetPick');
+  if (pick) pick.onchange = () => {                       // reload: every number
+    try { localStorage.setItem('viktorDataset', pick.value); } catch (e) {}
+    const u = new URL(location.href);                     // recomputes from the
+    u.searchParams.set('dataset', pick.value);            // newly loaded chunk
+    location.href = u.href;
+  };
 }
 function renderAll() {
   tip.style.display = 'none';

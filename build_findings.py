@@ -11,7 +11,10 @@ Usage: python build_findings.py   (after infer_tiers / cache_trap / matching_che
 import json
 from pathlib import Path
 
+from scripts import dashboard_datasets
+
 OUT = Path("dashboard/findings.js")
+DATA = Path("dashboard/data.js")
 PARTS = {
     "modelTiers": "results/model_tiers.json",
     "cacheTrap": "results/cache_trap.json",
@@ -34,6 +37,21 @@ def main():
     OUT.write_text("window.VIKTOR_FINDINGS = " + json.dumps(bundle, separators=(",", ":"))
                    + ";\n", encoding="utf-8")
     print(f"wrote {OUT} with: {', '.join(bundle)}")
+    # the findings above describe whichever chunk run_pipeline.py last ran on —
+    # keep a copy next to that chunk's data file so the lab's dataset dropdown
+    # switches cards and numbers together (see scripts/dashboard_datasets.py)
+    source = None
+    if DATA.exists():
+        head = DATA.read_text(encoding="utf-8")[:4000]
+        start = head.find('"source":"')
+        if start >= 0:
+            source = head[start + 10:head.find('"', start + 10)]
+    if source:
+        p = dashboard_datasets.write(source, "findings", bundle, "VIKTOR_FINDINGS")
+        dashboard_datasets.rebuild_manifest()
+        print(f"wrote {p} (dataset '{dashboard_datasets.slug_of(source)}')")
+    else:
+        print(f"no meta.source in {DATA} — skipped the per-dataset findings copy")
 
 
 if __name__ == "__main__":
