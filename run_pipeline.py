@@ -54,12 +54,12 @@ ROOT = Path(__file__).parent
 DEFAULT_EXPORT = str(ROOT / "export_linked")  # a directory (all chunks) or one .jsonl file
 
 # tier -> assumed [$ / 1M input, $ / 1M cached input, $ / 1M output]
-# (representative rows from scripts/pricing.json; model ids are anonymized, so
-# pricing is an assumption). Tier 3's representative is the opus-5 row; the
-# inferred tier map also puts fable-5 ($10/$1/$50) in Tier 3 — the
-# tier3_price_sensitivity entry in comparison.json shows the headline under
-# that pricier representative too.
-TIER_PRICES = {1: [0.2, 0.02, 1.2], 2: [2.0, 0.2, 10.0], 3: [5.0, 0.5, 25.0]}
+# (model ids are anonymized, so pricing is an assumption). T1/T2 are the luna and
+# terra rows from scripts/pricing.json; T3 is a mid opus-class assumption sitting
+# a little under the opus-5 row ($5/$0.5/$25). The inferred tier map also puts
+# fable-5 ($10/$1/$50) in Tier 3 — the tier3_price_sensitivity entry in
+# comparison.json shows the headline under that pricier representative too.
+TIER_PRICES = {1: [0.2, 0.02, 1.2], 2: [2.0, 0.2, 12.0], 3: [4.0, 0.4, 20.0]}
 TIER3_FABLE = [10.0, 1.0, 50.0]
 
 # dispatch defaults picked from the committed sweeps (sweep_defaults.py ->
