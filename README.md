@@ -4,10 +4,15 @@ Our solution for the **Viktor Challenge** at the TUM.ai hackathon (Munich, 22–
 a two-part **tier router + trajectory evaluator** with an honest off-policy evaluation.
 The full writeup is in [SOLUTION.md](SOLUTION.md). **Judging this? Start with
 [docs/JUDGES.md](docs/JUDGES.md)** — the 15-minute evaluation path, the
-claim-to-artifact map, and how to run it on your own data. License-containment
+claim-to-artifact map, and how to run it on your own data. **Setting this up on a new
+machine? Start with [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** — a step-by-step
+checklist with verification points and troubleshooting. License-containment
 status is in [docs/LICENSE_CONTAINMENT.md](docs/LICENSE_CONTAINMENT.md).
 
 ## Reproduce from a clean checkout
+
+(The condensed version — [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) has the same steps
+with prerequisites, expected output at each stage, and a troubleshooting table.)
 
 ```bash
 # 0. dependencies (numpy / scipy / scikit-learn — see pyproject.toml)
@@ -95,6 +100,7 @@ In Claude Code you also get slash commands:
 | Path | What |
 |---|---|
 | `AGENTS.md` | Agent briefing: dataset shape, the cache trap, judging, starter ideas |
+| `docs/DEPLOYMENT.md` | Set-up checklist for a new machine: look → route → reproduce, with verification and troubleshooting |
 | `skills/` | The three guided workflows above (plain Markdown, readable by humans too) |
 | `scripts/` | Loader + trajectory reconstruction, baseline router, cache-aware cost model (estimated tokens), frontier plot, synthetic sample |
 | `templates/presentation.html` | Self-contained branded slide template |
