@@ -40,6 +40,45 @@ Open the lab and the deck with `python -m http.server 8017 -d dashboard`
 (or the `dashboard` entry in `.claude/launch.json`): `index.html` is the
 interactive lab, `present.html` the 5-minute deck.
 
+## For judges: run it on YOUR data
+
+Any export in the challenge format works — one JSONL line per LLM request with
+`model`, `input` (Responses-format item list), `tools`. Two modes:
+
+**Mode A — held-out scoring (the honest test: nothing refits on your data).**
+
+```bash
+# put YOUR chunk(s) in export/ and rebuild the id layer
+mkdir -p export && tar xzf trajectories_v1_02.jsonl.tar.gz -C export/
+python scripts/load_trajectories.py export/            # reconstruction + validator stats
+python scripts/enrich_dataset.py export/ export_linked/
+
+# freeze the router on OUR fit chunk once (regenerates the gitignored pickle —
+# it embeds TF-IDF vocabulary, so the license keeps it out of git):
+python freeze_router.py export_linked/trajectories_v1_01.jsonl
+
+# apply frozen to your chunk: every transform (feature ECDFs, TF-IDF, logits,
+# cut values, the evaluator yardstick) is fixed from the fit chunk
+python apply_frozen.py export_linked/trajectories_v1_02.jsonl
+# -> prints exact/adjacent/served/savings, writes results/heldout_report.json
+
+# or route ONE request (single-task inference path):
+python apply_frozen.py --one some_request.json
+```
+
+**Mode B — the full analysis on your data.** Replace the chunks in `export/`,
+rerun steps 2–4 of the reproduction above, and reload the dashboard: every
+number, chart, finding card and deck slide recomputes from your data — nothing
+in `dashboard/` is hand-typed. The defaults live in `run_pipeline.py`
+(`TIER_PRICES`, α/τ/λ) if you want to test other assumptions, and every knob is
+also live in the lab UI.
+
+Caveats that carry over to any data: token counts are chars/4 estimates (no
+`usage` in the format), prices are an assumption for anonymized ids, and
+Mode A's evaluator grades your chunk with the FIT chunk's yardstick — that is
+the point, but expect distribution shift on small or unusual chunks
+(see `results/heldout_chunk00.json` for a worked n=25 example).
+
 ## Using a coding agent
 
 Point Claude Code / Codex / Cursor / opencode at this repo — `AGENTS.md` briefs your agent.
