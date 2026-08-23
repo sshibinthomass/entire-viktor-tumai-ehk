@@ -1,0 +1,38 @@
+{
+  "n": 1000,
+  "exact_agreement": 0.654,
+  "adjacent_agreement": 0.958,
+  "spearman_scores": 0.6564195890683774,
+  "under_routed": 0.179,
+  "over_routed": 0.167,
+  "served": 0.821,
+  "served_token_weighted": 0.7450222021605766,
+  "confusion": [
+    [
+      424,
+      109,
+      17
+    ],
+    [
+      101,
+      146,
+      53
+    ],
+    [
+      25,
+      41,
+      84
+    ]
+  ],
+  "est_cost_policy_usd": 108.03,
+  "est_cost_all_tier3_usd": 186.18,
+  "est_savings_pct": 42.0,
+  "method": "blend",
+  "residualized_evaluator": false,
+  "cost_cache_blind": 61.8,
+  "tier3_price_sensitivity": {
+    "opus_priced_savings_pct": 42.0,
+    "fable_priced_savings_pct": 52.9,
+    "note": "Tier 3 representative row: the shipped mid-opus assumption [4, .4, 20] vs fable-5 [10, 1, 50] $/1M"
+  }
+}

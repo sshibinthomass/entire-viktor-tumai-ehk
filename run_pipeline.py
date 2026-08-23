@@ -262,7 +262,8 @@ def main():
     report["tier3_price_sensitivity"] = {
         "opus_priced_savings_pct": report["est_savings_pct"],
         "fable_priced_savings_pct": rf["est_savings_pct"],
-        "note": "Tier 3 representative row: opus-5 [5, .5, 25] vs fable-5 [10, 1, 50] $/1M",
+        "note": "Tier 3 representative row: the shipped mid-opus assumption "
+                "[4, .4, 20] vs fable-5 [10, 1, 50] $/1M",
     }
 
     # ---- results ----

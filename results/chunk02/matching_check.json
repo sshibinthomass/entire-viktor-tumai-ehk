@@ -1,0 +1,41 @@
+{
+  "table": {
+    "easy_low_tier": {
+      "n": 66,
+      "err_rate": 0.1007,
+      "retry_streak": 3.91
+    },
+    "easy_high_tier": {
+      "n": 234,
+      "err_rate": 0.0337,
+      "retry_streak": 1.82
+    },
+    "hard_low_tier": {
+      "n": 94,
+      "err_rate": 0.0987,
+      "retry_streak": 6.06
+    },
+    "hard_high_tier": {
+      "n": 106,
+      "err_rate": 0.0726,
+      "retry_streak": 2.5
+    }
+  },
+  "design": "tier map fit on even-half trajectories (infer_tiers.py), validated on this odd half only; both interactions bootstrapped with 5000 resamples on unrounded arrays",
+  "interaction": {
+    "extra_err_rate_of_low_tier_on_hard": -0.0409,
+    "err_ci95": [
+      -0.0974,
+      0.0133
+    ],
+    "err_significant": false,
+    "extra_retry_streak_of_low_tier_on_hard": 1.48,
+    "streak_ci95": [
+      0.239,
+      2.774
+    ],
+    "streak_significant": true,
+    "n_boot": 5000
+  },
+  "verdict": "PARTIALLY SUPPORTED: the retry-streak interaction is positive and significant; the error-rate interaction is directionally negative but its CI includes zero"
+}

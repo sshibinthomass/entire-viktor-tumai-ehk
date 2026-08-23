@@ -80,11 +80,19 @@ in `dashboard/` is hand-typed. The defaults live in `run_pipeline.py`
 (`TIER_PRICES`, α/τ/λ) if you want to test other assumptions, and every knob is
 also live in the lab UI.
 
+Both modes were run on the second data drop (`trajectories_v1_02`, 1,000 unseen
+tasks): **67.8% exact / 97.2% adjacent agreement, 83.1% served, 45.0% saved with
+zero refitting** — plus one claim that only half replicated. The worked example,
+with the distribution check that makes those numbers readable, is
+[docs/HELDOUT_CHUNK02.md](docs/HELDOUT_CHUNK02.md).
+
 Caveats that carry over to any data: token counts are chars/4 estimates (no
 `usage` in the format), prices are an assumption for anonymized ids, and
 Mode A's evaluator grades your chunk with the FIT chunk's yardstick — that is
 the point, but expect distribution shift on small or unusual chunks
-(see `results/heldout_chunk00.json` for a worked n=25 example).
+(see `results/heldout_chunk00.json` for a worked n=25 example, and
+`scripts/heldout_shift.py` to measure the shift on yours before reading the
+agreement numbers).
 
 ## Using a coding agent
 
@@ -101,8 +109,9 @@ In Claude Code you also get slash commands:
 |---|---|
 | `AGENTS.md` | Agent briefing: dataset shape, the cache trap, judging, starter ideas |
 | `docs/DEPLOYMENT.md` | Set-up checklist for a new machine: look → route → reproduce, with verification and troubleshooting |
+| `docs/HELDOUT_CHUNK02.md` | The second data drop, run end to end: what transferred, what only half replicated, what the shift check says |
 | `skills/` | The three guided workflows above (plain Markdown, readable by humans too) |
-| `scripts/` | Loader + trajectory reconstruction, baseline router, cache-aware cost model (estimated tokens), frontier plot, synthetic sample |
+| `scripts/` | Loader + trajectory reconstruction, baseline router, cache-aware cost model (estimated tokens), frontier plot, held-out distribution-shift check, synthetic sample |
 | `templates/presentation.html` | Self-contained branded slide template |
 
 ## Rules that matter

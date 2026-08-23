@@ -13,7 +13,9 @@ TWO layers, clearly separated (they were previously blurred):
   tool-loops policy produces ~zero switches — the export samples ~1 call per
   task and consecutive logged calls are all mechanical continuations, so the
   planning<->execution switch points fall BETWEEN the samples. The measured
-  overstatement is a floor, not the effect.
+  overstatement is a floor, not the effect. A chunk with NO multi-call
+  trajectory (v1_01 and v1_02 are both one-call-per-task) has no call pair to
+  measure at all: the layer is then reported unavailable, not faked.
 
   MODELED (all trajectories): an extrapolation under three stated assumptions:
     (a) a mid-task switch re-pays ~T/2 uncached-vs-cached (T = final context)
@@ -94,6 +96,24 @@ def main():
     print(f"trajectories with >=2 logged calls: {len(calls_of)} "
           f"(total logged calls {sum(len(v) for v in calls_of.values())})")
 
+    out = {"n_trajectories": len(calls_of), "policies": {}}
+    g = measured_layer(calls_of, task_tier, out) if calls_of else None
+    if g is None:
+        out["measured_available"] = False
+        out["measured_note"] = (
+            "MEASURED layer unavailable: no trajectory in this export has >=2 logged "
+            "calls, so there are no intra-task call pairs whose prefix overlap could "
+            "be measured. Chunks that ship one sampled call per task (v1_01, v1_02) "
+            "are like this; v1_00 ships whole trajectories. The MODELED layer below "
+            "needs only the per-trajectory metrics and still runs."
+        )
+        print(out["measured_note"])
+    modeled_layer(out, g)
+
+
+def measured_layer(calls_of, task_tier, out):
+    """Price the per-call policies on the trajectories that DO have >=2 logged
+    calls. Returns the cheap-tool-loops record (the one the correction uses)."""
     profiles = {tid: per_call_token_profile(v) for tid, v in calls_of.items()}
 
     # greedy per-call thresholds from the input-size distribution
@@ -122,7 +142,6 @@ def main():
         "per-call greedy (size)": greedy_route,
         "per-call cheap-tool-loops": alternating_route,
     }
-    out = {"n_trajectories": len(calls_of), "policies": {}}
     top_naive = sum(price(p, [3] * len(p), False) for p in profiles.values())
     top_aware = sum(price(p, [3] * len(p), True) for p in profiles.values())
     for name, pol in policies.items():
@@ -149,7 +168,14 @@ def main():
     print(f"\nMEASURED subset: overstatement {out['measured_overstatement_pct_points']} pts "
           f"with {g['switches']} switches — the sampling hides switch points, so this "
           f"is a floor, not the effect.")
+    out["measured_available"] = True
+    return g
 
+
+def modeled_layer(out, g):
+    """The extrapolation (assumptions a/b/c in the docstring). Needs only the
+    per-trajectory metrics, so it runs on one-call-per-task chunks too; the
+    naive-claim correction needs the measured layer and is skipped without it."""
     # ---------------- MODELED extrapolation (assumptions a/b/c in the docstring)
     mets = [json.loads(l) for l in open("results/evaluator_metrics.jsonl",
                                         encoding="utf-8")]
@@ -172,8 +198,9 @@ def main():
 
     penalty, first_pass, replay = modeled(TIER_PRICES[3])
     input_budget = first_pass + replay
-    naive_claim = g["savings_naive_pct"]
-    corrected = round(naive_claim - 100 * penalty / input_budget, 1)
+    naive_claim = g["savings_naive_pct"] if g else None
+    corrected = None if g is None else \
+        round(naive_claim - 100 * penalty / input_budget, 1)
     out["modeled_full_trajectory"] = {
         "label": "MODELED, not measured — extrapolation under the three stated assumptions",
         "assumptions": [
@@ -206,8 +233,12 @@ def main():
     print(f"\nMODELED (all {len(mets)} tasks, input-only, assumptions stated): the same "
           f"policy pays ~${penalty:,.0f} in cache resets vs a ${input_budget:,.0f} "
           f"all-Tier3 INPUT budget ({100 * penalty / input_budget:.0f}% of it).")
-    print(f"Its 'naive {naive_claim:.0f}% saved' corrects to ~{corrected:.0f}% saved "
-          f"once resets are priced — per-task routing pays zero resets by construction.")
+    if g:
+        print(f"Its 'naive {naive_claim:.0f}% saved' corrects to ~{corrected:.0f}% saved "
+              f"once resets are priced — per-task routing pays zero resets by construction.")
+    else:
+        print("(no measured per-call claim on this export to correct — the naive-vs-"
+              "corrected pair needs trajectories with >=2 logged calls.)")
     print(f"(fable-priced Tier 3: penalty ${pen_f:,.0f} on a ${fp_f + rp_f:,.0f} budget)")
     with open("results/cache_trap.json", "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2)

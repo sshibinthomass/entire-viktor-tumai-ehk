@@ -1,0 +1,34 @@
+{
+  "n": 1000,
+  "exact_agreement": 0.55,
+  "adjacent_agreement": 0.953,
+  "spearman_scores": 0.6809320022644334,
+  "under_routed": 0.13,
+  "over_routed": 0.32,
+  "served": 0.87,
+  "served_token_weighted": 0.7043509748670168,
+  "confusion": [
+    [
+      278,
+      60,
+      27
+    ],
+    [
+      276,
+      221,
+      43
+    ],
+    [
+      20,
+      24,
+      51
+    ]
+  ],
+  "est_cost_policy_usd": 95.11,
+  "est_cost_all_tier3_usd": 186.18,
+  "est_savings_pct": 48.9,
+  "method": "ml-lambda",
+  "heldout_source": "trajectories_v1_02.jsonl",
+  "frozen_fit_source": "trajectories_v1_01.jsonl",
+  "note": "HELD-OUT run: every transform (ECDFs, TF-IDF, logits, cuts, evaluator yardstick) frozen from the fit chunk. Report these numbers separately from public-split numbers."
+}

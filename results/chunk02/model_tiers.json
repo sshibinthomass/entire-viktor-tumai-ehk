@@ -1,0 +1,130 @@
+{
+  "min_n": 15,
+  "models": [
+    {
+      "model": "claude-opus-4-8",
+      "n": 80,
+      "served_difficulty": 0.3598,
+      "struggle_z": -0.2874,
+      "tier": 3,
+      "bootstrap_stability": 1.0,
+      "low_confidence": false
+    },
+    {
+      "model": "claude-sonnet-5",
+      "n": 269,
+      "served_difficulty": 0.4055,
+      "struggle_z": -0.2774,
+      "tier": 3,
+      "bootstrap_stability": 1.0,
+      "low_confidence": false
+    },
+    {
+      "model": "claude-opus-5",
+      "n": 306,
+      "served_difficulty": 0.4909,
+      "struggle_z": -0.1422,
+      "tier": 3,
+      "bootstrap_stability": 0.735,
+      "low_confidence": false
+    },
+    {
+      "model": "claude-fable-5",
+      "n": 62,
+      "served_difficulty": 0.4574,
+      "struggle_z": -0.0851,
+      "tier": 2,
+      "bootstrap_stability": 0.735,
+      "low_confidence": false
+    },
+    {
+      "model": "gpt-5.6-sol",
+      "n": 97,
+      "served_difficulty": 0.6836,
+      "struggle_z": 0.3077,
+      "tier": 2,
+      "bootstrap_stability": 1.0,
+      "low_confidence": false
+    },
+    {
+      "model": "claude-opus-4-6",
+      "n": 2,
+      "served_difficulty": 0.8922,
+      "struggle_z": 0.5652,
+      "tier": 2,
+      "bootstrap_stability": 0.0,
+      "low_confidence": true
+    },
+    {
+      "model": "gpt-5.6-terra",
+      "n": 159,
+      "served_difficulty": 0.6341,
+      "struggle_z": 0.5704,
+      "tier": 1,
+      "bootstrap_stability": 1.0,
+      "low_confidence": false
+    },
+    {
+      "model": "gpt-5.6-luna",
+      "n": 25,
+      "served_difficulty": 0.6065,
+      "struggle_z": 0.9896,
+      "tier": 1,
+      "bootstrap_stability": 1.0,
+      "low_confidence": false
+    }
+  ],
+  "models_half_a": [
+    {
+      "model": "claude-fable-5",
+      "n": 36,
+      "tier": 2,
+      "bootstrap_stability": 0.84
+    },
+    {
+      "model": "claude-opus-4-6",
+      "n": 2,
+      "tier": 1,
+      "bootstrap_stability": 0.0
+    },
+    {
+      "model": "claude-opus-4-8",
+      "n": 35,
+      "tier": 3,
+      "bootstrap_stability": 0.995
+    },
+    {
+      "model": "claude-opus-5",
+      "n": 159,
+      "tier": 3,
+      "bootstrap_stability": 0.845
+    },
+    {
+      "model": "claude-sonnet-5",
+      "n": 121,
+      "tier": 3,
+      "bootstrap_stability": 1.0
+    },
+    {
+      "model": "gpt-5.6-luna",
+      "n": 12,
+      "tier": 1,
+      "bootstrap_stability": 1.0
+    },
+    {
+      "model": "gpt-5.6-sol",
+      "n": 45,
+      "tier": 2,
+      "bootstrap_stability": 1.0
+    },
+    {
+      "model": "gpt-5.6-terra",
+      "n": 90,
+      "tier": 1,
+      "bootstrap_stability": 1.0
+    }
+  ],
+  "split_design": "models_half_a is fit on even-indexed trajectories (sorted by trajectory_id); matching_check.py validates on the odd-indexed half only \u2014 the tier map is never validated on the rows that produced it",
+  "tercile_note": "terciles force three ids per tier regardless of spread; read low-stability boundary members as fuzzy, not fixed",
+  "null_result": "revealed preference is flat across models (see served_difficulty): the logged dispatch was not difficulty-aware \u2014 that headroom is what the router exploits"
+}

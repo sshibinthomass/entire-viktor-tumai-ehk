@@ -1,0 +1,37 @@
+{
+  "n_trajectories": 0,
+  "policies": {},
+  "measured_available": false,
+  "measured_note": "MEASURED layer unavailable: no trajectory in this export has >=2 logged calls, so there are no intra-task call pairs whose prefix overlap could be measured. Chunks that ship one sampled call per task (v1_01, v1_02) are like this; v1_00 ships whole trajectories. The MODELED layer below needs only the per-trajectory metrics and still runs.",
+  "modeled_full_trajectory": {
+    "label": "MODELED, not measured \u2014 extrapolation under the three stated assumptions",
+    "assumptions": [
+      "a switch re-pays ~T/2 uncached-vs-cached (T = final context tokens)",
+      "cheap-tool-loops switches ~2x per user/planning turn, capped by call count",
+      "rate delta averaged over the two tiers entered (T1 and T3)",
+      "input side only; token counts are chars/4 estimates"
+    ],
+    "cache_reset_penalty_usd": 112.94,
+    "all_tier3_input_budget_usd": 152.68,
+    "all_tier3_budget_decomposition": {
+      "first_pass_input_usd": 85.7,
+      "cached_replay_usd": 66.98,
+      "note": "input-only \u2014 output cost is NOT in this denominator"
+    },
+    "penalty_share_of_input_budget_pct": 74.0,
+    "naive_claimed_savings_pct": null,
+    "corrected_savings_pct": null,
+    "tier3_price_sensitivity": {
+      "opus_priced": {
+        "penalty_usd": 112.94,
+        "input_budget_usd": 152.68,
+        "penalty_share_pct": 74.0
+      },
+      "fable_priced": {
+        "penalty_usd": 274.28,
+        "input_budget_usd": 381.71,
+        "penalty_share_pct": 71.9
+      }
+    }
+  }
+}

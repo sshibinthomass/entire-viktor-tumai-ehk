@@ -1,0 +1,387 @@
+{
+  "fit_source": "trajectories_v1_01.jsonl",
+  "new_source": "trajectories_v1_02.jsonl",
+  "fit_shape": {
+    "n_trajectories": 1000,
+    "n_requests": 1000,
+    "logged_calls_median": 1.0,
+    "logged_calls_max": 1,
+    "one_call_only_pct": 100.0
+  },
+  "new_shape": {
+    "n_trajectories": 1000,
+    "n_requests": 1000,
+    "logged_calls_median": 1.0,
+    "logged_calls_max": 1,
+    "one_call_only_pct": 100.0
+  },
+  "features": [
+    {
+      "name": "usr_n_questions",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.056,
+      "mean_fit_rank": 0.472
+    },
+    {
+      "name": "n_tools",
+      "fit_median": 12.0,
+      "new_median": 12.0,
+      "ks": 0.034,
+      "mean_fit_rank": 0.479
+    },
+    {
+      "name": "usr_has_deadline",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.043,
+      "mean_fit_rank": 0.479
+    },
+    {
+      "name": "tools_n_params",
+      "fit_median": 45.0,
+      "new_median": 45.0,
+      "ks": 0.035,
+      "mean_fit_rank": 0.48
+    },
+    {
+      "name": "usr_n_pii_refs",
+      "fit_median": 32.0,
+      "new_median": 31.0,
+      "ks": 0.038,
+      "mean_fit_rank": 0.482
+    },
+    {
+      "name": "trig_slack",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.033,
+      "mean_fit_rank": 0.484
+    },
+    {
+      "name": "usr_n_code_fences",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.048,
+      "mean_fit_rank": 0.486
+    },
+    {
+      "name": "usr_n_bullets",
+      "fit_median": 28.0,
+      "new_median": 28.0,
+      "ks": 0.054,
+      "mean_fit_rank": 0.487
+    },
+    {
+      "name": "usr_n_file_ext",
+      "fit_median": 5.0,
+      "new_median": 5.0,
+      "ks": 0.031,
+      "mean_fit_rank": 0.487
+    },
+    {
+      "name": "sys_n_skills",
+      "fit_median": 67.0,
+      "new_median": 67.0,
+      "ks": 0.047,
+      "mean_fit_rank": 0.512
+    },
+    {
+      "name": "usr_n_coord_markers",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.019,
+      "mean_fit_rank": 0.511
+    },
+    {
+      "name": "usr_tokens",
+      "fit_median": 2498.5,
+      "new_median": 2501.0,
+      "ks": 0.051,
+      "mean_fit_rank": 0.49
+    },
+    {
+      "name": "usr_n_words",
+      "fit_median": 1298.5,
+      "new_median": 1323.0,
+      "ks": 0.056,
+      "mean_fit_rank": 0.49
+    },
+    {
+      "name": "usr_sys_ratio",
+      "fit_median": 0.312,
+      "new_median": 0.317,
+      "ks": 0.031,
+      "mean_fit_rank": 0.49
+    },
+    {
+      "name": "usr_n_lines",
+      "fit_median": 94.5,
+      "new_median": 95.0,
+      "ks": 0.033,
+      "mean_fit_rank": 0.491
+    },
+    {
+      "name": "usr_n_numbers",
+      "fit_median": 163.0,
+      "new_median": 173.5,
+      "ks": 0.046,
+      "mean_fit_rank": 0.507
+    },
+    {
+      "name": "tool_slack",
+      "fit_median": 1.0,
+      "new_median": 1.0,
+      "ks": 0.014,
+      "mean_fit_rank": 0.507
+    },
+    {
+      "name": "tool_msteams",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.014,
+      "mean_fit_rank": 0.493
+    },
+    {
+      "name": "usr_n_urls",
+      "fit_median": 9.0,
+      "new_median": 9.0,
+      "ks": 0.032,
+      "mean_fit_rank": 0.506
+    },
+    {
+      "name": "sys_n_flags",
+      "fit_median": 7.0,
+      "new_median": 7.0,
+      "ks": 0.015,
+      "mean_fit_rank": 0.506
+    },
+    {
+      "name": "tools_tokens",
+      "fit_median": 4209.0,
+      "new_median": 4209.0,
+      "ks": 0.02,
+      "mean_fit_rank": 0.494
+    },
+    {
+      "name": "usr_audio",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.009,
+      "mean_fit_rank": 0.495
+    },
+    {
+      "name": "sys_n_sections",
+      "fit_median": 10.0,
+      "new_median": 10.0,
+      "ks": 0.014,
+      "mean_fit_rank": 0.505
+    },
+    {
+      "name": "sys_tokens",
+      "fit_median": 7182.0,
+      "new_median": 7093.0,
+      "ks": 0.034,
+      "mean_fit_rank": 0.504
+    },
+    {
+      "name": "usr_exclaim",
+      "fit_median": 1.0,
+      "new_median": 1.0,
+      "ks": 0.044,
+      "mean_fit_rank": 0.504
+    },
+    {
+      "name": "usr_truncated_ctx",
+      "fit_median": 1.0,
+      "new_median": 1.0,
+      "ks": 0.006,
+      "mean_fit_rank": 0.503
+    },
+    {
+      "name": "usr_n_ctx_blocks",
+      "fit_median": 2.0,
+      "new_median": 2.0,
+      "ks": 0.004,
+      "mean_fit_rank": 0.503
+    },
+    {
+      "name": "usr_has_attachment",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.007,
+      "mean_fit_rank": 0.497
+    },
+    {
+      "name": "tool_subagent",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.003,
+      "mean_fit_rank": 0.502
+    },
+    {
+      "name": "tool_background",
+      "fit_median": 1.0,
+      "new_median": 1.0,
+      "ks": 0.003,
+      "mean_fit_rank": 0.498
+    },
+    {
+      "name": "trig_thread_activity",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.003,
+      "mean_fit_rank": 0.498
+    },
+    {
+      "name": "usr_n_action_verbs",
+      "fit_median": 6.0,
+      "new_median": 6.0,
+      "ks": 0.018,
+      "mean_fit_rank": 0.501
+    },
+    {
+      "name": "usr_n_attachments",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.003,
+      "mean_fit_rank": 0.499
+    },
+    {
+      "name": "usr_has_image",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.001,
+      "mean_fit_rank": 0.499
+    },
+    {
+      "name": "usr_n_todo",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.005,
+      "mean_fit_rank": 0.499
+    },
+    {
+      "name": "usr_n_deliverable_kw",
+      "fit_median": 4.0,
+      "new_median": 4.0,
+      "ks": 0.031,
+      "mean_fit_rank": 0.501
+    },
+    {
+      "name": "tool_memory_search",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.0,
+      "mean_fit_rank": 0.5
+    },
+    {
+      "name": "usr_n_parts",
+      "fit_median": 1.0,
+      "new_median": 1.0,
+      "ks": 0.003,
+      "mean_fit_rank": 0.5
+    },
+    {
+      "name": "tool_has_bash",
+      "fit_median": 1.0,
+      "new_median": 1.0,
+      "ks": 0.0,
+      "mean_fit_rank": 0.5
+    },
+    {
+      "name": "tool_has_write",
+      "fit_median": 1.0,
+      "new_median": 1.0,
+      "ks": 0.0,
+      "mean_fit_rank": 0.5
+    },
+    {
+      "name": "trig_teams",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.0,
+      "mean_fit_rank": 0.5
+    },
+    {
+      "name": "trig_scheduled",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.0,
+      "mean_fit_rank": 0.5
+    }
+  ],
+  "evaluator_metrics": [
+    {
+      "name": "n_distinct_tools",
+      "fit_median": 2.0,
+      "new_median": 2.0,
+      "ks": 0.048,
+      "mean_fit_rank": 0.468
+    },
+    {
+      "name": "gen_tokens",
+      "fit_median": 715.0,
+      "new_median": 631.0,
+      "ks": 0.062,
+      "mean_fit_rank": 0.475
+    },
+    {
+      "name": "n_user_turns",
+      "fit_median": 1.0,
+      "new_median": 1.0,
+      "ks": 0.045,
+      "mean_fit_rank": 0.478
+    },
+    {
+      "name": "n_tool_errors",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.034,
+      "mean_fit_rank": 0.48
+    },
+    {
+      "name": "n_llm_calls",
+      "fit_median": 7.0,
+      "new_median": 7.0,
+      "ks": 0.052,
+      "mean_fit_rank": 0.482
+    },
+    {
+      "name": "reasoning_tokens",
+      "fit_median": 0.0,
+      "new_median": 0.0,
+      "ks": 0.036,
+      "mean_fit_rank": 0.515
+    },
+    {
+      "name": "n_tool_calls",
+      "fit_median": 6.0,
+      "new_median": 6.0,
+      "ks": 0.057,
+      "mean_fit_rank": 0.486
+    },
+    {
+      "name": "context_tokens",
+      "fit_median": 17388.0,
+      "new_median": 16685.5,
+      "ks": 0.037,
+      "mean_fit_rank": 0.49
+    },
+    {
+      "name": "max_repeat_streak",
+      "fit_median": 2.0,
+      "new_median": 2.0,
+      "ks": 0.034,
+      "mean_fit_rank": 0.51
+    },
+    {
+      "name": "tool_output_tokens",
+      "fit_median": 2220.0,
+      "new_median": 2035.0,
+      "ks": 0.027,
+      "mean_fit_rank": 0.501
+    }
+  ],
+  "n_features_shifted_gt_0_15": 0
+}

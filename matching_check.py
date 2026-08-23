@@ -124,11 +124,18 @@ def main():
         if sig_err and sig_st and did_err > 0 and did_st > 0:
             verdict = "SUPPORTED on both metrics: under-routing has a measurable cost"
         elif (sig_err and did_err > 0) or (sig_st and did_st > 0):
-            which = "error-rate" if sig_err else "retry-streak"
-            other = "retry-streak" if sig_err else "error-rate"
+            # name the OTHER metric's actual sign — the old wording said
+            # "directionally positive" even when it had flipped negative
+            if sig_err and did_err > 0:
+                which, other, o_did, o_sig = "error-rate", "retry-streak", did_st, sig_st
+            else:
+                which, other, o_did, o_sig = "retry-streak", "error-rate", did_err, sig_err
+            sign = "positive" if o_did > 0 else "negative" if o_did < 0 else "flat"
+            tail = ("and significant with the OPPOSITE sign — inspect before claiming"
+                    if o_sig else "but its CI includes zero")
             verdict = (f"PARTIALLY SUPPORTED: the {which} interaction is positive and "
-                       f"significant; the {other} interaction is directionally positive "
-                       f"but its CI includes zero")
+                       f"significant; the {other} interaction is directionally {sign} "
+                       f"{tail}")
         elif (sig_err and did_err < 0) or (sig_st and did_st < 0):
             verdict = "REFUTED-DIRECTION on at least one metric — inspect before claiming"
         else:

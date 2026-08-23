@@ -35,6 +35,7 @@ random routing, the repriced logged dispatch, and the always-top-tier dot.
 | Under-routing has a measurable cost: +6.7pt error rate (CI [+2.5, +10.8]) and +2.7 retry streak (CI [+1.6, +4.0]) on matched hard tasks — both significant | `results/matching_check.json` | `matching_check.py`: tier map fit on the even half of trajectories, validated on the odd half ONLY; 5,000 bootstrap resamples on unrounded arrays |
 | The cache trap: measured switches on the 25 real multi-call trajectories; MODELED ~$160 reset penalty vs a $221 input-only all-T3 budget (assumptions listed in the JSON) | `results/cache_trap.json` | `cache_trap.py` |
 | Held-out mechanism works with zero refitting | `results/heldout_chunk00.json` | `freeze_router.py` on chunk 01 → `apply_frozen.py` on chunk 00 (n=25, shifted — a mechanism demo, not a headline) |
+| Held-out on the second data drop: 67.8% exact, 97.2% adjacent, 83.1% served, 45.0% saved with ZERO refitting (n=1000, no task overlap, no detectable distribution shift) — and the under-routing cost claim only half replicates | `results/heldout_chunk02*.json`, `results/heldout_shift_chunk02.json`, `results/chunk02/` | `freeze_router.py` on chunk 01 → `apply_frozen.py` on chunk 02; full write-up incl. what failed in [HELDOUT_CHUNK02.md](HELDOUT_CHUNK02.md) |
 
 ## The rigor checklist (things you should try to break)
 
