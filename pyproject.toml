@@ -1,7 +1,14 @@
 [project]
 name = "entire-viktor-tumai-ehk"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.2.0"
+description = "Viktor Challenge (TUM.ai): tier router + trajectory evaluator with an honest off-policy evaluation"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "scikit-learn>=1.4",
+]
+
+[project.optional-dependencies]
+plots = ["matplotlib>=3.8"]
