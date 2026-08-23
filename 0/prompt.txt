@@ -1,0 +1,4 @@
+[trajectories_v1_01.jsonl](file;file:///d%3A/Github-Projects/entire-viktor-tumai-ehk/export/trajectories_v1_01.jsonl) [routes.jsonl](file;file:///d%3A/Github-Projects/entire-viktor-tumai-ehk/results/routes.jsonl) 
+
+create a folder export_linked and recreate both files and  i also need both these files to be linkeded with primary key from 1....
+and foreign key
