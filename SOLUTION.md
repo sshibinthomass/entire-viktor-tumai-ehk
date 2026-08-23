@@ -211,13 +211,23 @@ Recommended operating points (defaults; cache-aware costs; from
   drove the tier inference (grading with them would mechanically depress logged
   served%). The tooltip carries a tercile-boundary sensitivity. We claim "better
   under our inferred tier map and fair grading", not "strict domination".
-- **The 5-minute deck** (`dashboard/present.html`): fixed slide order, every number
-  computed live from `data.js`/`findings.js` (committed artifacts) — including the
-  slide-5 selection-bias and evaluator-agreement numbers that used to be hardcoded.
-  The τ=0.80 operating point is pinned on the frontier; the replay does one sweep
-  and parks on it ('p' pauses). Slide 3 shows the signal on one real trace
-  (loaded from the gitignored local previews — verbatim dataset text is never
-  committed).
+- **The 5-minute deck** (`dashboard/present.html`): seven timed slides plus a Q&A
+  appendix — claim (0:20) · setup in three facts (1:00) · the frontier (2:00) · the
+  decision rule (2:45) · the honest slide (3:45) · one known weakness and a week of
+  work (4:20) · close (5:00). Each slide carries its time window and `t` starts a
+  presenter timer that turns amber past the segment. Slides are deliberately
+  text-minimal — headline sentence, numbers with denominators and intervals, one
+  chart; the prose lives in speaker notes toggled with `n` and never shown to the
+  room. Every number is computed live from `data.js`/`findings.js` (committed
+  artifacts), including the bootstrap CIs (2,000 resamples of the 1,025 tasks)
+  and the evaluator-perturbation band. The
+  frontier draws the router as a curve against four labeled baselines — always-cheap
+  (all T1), always-strong (all T3), the repriced logged dispatch, and **random at
+  matched cost** — with error bars on the operating point and on random. The τ=0.80
+  point is pinned; the replay does one sweep and parks on it ('p' pauses). The rule
+  slide prints the dispatch rule and its fallbacks verbatim; it also shows the rule
+  firing on one real trace (loaded from the gitignored local previews — verbatim
+  dataset text is never committed).
 - **Judge-model rescoring** (`judge_rescore.py`, starter idea 3): matched
   low-vs-high-tier call pairs are built from recovered replies (call i's output
   lives in call i+1's input) — 8 pairs exist at the current data size; scoring

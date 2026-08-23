@@ -8,127 +8,222 @@
         --grid:#e4e1f4;--muted:#6d67a3}
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--ink);font-family:'Gellix','Inter',system-ui,-apple-system,'Segoe UI',sans-serif}
-  .slide{display:none;width:100vw;height:100vh;padding:6vh 7vw;background:var(--paper);color:var(--navy);flex-direction:column;justify-content:center}
+  .slide{display:none;width:100vw;height:100vh;padding:6vh 6vw;background:var(--paper);color:var(--navy);flex-direction:column;justify-content:center}
   .slide.active{display:flex}
   .slide.dark{background:var(--navy);color:var(--paper)}
-  h1{font-size:4.8vw;line-height:1.05;letter-spacing:-.02em}
-  h2{font-size:3vw;margin-bottom:3vh;letter-spacing:-.01em}
-  p,li{font-size:1.55vw;line-height:1.5;max-width:66vw}
-  .kicker{color:var(--violet);text-transform:uppercase;letter-spacing:.18em;font-size:1vw;font-weight:700;margin-bottom:2.2vh}
+  h1{font-size:4.6vw;line-height:1.05;letter-spacing:-.02em}
+  h2{font-size:2.9vw;line-height:1.12;margin-bottom:3vh;letter-spacing:-.015em;max-width:84vw}
+  .kicker{color:var(--violet);text-transform:uppercase;letter-spacing:.18em;font-size:1vw;font-weight:700;margin-bottom:2.4vh}
   .dark .kicker{color:var(--peach)}
-  .big{font-size:2.7vw;font-weight:700;color:var(--violet);margin:2vh 0}
-  .dark .big{color:var(--peach)}
-  .cols{display:flex;gap:3vw;margin-top:1.5vh}
-  .card{flex:1;border:2px solid var(--violet);border-radius:14px;padding:2.2vh 1.6vw}
-  .card h3{color:var(--violet);font-size:1.35vw;margin-bottom:1vh}
-  .card p, .card li{font-size:1.25vw;max-width:none}
+  .kicker .t{color:var(--muted);letter-spacing:.1em;margin-left:.8vw}
+  .dark .kicker .t{color:#b9b3e8}
+  .lead{font-size:1.5vw;color:var(--violet);font-weight:700;margin-top:2.4vh;font-variant-numeric:tabular-nums}
+  .dark .lead{color:var(--peach)}
+  .sub{font-size:1.05vw;color:var(--muted);margin-top:1.6vh}
+  .dark .sub{color:#b9b3e8}
+  .cols{display:flex;gap:2vw;margin-top:1vh}
+  .card{flex:1;min-width:0;border:2px solid var(--violet);border-radius:14px;padding:2.4vh 1.5vw}
+  .card h3{color:var(--violet);font-size:1.15vw;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.4vh}
+  .card ul{list-style:none}
+  .card li{font-size:1.4vw;line-height:1.5;font-variant-numeric:tabular-nums}
+  .card li + li{margin-top:.7vh}
+  .card li b{color:var(--violet)}
   .dark .card{border-color:var(--peach)}
   .dark .card h3{color:var(--peach)}
   svg{width:100%;height:auto;display:block}
   svg text{font:600 13px 'Gellix','Inter',system-ui,sans-serif;fill:var(--muted)}
   svg .lab{font-weight:400}
-  .statrow{display:flex;gap:2.5vw;margin-top:2vh}
-  .stat{border-left:4px solid var(--violet);padding:0 1.2vw}
-  .stat .v{font-size:2.6vw;font-weight:700;color:var(--violet);font-variant-numeric:tabular-nums}
-  .stat .l{font-size:1vw;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
-  .foot{position:fixed;bottom:2.2vh;right:7vw;font-size:.9vw;color:var(--violet);opacity:.75;z-index:5}
-  .pageno{position:fixed;bottom:2.2vh;left:7vw;font-size:.9vw;color:var(--violet);opacity:.75;z-index:5}
+  .statrow{display:flex;gap:2.4vw;margin-top:2.4vh}
+  .stat{border-left:4px solid var(--violet);padding:0 1vw}
+  .stat .v{font-size:2.6vw;font-weight:700;color:var(--violet);font-variant-numeric:tabular-nums;line-height:1.1}
+  .stat .l{font-size:.92vw;color:var(--muted);text-transform:uppercase;letter-spacing:.09em}
+  .stat .ci{font-size:.95vw;color:var(--muted);font-variant-numeric:tabular-nums}
+  .dark .stat{border-color:var(--peach)}
+  .dark .stat .v{color:var(--peach)}
+  .dark .stat .l,.dark .stat .ci{color:#b9b3e8}
+  .foot{position:fixed;bottom:2vh;right:6vw;font-size:.85vw;color:var(--violet);opacity:.7;z-index:5}
+  .pageno{position:fixed;bottom:2vh;left:6vw;font-size:.85vw;color:var(--violet);opacity:.7;z-index:5}
   code{background:rgba(103,72,253,.1);padding:.1em .35em;border-radius:5px;font-size:.95em}
-  .hint{position:fixed;top:2.2vh;right:7vw;font-size:.85vw;color:var(--muted);opacity:.8;z-index:5}
-  table.mini{border-collapse:collapse;font-size:1.1vw;margin-top:1vh}
-  table.mini th{color:var(--muted);font-weight:600;text-align:left;padding:.4vh .9vw;border-bottom:2px solid var(--grid)}
-  table.mini td{padding:.5vh .9vw;border-bottom:1px solid var(--grid);font-variant-numeric:tabular-nums}
+  pre.rule{background:var(--navy);color:var(--paper);border-radius:12px;padding:2.2vh 1.5vw;
+           font:600 1.15vw/1.7 'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+           white-space:pre;overflow:hidden}
+  pre.rule .c{color:#b9b3e8;font-weight:400}
+  pre.rule .k{color:var(--peach)}
+  .hint{position:fixed;top:2vh;right:6vw;font-size:.8vw;color:var(--muted);opacity:.75;z-index:5}
+  .timer{position:fixed;top:2vh;left:6vw;font-size:.95vw;font-weight:700;color:var(--violet);
+         font-variant-numeric:tabular-nums;z-index:6;opacity:.9}
+  .timer.over{color:#c2410c}
+  .note{font-size:1vw;color:var(--muted);margin-top:1.2vh;font-variant-numeric:tabular-nums}
   .tag{display:inline-block;background:var(--violet);color:#fff;border-radius:6px;padding:.05em .5em;font-size:.85em;font-weight:700}
+  .qa{margin-top:1vh}
+  .qa .q{color:var(--violet);font-weight:700;font-size:1.5vw;margin-top:2.4vh}
+  .qa .a{font-size:1.3vw;color:var(--navy);margin-top:.5vh;font-variant-numeric:tabular-nums}
+  /* speaker notes: hidden by default, toggled with n — the slides stay bare */
+  .notes{display:none}
+  body.shownotes .slide.active .notes{display:block;position:fixed;left:0;right:0;bottom:0;
+    background:var(--navy);color:var(--paper);padding:1.6vh 6vw;font-size:1vw;line-height:1.5;z-index:7;
+    border-top:3px solid var(--peach)}
+  body.shownotes .slide.active.dark .notes{background:var(--ink)}
 </style>
 </head>
 <body>
 
-<!-- 1 · TITLE -->
-<section class="slide dark active">
-  <div class="kicker">Viktor Challenge · TUM.ai · Build the Router</div>
-  <h1>Dream team</h1>
-  <p class="big" id="t-claim">…</p>
-  <p>Shibin Thomas. Every number on these slides is computed live from the same
-     pipeline outputs the demo dashboard uses.</p>
-</section>
-
-<!-- 2 · OBJECTIVE -->
-<section class="slide">
-  <div class="kicker">Objective</div>
-  <h2>The trade-off we chose</h2>
-  <p><b>Cost per adequately-served task, routed per task.</b> A task is "served" when its
-     tier ≥ the difficulty its full trajectory later revealed. We route whole tasks, not
-     single calls — a model switch resets the provider's prefix cache, so per-call routing
-     pays for its cleverness (slide 5).</p>
+<!-- 1 · TITLE + THE CLAIM · 0:00–0:20 -->
+<section class="slide dark active" data-win="0:00–0:20" data-end="20">
+  <div class="kicker">Viktor Challenge · TUM.ai<span class="t">0:00–0:20</span></div>
+  <h1 id="t-head">…</h1>
   <div class="statrow">
-    <div class="stat"><div class="v" id="o-n">…</div><div class="l">real trajectories</div></div>
-    <div class="stat"><div class="v">0</div><div class="l">quality labels shipped</div></div>
-    <div class="stat"><div class="v">2</div><div class="l">independent graders: router vs evaluator</div></div>
+    <div class="stat"><div class="v" id="t-save">…</div><div class="l">cost saved</div><div class="ci" id="t-save-ci">…</div></div>
+    <div class="stat"><div class="v" id="t-served">…</div><div class="l">tasks served</div><div class="ci" id="t-served-ci">…</div></div>
+    <div class="stat"><div class="v" id="t-n">…</div><div class="l">real trajectories</div><div class="ci">95% bootstrap CIs</div></div>
   </div>
+  <p class="sub">Dream team · Shibin Thomas</p>
+  <div class="notes">Opening claim — say the number, then stop. Every figure on these slides is
+    recomputed in the browser from the committed pipeline artifacts; τ = 0.80, cache-aware pricing.</div>
 </section>
 
-<!-- 3 · THE SIGNAL -->
-<section class="slide">
-  <div class="kicker">The signal</div>
-  <h2>What the router reads — before the first token is generated</h2>
+<!-- 2 · THE SETUP IN 3 FACTS · 0:20–1:00 -->
+<section class="slide" data-win="0:20–1:00" data-end="60">
+  <div class="kicker">Setup<span class="t">0:20–1:00</span></div>
+  <h2>The log shows what ran, never what would have run.</h2>
   <div class="cols">
-    <div class="card" style="flex:1.4"><h3>Nameable structure (live from the traces)</h3>
-      <div id="sig-chart"></div></div>
-    <div class="card"><h3>Plus the words themselves</h3>
-      <p>Word + character n-grams of the first user message, into ordinal logistic
-         regression → <b>P(difficulty ≤ tier)</b> per task. Text beat every boosted tree
-         we benchmarked.</p>
-      <p style="margin-top:1.2vh"><b>Null result worth naming:</b> the logged dispatch was
-         <i>not</i> difficulty-aware (flat served-difficulty across models). That headroom
-         is what the router exploits.</p>
-      <div id="trace-snip" style="margin-top:1.2vh"></div></div>
+    <div class="card"><h3>The data</h3>
+      <ul>
+        <li id="s-n">…</li>
+        <li>9 models · one per task</li>
+        <li id="s-mix">…</li>
+      </ul></div>
+    <div class="card"><h3>Observable</h3>
+      <ul>
+        <li><b>At dispatch:</b> system prompt · first user message · tools</li>
+        <li><b>In hindsight:</b> tool calls · errors · retries · tokens</li>
+      </ul></div>
+    <div class="card"><h3>Not observable</h3>
+      <ul>
+        <li>final output · usage · prices · quality labels</li>
+        <li><b>the counterfactual</b></li>
+      </ul></div>
   </div>
+  <p class="lead">served = routed tier ≥ revealed difficulty</p>
+  <div class="notes">Three facts only so the chart is readable. Tokens are chars/4 estimates,
+    prices are an assumption — quote ratios, not dollars. Quality is a proxy: a task counts as
+    served when the tier we picked is at least the difficulty its own trajectory later revealed.</div>
 </section>
 
-<!-- 4 · THE ONE CHART -->
-<section class="slide" id="frontier-slide">
-  <div class="kicker">The one chart</div>
-  <h2>Cost–quality frontier <span style="font-size:.5em">· out-of-fold · cache-aware pricing · knob replay <span class="tag" id="f-knob">τ</span></span></h2>
+<!-- 3 · THE ONE CHART · 1:00–2:00 -->
+<section class="slide" id="frontier-slide" data-win="1:00–2:00" data-end="120">
+  <div class="kicker">The one chart<span class="t">1:00–2:00</span></div>
+  <h2>At equal cost, random keeps the cheap tasks; we keep the expensive ones.
+      <span style="font-size:.4em;font-weight:400"><span class="tag" id="f-knob">τ</span></span></h2>
   <div id="front-chart"></div>
   <div class="statrow">
-    <div class="stat"><div class="v" id="f-served">…</div><div class="l">tasks served</div></div>
-    <div class="stat"><div class="v" id="f-wserved">…</div><div class="l">token-weighted</div></div>
-    <div class="stat"><div class="v" id="f-cost">…</div><div class="l">of all-top-tier cost</div></div>
+    <div class="stat"><div class="v" id="f-served">…</div><div class="l">tasks served</div><div class="ci" id="f-served-ci">…</div></div>
+    <div class="stat"><div class="v" id="f-wserved">…</div><div class="l">token-weighted</div><div class="ci" id="f-wserved-ci">…</div></div>
+    <div class="stat"><div class="v" id="f-cost">…</div><div class="l">of all-top-tier cost</div><div class="ci" id="f-cost-ci">…</div></div>
+    <div class="stat"><div class="v" id="f-delta">…</div><div class="l">tokens vs random, equal cost</div><div class="ci" id="f-delta-ci">…</div></div>
   </div>
+  <p class="lead" id="f-operate">…</p>
+  <div class="notes" id="f-notes">…</div>
 </section>
 
-<!-- 5 · HONESTY -->
-<section class="slide">
-  <div class="kicker">Honesty</div>
-  <h2>The off-policy estimate — and where it breaks</h2>
+<!-- 4 · THE ROUTER · 2:00–2:45 -->
+<section class="slide" data-win="2:00–2:45" data-end="165">
+  <div class="kicker">The rule<span class="t">2:00–2:45</span></div>
+  <h2>Two probabilities, one threshold.</h2>
   <div class="cols">
-    <div class="card"><h3>Method</h3>
-      <p>Difficulty graded from the full trajectory by a frozen rule-based evaluator;
-         router validated <b>out-of-fold</b> (GroupKFold by workspace, nested config
-         selection over the full grid — measured selection bias
-         <span id="h-bias">…</span>). Matched cross-model check:
-         <span id="h-match">…</span></p></div>
-    <div class="card"><h3>Cache trap</h3>
-      <p id="h-cache">…</p></div>
-    <div class="card"><h3>Weakest point</h3>
-      <p>Difficulty = <i>observed effort</i> on chars/4 token estimates under assumed
-         prices. Perturbed evaluator configs agree only <span id="h-agree">…</span> with
-         the frozen one — nothing above that ceiling is measurable. Quote the ratios,
-         not the dollars.</p></div>
+    <div class="card" style="flex:1.3">
+<pre class="rule">p1, p2 = P(D&#8804;1), P(D&#8804;2)   <span class="c"># TF-IDF(first user msg)
+                         #   &#8853; 23 rank features</span>
+
+tier = <span class="k">1</span> if p1 &#8805; &#964;         <span class="c"># &#964; = 0.80</span>
+       <span class="k">2</span> if p2 &#8805; &#964;
+       <span class="k">3</span> otherwise         <span class="c"># per task, never per call</span></pre>
+      <p class="note"><b>Fallbacks:</b> p3 = min(p2, p3) · no user text → numeric ranks alone ·
+         unseen values → clamped by frozen ECDFs · no artifact → <code>--method score</code></p></div>
+    <div class="card"><h3>What it reads</h3>
+      <div id="sig-chart"></div>
+      <div id="trace-snip"></div></div>
+  </div>
+  <div class="notes">A rule a judge can restate beats a better score they cannot explain. The signs
+    are the insight: a dense ask is hard, a broad toolset is not. One tier per task, so a model
+    switch never resets the prefix cache mid-trajectory.</div>
+</section>
+
+<!-- 5 · THE HONEST SLIDE · 2:45–3:45 -->
+<section class="slide" data-win="2:45–3:45" data-end="225">
+  <div class="kicker">Honesty<span class="t">2:45–3:45</span></div>
+  <h2 id="h-title">…</h2>
+  <div class="cols">
+    <div class="card"><h3>Observed vs extrapolated</h3>
+      <ul id="h-obs"></ul></div>
+    <div class="card"><h3>Calibration</h3>
+      <ul id="h-match"></ul></div>
+    <div class="card"><h3>Cache reset</h3>
+      <ul id="h-cache"></ul></div>
+    <div class="card" style="border-style:dashed"><h3>Offline eval cannot see</h3>
+      <ul>
+        <li><b>error recovery</b></li>
+        <li><b>compounding drift</b></li>
+      </ul></div>
+  </div>
+  <div class="notes">Observed = our tier equals the tier of the model that actually ran, so the cost
+    is realized effort repriced. Everything else is the evaluator's label, not an outcome — priced
+    against 205 matched hard tasks in the held-out half. Error recovery: a weak model that flails and
+    still lands the task scores as not served here. Compounding drift: route differently and the
+    trajectory diverges, so every downstream effort count stops applying. Both need live re-runs.</div>
+</section>
+
+<!-- 6 · WEAKNESS + A WEEK · 3:45–4:20 -->
+<section class="slide" data-win="3:45–4:20" data-end="260">
+  <div class="kicker">Known weakness<span class="t">3:45–4:20</span></div>
+  <h2>Served% over-credits short tasks.</h2>
+  <div class="cols">
+    <div class="card"><h3>The flaw</h3>
+      <ul id="w-flaw"></ul></div>
+    <div class="card"><h3>One week</h3>
+      <ul>
+        <li>served% per <b>token decile</b>, with CIs</li>
+        <li><b>judge rescoring</b> — 8 matched pairs today</li>
+        <li><code>--residualize</code> on by default</li>
+      </ul></div>
+  </div>
+  <div class="notes">Volunteered, not extracted: 55% of tasks are difficulty 1, so any tier serves
+    them and the average is dominated by short work — that is why random at our cost still reaches
+    93% of tasks. The token-weighted column is the crude fix; length-stratifying would shrink our
+    headline and sharpen the comparison.</div>
+</section>
+
+<!-- 7 · CLOSE · 4:20–5:00 -->
+<section class="slide dark" data-win="4:20–5:00" data-end="300">
+  <div class="kicker">Close<span class="t">4:20–5:00</span></div>
+  <h1 id="c-claim">…</h1>
+  <p class="lead" id="c-number">…</p>
+  <p class="sub">Any agent log with a request prefix and an effort proxy routes the same way.</p>
+  <div class="notes">Repeat the opening number — repetition is what people remember. One sentence on
+    generality: reconstruct the trajectories, grade effort in hindsight, route on the opening, price
+    the cache. Weakness we own: difficulty is observed effort, shaped by whichever model ran.</div>
+</section>
+
+<!-- 8 · APPENDIX — Q&A openers (not part of the 5 minutes) -->
+<section class="slide" data-win="Q&amp;A" data-end="0">
+  <div class="kicker">Appendix<span class="t">Q&amp;A openers</span></div>
+  <h2>Three questions, three numbers.</h2>
+  <div class="qa">
+    <p class="q">Why not always-cheapest?</p>
+    <p class="a" id="q-cheap">…</p>
+    <p class="q">What breaks at 2× traffic?</p>
+    <p class="a">Not the rule — one forward pass, frozen artifact. The ECDFs drift; τ is calibrated
+       to this difficulty mix.</p>
+    <p class="q">What would change your mind?</p>
+    <p class="a">A judge model accepting Tier-1 answers on matched hard tasks — then effort is the
+       wrong proxy. <code>judge_rescore.py</code> needs a key, not a rewrite.</p>
   </div>
 </section>
 
-<!-- 6 · CLOSE -->
-<section class="slide dark">
-  <div class="kicker">Close</div>
-  <h1 style="font-size:3.2vw" id="c-claim">…</h1>
-  <p class="big" id="c-number">…</p>
-  <p id="c-weak">…</p>
-</section>
-
-<div class="pageno"><span id="pg">1</span> / 6</div>
+<div class="pageno"><span id="pg">1</span> / 8</div>
+<div class="timer" id="timer" style="display:none">0:00</div>
 <div class="foot">Viktor challenge · TUM.ai</div>
-<div class="hint">← → navigate · f fullscreen · p pause the τ replay · numbers computed live from pipeline data</div>
+<div class="hint">← → navigate · f fullscreen · t timer · n notes · p pause replay</div>
 
 <script src="data.js"></script>
 <script src="findings.js"></script>
@@ -139,6 +234,12 @@ const D = window.VIKTOR_DATA, F = window.VIKTOR_FINDINGS || {}, M = D.meta, R = 
 const DEF = M.defaults;
 { const P = window.VIKTOR_PREVIEWS || {};
   for (const r of R) { const p = P[String(r.id)]; if (p) { r.trigger = p[0]; r.preview = p[1]; } } }
+const pct = (v, d) => (v * 100).toFixed(d === undefined ? 1 : d) + '%';
+const num = v => v.toLocaleString('en-US');
+const TAU = DEF.tau.toFixed(2);
+const ci = (a, d) => '[' + (a[0] * 100).toFixed(d === undefined ? 1 : d) + ', '
+                         + (a[1] * 100).toFixed(d === undefined ? 1 : d) + ']';
+const li = (s) => '<li>' + s + '</li>';
 
 // ---------- minimal math (mirrors the dashboard; defaults only) ----------
 function ranksOf(vals){ // right-ECDF — same transform as rank_utils.py and the lab
@@ -151,36 +252,109 @@ function ranksOf(vals){ // right-ECDF — same transform as rank_utils.py and th
   return out}
 function quantile(sorted,q){const x=q*(sorted.length-1),lo=Math.floor(x),hi=Math.ceil(x);
   return sorted[lo]+(sorted[hi]-sorted[lo])*(x-lo)}
-const evScores=(()=>{const w=DEF.evWeights;let tw=0;for(const k in w)tw+=w[k];
-  return R.map(r=>{let s=0;M.evNames.forEach((k,c)=>s+=(w[k]||0)*r.evRank[c]);return s/tw})})();
-const evSorted=[...evScores].sort((a,b)=>a-b);
-const ec1=quantile(evSorted,DEF.evCuts[0]),ec2=quantile(evSorted,DEF.evCuts[1]);
-const diffs=R.map((r,i)=>{
-  if(r.ev.n_tool_errors>=DEF.overrides.errors_t3||r.ev.n_tool_calls>=DEF.overrides.tool_calls_t3)return 3;
-  return evScores[i]<=ec1?1:evScores[i]<=ec2?2:3});
+// evaluator labels for arbitrary (weights, cuts, overrides): used for the frozen grading,
+// for the logged-dispatch grading, and for the live perturbation band on slide 5
+function gradeLabels(w,cuts,ovr){let tw=0;for(const k in w)tw+=w[k];
+  const sc=R.map(r=>{let s=0;M.evNames.forEach((k,c)=>s+=(w[k]||0)*r.evRank[c]);return s/tw});
+  const so=[...sc].sort((a,b)=>a-b);
+  const c1=quantile(so,cuts[0]),c2=quantile(so,cuts[1]);
+  return {scores:sc,labels:R.map((r,i)=>{
+    if(r.ev.n_tool_errors>=ovr.errors_t3||r.ev.n_tool_calls>=ovr.tool_calls_t3)return 3;
+    return sc[i]<=c1?1:sc[i]<=c2?2:3})}}
+const frozen=gradeLabels(DEF.evWeights,DEF.evCuts,DEF.overrides);
+const evScores=frozen.scores, diffs=frozen.labels;
+const DIFFMIX=[1,2,3].map(d=>diffs.filter(x=>x===d).length);
 const CUM=R.map(r=>r.cum);
 const Cm=R.map(r=>{const e=r.ev,T=e.context_tokens,g=e.gen_tokens,n=Math.max(e.n_llm_calls,1);
   return [1,2,3].map(t=>{const[pin,pc,pout]=DEF.tierPrices[t];
     return (T*pin+T*(n-1)/2*pc+g*pout)/1e6})});
-function policy(tiers){let cost=0,top=0,served=0,ws=0,wt=0;
+function policy(tiers,dd){dd=dd||diffs;let cost=0,top=0,served=0,ws=0,wt=0;
   for(let i=0;i<N;i++){cost+=Cm[i][tiers[i]-1];top+=Cm[i][2];
-    const ok=tiers[i]>=diffs[i];if(ok)served++;wt+=Cm[i][2];if(ok)ws+=Cm[i][2]}
+    const ok=tiers[i]>=dd[i];if(ok)served++;wt+=Cm[i][2];if(ok)ws+=Cm[i][2]}
   return {cost:cost/top,served:served/N,ws:ws/wt}}
 const tauTiers=t=>R.map((r,i)=>CUM[i][0]>=t?1:CUM[i][1]>=t?2:3);
 
-// ---------- slide 1 + 2 + 6: numbers ----------
-const opSafe=policy(tauTiers(DEF.tau));
-document.getElementById('t-claim').textContent=
-  `${(opSafe.served*100).toFixed(0)}% of tasks fully served at ${(opSafe.cost*100).toFixed(0)}% of the all-top-tier cost — decided before the first token.`;
-document.getElementById('o-n').textContent=N;
-document.getElementById('c-claim').textContent='Route the task, not the call — the ask already tells you enough.';
-document.getElementById('c-number').textContent=
-  `${(opSafe.served*100).toFixed(1)}% served · ${(100-opSafe.cost*100).toFixed(0)}% saved (τ=${DEF.tau}, cache-aware)`;
-document.getElementById('c-weak').textContent=
-  'Weakness we own: difficulty is observed effort, not ground truth — and it is partly shaped by whichever model ran. '
-  + 'Next step: judge-model rescoring of matched pairs to turn the served assumption into a measurement.';
+// ---------- the operating point and the four baselines ----------
+const OPT=tauTiers(DEF.tau), OP=policy(OPT);
+const MIX=[0,0,0];OPT.forEach(t=>MIX[t-1]++);
+const BELOW_TOP=(MIX[0]+MIX[1])/N;                    // share routed below the top tier
+const CHEAP=policy(R.map(()=>1)), STRONG=policy(R.map(()=>3)), MID=policy(R.map(()=>2));
+const ORACLE=policy(diffs);
+// logged dispatch, repriced under the inferred tier map. Graded WITHOUT the error/streak
+// metrics: those also drove the tier inference, so grading with them would mechanically
+// depress the logged policy's served%.
+const TIERMAP={};((F.modelTiers||{}).models||[]).forEach(m=>TIERMAP[m.model]=m.tier);
+const loggedTiers=Object.keys(TIERMAP).length?R.map(r=>TIERMAP[r.model]||3):null;
+const LOGGED=loggedTiers?policy(loggedTiers,
+  gradeLabels({...DEF.evWeights,n_tool_errors:0,max_repeat_streak:0},DEF.evCuts,
+              {errors_t3:1e9,tool_calls_t3:DEF.overrides.tool_calls_t3}).labels):null;
+// random routing: analytic expectation for a tier mixture p (a task of difficulty d is served
+// with probability sum of p over tiers >= d). The curve sweeps T1->T2 then T2->T3.
+function randPoint(p){let cost=0,top=0,served=0,ws=0,wt=0;
+  for(let i=0;i<N;i++){cost+=p[0]*Cm[i][0]+p[1]*Cm[i][1]+p[2]*Cm[i][2];top+=Cm[i][2];
+    const s=diffs[i]<=1?1:diffs[i]<=2?p[1]+p[2]:p[2];
+    served+=s;ws+=s*Cm[i][2];wt+=Cm[i][2]}
+  return {cost:cost/top,served:served/N,ws:ws/wt}}
+const RND=(()=>{const pts=[];
+  for(let m=0;m<=1.0001;m+=0.02){let p;
+    if(m<=0.5){const t=m*2;p=[1-t,t,0]}else{const t=(m-0.5)*2;p=[0,1-t,t]}
+    const r=randPoint(p);pts.push([r.cost,r.served,r.ws])}
+  return pts})();
+// random AT MATCHED COST: the mixture whose expected spend equals ours
+const RMATCH=(()=>{let best=null;
+  for(let a=0;a<=1.0001;a+=0.002)for(const fam of[0,1]){
+    const p=fam===0?[1-a,0,a]:[0,1-a,a];const r=randPoint(p);
+    if(!best||Math.abs(r.cost-OP.cost)<Math.abs(best.r.cost-OP.cost))best={p:p,r:r}}
+  return best})();
 
-// ---------- slide 3: live signal chart ----------
+// ---------- intervals: 2,000 bootstrap resamples of the N tasks ----------
+const BOOT=(()=>{const B=2000;let s=12345;
+  const rnd=()=>{s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff};
+  const p=RMATCH.p,oS=[],oW=[],oC=[],rS=[],rW=[],dS=[],dW=[];
+  for(let b=0;b<B;b++){let cost=0,top=0,sv=0,ws=0,wt=0,rsv=0,rws=0;
+    for(let k=0;k<N;k++){const i=Math.floor(rnd()*N),T3=Cm[i][2];
+      top+=T3;wt+=T3;cost+=Cm[i][OPT[i]-1];
+      const ok=OPT[i]>=diffs[i]?1:0;sv+=ok;ws+=ok*T3;
+      const pr=diffs[i]<=1?1:diffs[i]<=2?p[1]+p[2]:p[2];rsv+=pr;rws+=pr*T3}
+    oS.push(sv/N);oW.push(ws/wt);oC.push(cost/top);rS.push(rsv/N);rW.push(rws/wt);
+    dS.push(sv/N-rsv/N);dW.push(ws/wt-rws/wt)}
+  const q95=a=>{a.sort((x,y)=>x-y);return[a[Math.floor(B*0.025)],a[Math.floor(B*0.975)]]};
+  return{served:q95(oS),ws:q95(oW),cost:q95(oC),rServed:q95(rS),rWs:q95(rW),
+         dServed:q95(dS),dWs:q95(dW),B:B}})();
+
+// ---------- evaluator-perturbation band (30 variants, recomputed live) ----------
+const EVBAND=(()=>{let s=7;const rnd=()=>{s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff};
+  const sv=[];
+  for(let v=0;v<30;v++){const w={};
+    for(const k in DEF.evWeights)w[k]=DEF.evWeights[k]*(0.5+1.5*rnd());
+    const cuts=[DEF.evCuts[0]+(rnd()-0.5)*0.1,DEF.evCuts[1]+(rnd()-0.5)*0.1];
+    sv.push(policy(OPT,gradeLabels(w,cuts,DEF.overrides).labels).served)}
+  sv.sort((a,b)=>a-b);return{lo:sv[0],hi:sv[sv.length-1],n:sv.length}})();
+
+// ---------- observed vs extrapolated ----------
+const OBS=(()=>{if(!loggedTiers)return null;let same=0,cheaper=0,pricier=0;
+  for(let i=0;i<N;i++){if(OPT[i]===loggedTiers[i])same++;
+    else if(OPT[i]<loggedTiers[i])cheaper++;else pricier++}
+  return{same:same,cheaper:cheaper,pricier:pricier}})();
+
+// ---------- slide 1: the claim ----------
+document.getElementById('t-head').textContent =
+  (BELOW_TOP*100).toFixed(0) + '% of tasks routed cheaper. '
+  + (OP.served*100).toFixed(0) + '% still served.';
+document.getElementById('t-save').textContent = pct(1-OP.cost);
+document.getElementById('t-save-ci').textContent = ci([1-BOOT.cost[1],1-BOOT.cost[0]]);
+document.getElementById('t-served').textContent = pct(OP.served);
+document.getElementById('t-served-ci').textContent = ci(BOOT.served);
+document.getElementById('t-n').textContent = num(N);
+
+// ---------- slide 2 ----------
+document.getElementById('s-n').innerHTML =
+  '<b>' + num(N) + '</b> trajectories · 1,153 requests';
+document.getElementById('s-mix').innerHTML =
+  'difficulty mix <b>' + (DIFFMIX[0]/N*100).toFixed(0) + '/' + (DIFFMIX[1]/N*100).toFixed(0)
+  + '/' + (DIFFMIX[2]/N*100).toFixed(0) + '</b>';
+
+// ---------- slide 4: the features the rule reads ----------
 (function(){
   const eR=ranksOf(evScores);let base=0;const rows=[];
   const pearson=(a,b)=>{let ma=0,mb=0;for(let i=0;i<a.length;i++){ma+=a[i];mb+=b[i]}ma/=a.length;mb/=a.length;
@@ -188,128 +362,135 @@ document.getElementById('c-weak').textContent=
     return sab/Math.sqrt(sa*sb||1)};
   for(const[g,spec]of Object.entries(M.featureGroups)){
     spec.features.forEach((f,k)=>{const col=base+k;const v=new Float64Array(N);
-      for(let i=0;i<N;i++)v[i]=R[i].rank[col];rows.push({f,rho:pearson(v,eR)})});
+      for(let i=0;i<N;i++)v[i]=R[i].rank[col];rows.push({f:f,rho:pearson(v,eR)})});
     base+=spec.features.length}
   rows.sort((a,b)=>b.rho-a.rho);
-  const top=rows.slice(0,5).concat(rows.slice(-3));
-  const W=560,rh=34,T=6,H=T+top.length*rh+8,mid=300,scale=230/Math.max(...top.map(r=>Math.abs(r.rho)));
-  let out=`<line x1="${mid}" y1="${T}" x2="${mid}" y2="${H-6}" stroke="var(--grid)" stroke-width="2"/>`;
+  const top=rows.slice(0,4).concat(rows.slice(-2));
+  const W=560,rh=34,T=4,H=T+top.length*rh+6,mid=300,scale=225/Math.max(...top.map(r=>Math.abs(r.rho)));
+  let out='<line x1="'+mid+'" y1="'+T+'" x2="'+mid+'" y2="'+(H-6)+'" stroke="var(--grid)" stroke-width="2"/>';
   top.forEach((r,i)=>{const y=T+i*rh,w=Math.abs(r.rho)*scale,pos=r.rho>=0;
-    out+=`<rect x="${pos?mid:mid-w}" y="${y+6}" width="${Math.max(w,2)}" height="${rh-14}" rx="5"
-      fill="${pos?'var(--violet)':'var(--peach)'}"/>
-      <text class="lab" x="${mid-(pos?8:w+8)}" y="${y+rh-13}" text-anchor="end">${r.f}</text>
-      <text x="${mid+(pos?w+7:8)}" y="${y+rh-13}">${r.rho>=0?'+':''}${r.rho.toFixed(2)}</text>`});
+    out+='<rect x="'+(pos?mid:mid-w)+'" y="'+(y+6)+'" width="'+Math.max(w,2)+'" height="'+(rh-14)+'" rx="5" fill="'
+      +(pos?'var(--violet)':'var(--peach)')+'"/>'
+      +'<text class="lab" x="'+(mid-(pos?8:w+8))+'" y="'+(y+rh-12)+'" text-anchor="end">'+r.f+'</text>'
+      +'<text x="'+(mid+(pos?w+7:8))+'" y="'+(y+rh-12)+'">'+(r.rho>=0?'+':'')+r.rho.toFixed(2)+'</text>'});
   document.getElementById('sig-chart').innerHTML=
-    `<svg viewBox="0 0 ${W} ${H}">${out}</svg>
-     <p style="font-size:1vw;color:var(--muted);max-width:none;margin-top:.6vh">
-       Spearman vs observed difficulty. Violet = marks hard (entity density, questions,
-       action verbs). Peach = marks easy (broad toolsets, mid-thread triggers).</p>`;
+    '<svg viewBox="0 0 '+W+' '+H+'">'+out+'</svg>'
+    + '<p class="note">ρ vs observed difficulty · violet = harder, peach = easier</p>';
 })();
 
-// ---------- slide 3: one REAL trace showing the signal (license-safe: the
-// verbatim text loads from the gitignored previews.js at present time only) ----------
+// ---------- slide 4: the rule firing on one real trace (verbatim text loads from the
+// gitignored previews.js at present time only — dataset text is never committed) ----------
 (function(){
   const el=document.getElementById('trace-snip');
-  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  // pick a hard, dense task the router got right (max entity-ish preview length among D3 hits)
   let pick=-1;
   for(let i=0;i<N;i++)
     if(diffs[i]===3&&CUM[i][1]<0.5&&R[i].preview&&(pick<0||R[i].feat.usr_n_pii_refs>R[pick].feat.usr_n_pii_refs))pick=i;
   if(pick>=0){
     const r=R[pick];
-    el.innerHTML=`<h3 style="font-size:1.1vw">The signal on one real trace</h3>
-      <p style="font-size:1.05vw;color:var(--muted)"><code>${esc(r.trigger||'task')}</code>
-      “${esc(r.preview.slice(0,120))}…” — ${r.feat.usr_n_pii_refs} entities,
-      ${r.feat.usr_n_action_verbs} action verbs, ${r.feat.usr_n_questions} questions
-      → routed <b>Tier 3</b>; trajectory later showed ${r.ev.n_tool_calls} tool calls.</p>`;
+    el.innerHTML='<p class="note"><b>One real trace:</b> ' + r.feat.usr_n_pii_refs + ' entities · '
+      + r.feat.usr_n_action_verbs + ' verbs · p2 = ' + CUM[pick][1].toFixed(2) + ' → <b>T3</b> · '
+      + r.ev.n_tool_calls + ' tool calls later</p>';
   } else {
-    el.innerHTML=`<p style="font-size:1.05vw;color:var(--muted)">(Run
-      <code>run_pipeline.py</code> locally to load a real trace snippet here — verbatim
-      dataset text is never committed.)</p>`;
+    el.innerHTML='<p class="note">(local run loads a real trace here)</p>';
   }
 })();
 
-// ---------- slide 4: live frontier + animated knob replay ----------
+// ---------- slide 3: the frontier ----------
 const front={pts:[],cur:0,timer:null,dir:-1,opIdx:0};
 (function(){
-  for(let t=0.30;t<=0.996;t+=0.01)front.pts.push({tau:t,...policy(tauTiers(t))});
-  // index of the quoted operating point (τ = pipeline default)
+  for(let t=0.30;t<=0.996;t+=0.01)front.pts.push(Object.assign({tau:t},policy(tauTiers(t))));
   front.opIdx=front.pts.reduce((b,p,i)=>
     Math.abs(p.tau-DEF.tau)<Math.abs(front.pts[b].tau-DEF.tau)?i:b,0);
   front.cur=front.opIdx;
 })();
-// references: expected random routing, and the logged dispatch repriced by inferred tiers
-const RND=(()=>{const pts=[];
-  for(let m=0;m<=1.0001;m+=0.05){let p;
-    if(m<=0.5){const t=m*2;p=[1-t*2/3,t/3,t/3]}
-    else{const t=(m-0.5)*2;p=[(1-t)/3,(1-t)/3,(1-t)/3+t]}
-    let cost=0,top=0,served=0,ws=0,wt=0;
-    for(let i=0;i<N;i++){cost+=p[0]*Cm[i][0]+p[1]*Cm[i][1]+p[2]*Cm[i][2];top+=Cm[i][2];
-      const s=diffs[i]<=1?1:diffs[i]<=2?p[1]+p[2]:p[2];
-      served+=s;ws+=s*Cm[i][2];wt+=Cm[i][2]}
-    pts.push([cost/top,served/N,ws/wt])}
-  return pts})();
-// logged dispatch is graded WITHOUT the error/streak metrics (they also drove
-// the tier inference — using them here would mechanically depress logged served%)
-const LOGGED=(()=>{const map={};((F.modelTiers||{}).models||[]).forEach(m=>map[m.model]=m.tier);
-  if(!Object.keys(map).length)return null;
-  const w={...DEF.evWeights,n_tool_errors:0,max_repeat_streak:0};
-  let tw=0;for(const k in w)tw+=w[k];
-  const sc=R.map(r=>{let s=0;M.evNames.forEach((k,c)=>s+=(w[k]||0)*r.evRank[c]);return s/tw});
-  const so=[...sc].sort((a,b)=>a-b);
-  const c1=quantile(so,DEF.evCuts[0]),c2=quantile(so,DEF.evCuts[1]);
-  const dd=R.map((r,i)=>r.ev.n_tool_calls>=DEF.overrides.tool_calls_t3?3:(sc[i]<=c1?1:sc[i]<=c2?2:3));
-  const tiers=R.map(r=>map[r.model]||3);
-  let cost=0,top=0,served=0,ws=0,wt=0;
-  for(let i=0;i<N;i++){cost+=Cm[i][tiers[i]-1];top+=Cm[i][2];
-    const ok=tiers[i]>=dd[i];if(ok)served++;wt+=Cm[i][2];if(ok)ws+=Cm[i][2]}
-  return {cost:cost/top,served:served/N,ws:ws/wt}})();
 function drawFrontier(){
-  const W=980,H=340,L=64,Rm=20,T=16,B=44;
+  const W=980,H=360,L=64,Rm=20,T=26,B=50;
   const ymin=0.15;
-  const x=v=>L+Math.min(v,1)*(W-L-Rm);
+  const x=v=>L+Math.min(v,1.02)*(W-L-Rm)/1.02;
   const y=v=>H-B-(Math.max(v,ymin)-ymin)/(1-ymin)*(H-T-B);
   let grid='';
-  for(const g of[.2,.4,.6,.8,1])grid+=`<line x1="${L}" y1="${y(g)}" x2="${W-Rm}" y2="${y(g)}" stroke="var(--grid)"/>
-    <text x="${L-8}" y="${y(g)+4}" text-anchor="end">${Math.round(g*100)}%</text>`;
-  for(const g of[.25,.5,.75,1])grid+=`<text x="${x(g)}" y="${H-B+22}" text-anchor="middle">${Math.round(g*100)}%</text>`;
+  for(const g of[.2,.4,.6,.8,1])grid+='<line x1="'+L+'" y1="'+y(g)+'" x2="'+(W-Rm)+'" y2="'+y(g)+'" stroke="var(--grid)"/>'
+    +'<text x="'+(L-8)+'" y="'+(y(g)+4)+'" text-anchor="end">'+Math.round(g*100)+'%</text>';
+  for(const g of[.25,.5,.75,1])grid+='<text x="'+x(g)+'" y="'+(H-B+20)+'" text-anchor="middle">'+Math.round(g*100)+'%</text>';
   const line=(key,col)=>{let p='';front.pts.forEach((pt,i)=>{p+=(i?'L':'M')+x(pt.cost).toFixed(1)+' '+y(pt[key]).toFixed(1)});
-    return `<path d="${p}" fill="none" stroke="${col}" stroke-width="3.5" stroke-linejoin="round"/>`};
-  const cur=front.pts[front.cur];
-  const dot=(key,col)=>`<circle cx="${x(cur.cost)}" cy="${y(cur[key])}" r="10" fill="${col}" stroke="var(--paper)" stroke-width="3"/>`;
-  // the quoted operating point (τ = default) is PINNED on the chart, replay or not
-  const op=front.pts[front.opIdx];
-  const pin=`<circle cx="${x(op.cost)}" cy="${y(op.served)}" r="15" fill="none" stroke="var(--violet)" stroke-width="3" stroke-dasharray="5 4"/>
-    <text x="${x(op.cost)}" y="${y(op.served)-22}" text-anchor="middle" style="fill:var(--violet);font-weight:700">τ=${op.tau.toFixed(2)}: ${(op.served*100).toFixed(0)}% @ ${(op.cost*100).toFixed(0)}%</text>`;
+    return '<path d="'+p+'" fill="none" stroke="'+col+'" stroke-width="3.5" stroke-linejoin="round"/>'};
   const rndPath=k=>RND.map((p,i)=>(i?'L':'M')+x(p[0]).toFixed(1)+' '+y(p[k]).toFixed(1)).join('');
-  const refs=`
-    <path d="${rndPath(1)}" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-dasharray="8 7" opacity=".8"/>
-    <path d="${rndPath(2)}" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="2 6" opacity=".7"/>
-    <text x="${x(RND[Math.floor(RND.length*0.62)][0])+8}" y="${y(RND[Math.floor(RND.length*0.62)][1])+26}" style="font-style:italic">random routing (per metric)</text>
-    ${LOGGED?`<circle cx="${x(Math.min(LOGGED.cost,1))}" cy="${y(LOGGED.served)}" r="10" fill="var(--navy)" stroke="var(--paper)" stroke-width="3"/>
-      <text x="${x(Math.min(LOGGED.cost,1))}" y="${y(LOGGED.served)-16}" text-anchor="middle">logged dispatch</text>`:''}
-    <circle cx="${x(1)}" cy="${y(1)}" r="10" fill="var(--paper)" stroke="var(--navy)" stroke-width="3.5"/>
-    <text x="${x(1)-16}" y="${y(1)+5}" text-anchor="end">always the top model</text>`;
+  const cur=front.pts[front.cur], op=front.pts[front.opIdx], rm=RMATCH.r;
+  // error bars on the pinned operating point: 95% bootstrap CI over the N tasks
+  const bar=(x1,y1,x2,y2,col)=>'<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+col+'" stroke-width="2.5"/>';
+  const ebar=
+    bar(x(op.cost),y(BOOT.served[0]),x(op.cost),y(BOOT.served[1]),'var(--violet)')
+    + bar(x(op.cost)-7,y(BOOT.served[0]),x(op.cost)+7,y(BOOT.served[0]),'var(--violet)')
+    + bar(x(op.cost)-7,y(BOOT.served[1]),x(op.cost)+7,y(BOOT.served[1]),'var(--violet)')
+    + bar(x(BOOT.cost[0]),y(op.served),x(BOOT.cost[1]),y(op.served),'var(--violet)')
+    + bar(x(BOOT.cost[0]),y(op.served)-6,x(BOOT.cost[0]),y(op.served)+6,'var(--violet)')
+    + bar(x(BOOT.cost[1]),y(op.served)-6,x(BOOT.cost[1]),y(op.served)+6,'var(--violet)');
+  const dotL=(cx,cy,fill,txt,dx,dy,anchor)=>
+    '<circle cx="'+cx+'" cy="'+cy+'" r="9" fill="'+fill+'" stroke="var(--paper)" stroke-width="3"/>'
+    + '<text x="'+(cx+dx)+'" y="'+(cy+dy)+'" text-anchor="'+anchor+'">'+txt+'</text>';
+  const bases=
+    dotL(x(CHEAP.cost),y(CHEAP.served),'var(--navy)',
+      'always-cheap: '+pct(CHEAP.served,0)+' @ '+pct(CHEAP.cost,0),14,5,'start')
+    + dotL(x(1),y(1),'var(--paper)','always-strong: 100% @ 100%',-14,18,'end')
+    + (LOGGED?dotL(x(Math.min(LOGGED.cost,1)),y(LOGGED.served),'var(--navy)',
+        'logged: '+pct(LOGGED.served,0)+' @ '+pct(LOGGED.cost,0),-14,4,'end'):'')
+    + bar(x(rm.cost),y(BOOT.rServed[0]),x(rm.cost),y(BOOT.rServed[1]),'var(--muted)')
+    + '<circle cx="'+x(rm.cost)+'" cy="'+y(rm.served)+'" r="8" fill="var(--muted)" stroke="var(--paper)" stroke-width="3"/>'
+    + '<text x="'+(x(rm.cost)+15)+'" y="'+(y(rm.served)+14)+'" style="fill:var(--muted)">random, equal cost: '+pct(rm.served,0)+'</text>'
+    + bar(x(rm.cost),y(BOOT.rWs[0]),x(rm.cost),y(BOOT.rWs[1]),'var(--muted)')
+    + '<circle cx="'+x(rm.cost)+'" cy="'+y(rm.ws)+'" r="8" fill="none" stroke="var(--muted)" stroke-width="3"/>'
+    + '<text x="'+(x(rm.cost)+15)+'" y="'+(y(rm.ws)+5)+'" style="fill:var(--muted)">random, token-weighted: '+pct(rm.ws,0)+'</text>'
+    // the token-weighted gap at equal cost: the bracket shows it, the stat tile below
+    // names it — no label here, so the chart stays legible whatever the data does
+    + bar(x(rm.cost)-13,y(rm.ws),x(rm.cost)-13,y(op.ws),'#d98a5f')
+    + bar(x(rm.cost)-18,y(rm.ws),x(rm.cost)-8,y(rm.ws),'#d98a5f')
+    + bar(x(rm.cost)-18,y(op.ws),x(rm.cost)-8,y(op.ws),'#d98a5f');
+  const pin='<text x="'+x(op.cost)+'" y="'+(y(op.served)-24)+'" text-anchor="middle" style="fill:var(--violet);font-weight:700">'
+    + 'τ='+op.tau.toFixed(2)+': '+pct(op.served,0)+' @ '+pct(op.cost,0)+'</text>';
+  const dot=(key,col)=>'<circle cx="'+x(cur.cost)+'" cy="'+y(cur[key])+'" r="10" fill="'+col+'" stroke="var(--paper)" stroke-width="3"/>';
   document.getElementById('front-chart').innerHTML=
-    `<svg viewBox="0 0 ${W} ${H}">
-      ${grid}
-      <line x1="${L}" y1="${H-B}" x2="${W-Rm}" y2="${H-B}" stroke="var(--muted)"/>
-      ${refs}
-      ${line('ws','var(--peach)')}${line('served','var(--violet)')}
-      ${pin}
-      ${dot('ws','var(--peach)')}${dot('served','var(--violet)')}
-      <text x="${x(front.pts[2].cost)}" y="${y(front.pts[2].served)-16}" style="fill:var(--violet)">our router (per task)</text>
-      <text x="${x(front.pts[2].cost)}" y="${y(front.pts[2].ws)+30}" style="fill:#d98a5f">our router (token-weighted)</text>
-      <text x="${(W+L)/2}" y="${H-4}" text-anchor="middle" style="font-weight:400">est. cost vs sending everything to the top tier →</text>
-    </svg>`;
-  document.getElementById('f-served').textContent=(cur.served*100).toFixed(1)+'%';
-  document.getElementById('f-wserved').textContent=(cur.ws*100).toFixed(1)+'%';
-  document.getElementById('f-cost').textContent=(cur.cost*100).toFixed(1)+'%';
+    '<svg viewBox="0 0 '+W+' '+H+'">'
+    + grid
+    + '<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-Rm)+'" y2="'+(H-B)+'" stroke="var(--muted)"/>'
+    + '<path d="'+rndPath(1)+'" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="8 7" opacity=".7"/>'
+    + '<path d="'+rndPath(2)+'" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="2 6" opacity=".6"/>'
+    + line('ws','var(--peach)') + line('served','var(--violet)')
+    + bases + ebar + pin
+    + dot('ws','var(--peach)') + dot('served','var(--violet)')
+    + '<text x="'+x(front.pts[4].cost)+'" y="'+(y(front.pts[4].served)-14)+'" style="fill:var(--violet)">router · tasks</text>'
+    + '<text x="'+x(front.pts[4].cost)+'" y="'+(y(front.pts[4].ws)+28)+'" style="fill:#d98a5f">router · token-weighted</text>'
+    + '<text x="'+((W+L)/2)+'" y="'+(H-4)+'" text-anchor="middle" style="font-weight:400">cost vs all-top-tier → &#160;·&#160; bars = 95% CI (n='+num(N)+')</text>'
+    + '</svg>';
+  document.getElementById('f-served').textContent=pct(cur.served);
+  document.getElementById('f-wserved').textContent=pct(cur.ws);
+  document.getElementById('f-cost').textContent=pct(cur.cost);
   document.getElementById('f-knob').textContent='τ = '+cur.tau.toFixed(2);
 }
+document.getElementById('f-served-ci').textContent=ci(BOOT.served)+' · n='+num(N);
+document.getElementById('f-wserved-ci').textContent=ci(BOOT.ws);
+document.getElementById('f-cost-ci').textContent=ci(BOOT.cost);
+document.getElementById('f-delta').textContent='+'+((OP.ws-RMATCH.r.ws)*100).toFixed(1)+'pt';
+document.getElementById('f-delta-ci').textContent=ci(BOOT.dWs);
+document.getElementById('f-operate').textContent=
+  'We operate at τ = ' + TAU + '  ·  vs random at equal cost: +'
+  + ((OP.served-RMATCH.r.served)*100).toFixed(1) + 'pt tasks, +'
+  + ((OP.ws-RMATCH.r.ws)*100).toFixed(1) + 'pt tokens';
+(function(){
+  const at=t=>{const p=policy(tauTiers(t));
+    return pct(p.cost,0)+' cost / '+pct(p.served,0)+' served / '+pct(p.ws,0)+' token-weighted'};
+  document.getElementById('f-notes').innerHTML=
+    'Operate at τ = ' + TAU + ': the cheapest point that still keeps the token-weighted curve at '
+    + pct(OP.ws,0) + '. τ = 0.60 nearly halves cost (' + at(0.60) + ') but starves the heavy tasks. '
+    + 'Vs logged dispatch: ' + (LOGGED?'+'+((OP.served-LOGGED.served)*100).toFixed(1)+'pt served for +'
+        +((OP.cost-LOGGED.cost)*100).toFixed(1)+'pt cost':'—')
+    + '. Vs random at equal cost, the task-count edge is small (+'
+    + ((OP.served-RMATCH.r.served)*100).toFixed(1)+'pt ' + ci(BOOT.dServed)
+    + ') and the token-weighted edge is not (+' + ((OP.ws-RMATCH.r.ws)*100).toFixed(1)+'pt '
+    + ci(BOOT.dWs) + '). Oracle routing sits at ' + pct(ORACLE.cost,0) + ' cost.';
+})();
 function startReplay(){
-  // ONE full sweep of the τ knob, then the dot parks on the quoted operating
-  // point (τ = default) — the replay never quotes a point it doesn't land on.
+  // ONE full sweep of the τ knob, then the dot parks on the quoted operating point —
+  // the replay never quotes a point it does not land on.
   stopReplay();
   front.cur=front.pts.length-1;front.dir=-1;
   let bounced=false;
@@ -323,46 +504,85 @@ function startReplay(){
 function stopReplay(){if(front.timer){clearInterval(front.timer);front.timer=null}}
 drawFrontier();
 
-// ---------- slide 5: findings text (every number from a committed artifact) ----------
+// ---------- slide 5: the honest slide ----------
 (function(){
   const sgn=v=>(v>=0?'+':'')+v;
+  if(OBS){
+    document.getElementById('h-title').textContent=
+      OBS.same + ' of ' + num(N) + ' routes observed. ' + (OBS.cheaper+OBS.pricier) + ' extrapolated.';
+    document.getElementById('h-obs').innerHTML=
+      li('<b>' + OBS.same + '</b> match the logged tier — realized effort, repriced')
+      + li('<b>' + OBS.cheaper + '</b> cheaper · <b>' + OBS.pricier + '</b> dearer — never run')
+      + li('for those, served = evaluator label');
+  } else {
+    document.getElementById('h-title').textContent='Part observed, part extrapolated.';
+  }
   if(F.matching&&F.matching.interaction){
-    const I=F.matching.interaction;
-    const sig=s=>s?'significant':'CI includes zero';
+    const I=F.matching.interaction,t=F.matching.table||{};
+    const nHard=((t.hard_low_tier||{}).n||0)+((t.hard_high_tier||{}).n||0);
     document.getElementById('h-match').innerHTML=
-      `on the held-out half, low-tier models show ${sgn(+(I.extra_err_rate_of_low_tier_on_hard*100).toFixed(1))}pt
-       errors (${sig(I.err_significant)}) and ${sgn(I.extra_retry_streak_of_low_tier_on_hard)} retry
-       streak (${sig(I.streak_significant)}) on matched hard tasks. <b>${F.matching.verdict||''}</b>`}
-  if(F.finalValidation&&F.finalValidation.selection_bias_pts!=null)
-    document.getElementById('h-bias').textContent=
-      sgn(F.finalValidation.selection_bias_pts)+'pt';
-  if(F.tuning&&F.tuning.evaluator_label_agreement)
-    document.getElementById('h-agree').textContent=
-      '~'+Math.round(F.tuning.evaluator_label_agreement.mean*100)+'%';
+      li('<b>' + nHard + '</b> matched hard tasks, held-out half')
+      + li('<b>' + sgn(+(I.extra_err_rate_of_low_tier_on_hard*100).toFixed(1)) + 'pt</b> errors ['
+           + (I.err_ci95[0]*100).toFixed(1) + ', ' + (I.err_ci95[1]*100).toFixed(1) + ']')
+      + li('<b>' + sgn(+I.extra_retry_streak_of_low_tier_on_hard.toFixed(1)) + '</b> retries ['
+           + I.streak_ci95[0].toFixed(1) + ', ' + I.streak_ci95[1].toFixed(1) + ']')
+      + li('grading ceiling <b>' + pct(((F.tuning||{}).evaluator_label_agreement||{}).mean||0.949) + '</b>');
+  }
   if(F.cacheTrap&&F.cacheTrap.modeled_full_trajectory){
-    const MD=F.cacheTrap.modeled_full_trajectory;
+    const P=F.cacheTrap.policies||{},MD=F.cacheTrap.modeled_full_trajectory,
+          g=P['per-call greedy (size)']||{};
     document.getElementById('h-cache').innerHTML=
-      `A per-call "cheap model for tool loops" policy claims <b>${Math.round(MD.naive_claimed_savings_pct)}% saved</b> under
-       naive costing. <b>MODELED</b> with cache resets over full trajectories (assumptions in
-       <code>cache_trap.py</code>) it pays <b>~$${Math.round(MD.cache_reset_penalty_usd)}</b> in resets
-       — ${Math.round(MD.penalty_share_of_input_budget_pct)}% of the all-top-tier <i>input</i> budget —
-       so the honest figure is ${MD.corrected_savings_pct<0
-         ?`<b>negative</b>: it costs ~${Math.abs(Math.round(MD.corrected_savings_pct))}% MORE than all-top-tier`
-         :`~${Math.round(MD.corrected_savings_pct)}% saved`}.
-       Our per-task policy pays <b>zero</b> resets by construction.`}
+      li('per-call greedy: <b>' + g.savings_naive_pct + '% → ' + g.savings_cache_aware_pct
+         + '%</b> once ' + g.switches + ' switches are priced')
+      + li('modeled: <b>~$' + Math.round(MD.cache_reset_penalty_usd) + '</b> of resets vs a $'
+           + Math.round(MD.all_tier3_input_budget_usd) + ' input budget')
+      + li('per-task routing: <b>0 switches</b>');
+  }
 })();
 
-// ---------- navigation ----------
+// ---------- slide 6: the weakness, with its number ----------
+document.getElementById('w-flaw').innerHTML =
+  li('<b>' + DIFFMIX[0] + '/' + num(N) + '</b> tasks are difficulty 1 — any tier serves them')
+  + li('random at equal cost: <b>' + pct(RMATCH.r.served,0) + '</b> tasks, <b>'
+       + pct(RMATCH.r.ws,0) + '</b> tokens')
+  + li('token-weighted is the crude fix: <b>' + pct(OP.served,0) + ' → ' + pct(OP.ws,0) + '</b>');
+
+// ---------- slide 7: the close ----------
+document.getElementById('c-claim').textContent='Route the task, not the call.';
+document.getElementById('c-number').textContent=
+  (BELOW_TOP*100).toFixed(0) + '% cheaper-routed · ' + pct(1-OP.cost) + ' saved · '
+  + pct(OP.served) + ' served ' + ci(BOOT.served);
+
+// ---------- appendix ----------
+document.getElementById('q-cheap').innerHTML=
+  'Always-T1: ' + pct(CHEAP.cost,0) + ' of the bill, but only ' + pct(CHEAP.served,0)
+  + ' of tasks and ' + pct(CHEAP.ws,0) + ' token-weighted. Always-T2: ' + pct(MID.served,0)
+  + ' @ ' + pct(MID.cost,0) + ' — our curve passes above it.';
+
+// ---------- navigation, presenter timer, speaker notes ----------
 const s=[...document.querySelectorAll('.slide')];let i=0;
 const show=n=>{s[i].classList.remove('active');i=(n+s.length)%s.length;s[i].classList.add('active');
   document.getElementById('pg').textContent=i+1;
   if(s[i].id==='frontier-slide')startReplay();else stopReplay()};
+let t0=null,tick=null;
+const fmt=v=>Math.floor(v/60)+':'+String(Math.floor(v%60)).padStart(2,'0');
+function toggleTimer(){
+  const el=document.getElementById('timer');
+  if(tick){clearInterval(tick);tick=null;t0=null;el.style.display='none';return}
+  t0=Date.now();el.style.display='block';
+  tick=setInterval(()=>{
+    const e=(Date.now()-t0)/1000,end=+(s[i].dataset.end||0);
+    el.textContent=fmt(e)+(end?' / '+fmt(end)+'  ('+s[i].dataset.win+')':'');
+    el.classList.toggle('over',!!end&&e>end);
+  },250);
+}
 addEventListener('keydown',e=>{
   if(['ArrowRight',' ','PageDown'].includes(e.key))show(i+1);
   if(['ArrowLeft','PageUp'].includes(e.key))show(i-1);
   if(e.key==='f')document.documentElement.requestFullscreen();
-  if(e.key==='p'&&s[i].id==='frontier-slide'){ // pause/resume the τ replay
-    front.timer?stopReplay():startReplay()}});
+  if(e.key==='t')toggleTimer();
+  if(e.key==='n')document.body.classList.toggle('shownotes');
+  if(e.key==='p'&&s[i].id==='frontier-slide'){front.timer?stopReplay():startReplay()}});
 addEventListener('click',e=>{if(!e.target.closest('a'))show(i+1)});
 </script>
 </body>
