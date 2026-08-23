@@ -1,0 +1,87 @@
+{
+  "min_n": 15,
+  "models": [
+    {
+      "model": "claude-sonnet-4-6",
+      "n": 1,
+      "served_difficulty": 0.8268,
+      "struggle_z": -0.7645,
+      "tier": 3,
+      "bootstrap_stability": 0.0,
+      "low_confidence": true
+    },
+    {
+      "model": "claude-fable-5",
+      "n": 68,
+      "served_difficulty": 0.462,
+      "struggle_z": -0.1072,
+      "tier": 3,
+      "bootstrap_stability": 0.935,
+      "low_confidence": false
+    },
+    {
+      "model": "claude-opus-5",
+      "n": 323,
+      "served_difficulty": 0.5212,
+      "struggle_z": -0.0772,
+      "tier": 3,
+      "bootstrap_stability": 0.935,
+      "low_confidence": false
+    },
+    {
+      "model": "claude-sonnet-5",
+      "n": 263,
+      "served_difficulty": 0.5008,
+      "struggle_z": -0.0112,
+      "tier": 3,
+      "bootstrap_stability": 0.595,
+      "low_confidence": false
+    },
+    {
+      "model": "gpt-5.6-terra",
+      "n": 107,
+      "served_difficulty": 0.4851,
+      "struggle_z": 0.0421,
+      "tier": 2,
+      "bootstrap_stability": 0.685,
+      "low_confidence": false
+    },
+    {
+      "model": "claude-opus-4-8",
+      "n": 64,
+      "served_difficulty": 0.4415,
+      "struggle_z": 0.0443,
+      "tier": 2,
+      "bootstrap_stability": 0.505,
+      "low_confidence": false
+    },
+    {
+      "model": "gpt-5.6-sol",
+      "n": 105,
+      "served_difficulty": 0.5038,
+      "struggle_z": 0.136,
+      "tier": 1,
+      "bootstrap_stability": 0.695,
+      "low_confidence": false
+    },
+    {
+      "model": "claude-opus-4-6",
+      "n": 2,
+      "served_difficulty": 0.5484,
+      "struggle_z": 0.5685,
+      "tier": 1,
+      "bootstrap_stability": 0.0,
+      "low_confidence": true
+    },
+    {
+      "model": "gpt-5.6-luna",
+      "n": 20,
+      "served_difficulty": 0.5275,
+      "struggle_z": 0.6586,
+      "tier": 1,
+      "bootstrap_stability": 0.995,
+      "low_confidence": false
+    }
+  ],
+  "null_result": "revealed preference is flat (served-difficulty spread ~0.44-0.55): the logged dispatch was not difficulty-aware \u2014 that headroom is what the router exploits"
+}

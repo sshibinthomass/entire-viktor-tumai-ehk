@@ -97,8 +97,25 @@
   .tierdot { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 5px; }
   #tip { position: fixed; pointer-events: none; background: var(--surface-1); color: var(--ink-1);
          border: 1px solid var(--ring); border-radius: 8px; padding: 7px 10px; font-size: 12px;
-         box-shadow: 0 4px 14px rgba(0,0,0,.18); max-width: 340px; z-index: 10; display: none; }
+         box-shadow: 0 4px 14px rgba(0,0,0,.18); max-width: 340px; z-index: 10; display: none;
+         line-height: 1.4; }
   #tip .t2 { color: var(--ink-2); } #tip .t3 { color: var(--ink-3); font-size: 11px; }
+  [data-tip] { cursor: help; }
+  svg [data-tip], .seg button[data-tip], input[data-tip] { cursor: pointer; }
+  .ctl label span[data-tip], .tile[data-tip], h2[data-tip], .chip[data-tip], .num[data-tip]
+    { border-bottom: 1px dotted var(--ink-3); }
+  .tile[data-tip], h2[data-tip] { border-bottom: none; }
+  .tile[data-tip] .lb::after, h2[data-tip]::after, .card .desc[data-tip]::after
+    { content: " ⓘ"; color: var(--ink-3); font-size: 10px; font-weight: 400; }
+  .sechead { margin: 18px 0 8px; font-size: 12px; font-weight: 650; letter-spacing: .08em;
+             text-transform: uppercase; color: var(--ink-3); }
+  .fnd { font-size: 12.5px; }
+  .fnd .headline { color: var(--ink-1); margin: 4px 0 8px; }
+  .tierchip { display: inline-block; min-width: 26px; text-align: center; border-radius: 6px;
+              padding: 1px 6px; font-size: 11.5px; font-weight: 600; color: #fff; }
+  .mini { display: inline-block; height: 8px; border-radius: 3px; vertical-align: middle; }
+  .verdict { border-left: 3px solid var(--axis); padding: 4px 10px; color: var(--ink-2);
+             margin-top: 8px; font-size: 12px; }
   .foot { color: var(--ink-3); font-size: 12px; margin-top: 16px; max-width: 100ch; }
   svg text { font: 11px system-ui, -apple-system, "Segoe UI", sans-serif; fill: var(--ink-3); }
   svg .val { fill: var(--ink-2); font-variant-numeric: tabular-nums; }
@@ -164,6 +181,7 @@ its own outcome.</div>
 </div>
 
 <div>
+  <div class="sechead" style="margin-top:0">Live evaluation (recomputes with every knob — hover anything for what it means)</div>
   <div class="grid">
     <div class="card"><h2>Router score</h2>
       <div class="desc" id="histRouterDesc">Routing-time difficulty score; dashed lines are the tier cuts.</div>
@@ -195,12 +213,23 @@ its own outcome.</div>
       <div class="desc">Where routing-time signals and the observed trajectory tell different stories.</div>
       <div style="overflow-x:auto"><table id="disTable"></table></div></div>
   </div>
+
+  <div class="sechead">Pipeline findings (fixed at pipeline defaults — rerun scripts to refresh)</div>
+  <div class="grid">
+    <div class="card fnd"><h2 data-tip="Inferred from data, as the challenge demands: within matched difficulty buckets, weaker models show more tool errors and longer retry streaks (struggle-z). Bootstrap says how often each model lands in its tier across 200 resamples.">Inferred model tiers</h2>
+      <div id="fndTiers"></div></div>
+    <div class="card fnd"><h2 data-tip="Providers cache the shared input prefix across a task's calls; switching models resets that cache. Naive costing bills the prefix cheap regardless — so per-call switching policies look far better than they are.">The cache trap</h2>
+      <div id="fndCache"></div></div>
+    <div class="card fnd"><h2 data-tip="The natural experiment: tasks of matched routing-time difficulty ran on different models. If low-tier models struggle more on hard tasks (difference-in-differences), under-routing has a measurable cost.">Matched cross-model check</h2>
+      <div id="fndMatch"></div></div>
+  </div>
   <div class="foot" id="foot"></div>
 </div>
 </div>
 <div id="tip"></div>
 
 <script src="data.js"></script>
+<script src="findings.js"></script>
 <script>
 'use strict';
 const D = window.VIKTOR_DATA, M = D.meta, R = D.rows, N = R.length;
@@ -460,16 +489,73 @@ const fmtPct = v => (100 * v).toFixed(1) + '%';
 const fmt$ = v => '$' + v.toFixed(2);
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
 const tip = document.getElementById('tip');
-function bindTips(root) {
-  root.querySelectorAll('[data-tip]').forEach(el => {
-    el.addEventListener('mousemove', e => {
-      tip.innerHTML = el.dataset.tip; tip.style.display = 'block';
-      const w = tip.offsetWidth, x = Math.min(e.clientX + 14, innerWidth - w - 8);
-      tip.style.left = x + 'px'; tip.style.top = (e.clientY + 16) + 'px';
-    });
-    el.addEventListener('mouseleave', () => tip.style.display = 'none');
-  });
-}
+// one delegated handler serves every [data-tip] element, static or re-rendered
+let tipEl = null;
+document.addEventListener('mouseover', e => {
+  const el = e.target.closest('[data-tip]');
+  if (el !== tipEl) { tipEl = el; tip.style.display = el ? 'block' : 'none';
+    if (el) tip.innerHTML = el.dataset.tip; }
+});
+document.addEventListener('mousemove', e => {
+  if (!tipEl) return;
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - w - 8) + 'px';
+  tip.style.top = Math.min(e.clientY + 16, innerHeight - h - 8) + 'px';
+});
+function bindTips() {} // kept for call sites — delegation handles everything
+
+// what-is-what, shown on hover (the explainability layer)
+const EXPLAIN = {
+  // evaluator metrics / weights
+  n_tool_calls: 'How many tools the agent invoked over the whole trajectory. The strongest effort signal.',
+  n_llm_calls: 'Estimated LLM responses in the trajectory (contiguous runs of model output, +1 for the final unlogged one).',
+  gen_tokens: 'Tokens the model itself generated (assistant text + tool-call arguments), chars/4 estimate.',
+  context_tokens: 'Size of the final context — everything the last call had to read. chars/4 estimate.',
+  n_tool_errors: 'Tool results containing error / traceback / exit-code markers. Struggle, not just length.',
+  n_distinct_tools: 'How many different tools were used — breadth of the work.',
+  tool_output_tokens: 'Tokens the tools returned — the volume the agent had to digest.',
+  max_repeat_streak: 'Longest run of the same tool called back-to-back — a retry/loop signal.',
+  n_user_turns: 'User messages in the trajectory (follow-ups and nudges).',
+  reasoning_tokens: 'Visible reasoning summaries — gpt-family only, so keep this weight small or you grade providers, not tasks.',
+  // router groups
+  'ask weight': 'Density of the request itself: entities, questions, action verbs, coordination markers, attachments. Dense ask → hard task (+).',
+  'harness weight': 'How heavily configured the workspace is: system-prompt sections, flags, skills, subagent tool (+).',
+  'breadth weight': 'Size of the generic toolset. Broad toolsets go with quick conversational turns, so this SUBTRACTS (−).',
+  'midthread weight': 'Mid-thread trigger marks (truncated context, auto-read blocks): most work already happened, SUBTRACTS (−).',
+  // dispatch knobs
+  'α (ML share of the blend)': 'Blend = α·ML-difficulty + (1−α)·heuristic. α=0.85 won the sweep: near-max agreement while the heuristic still protects big tasks.',
+  'τ confidence to stay cheap': 'Serve each task with the cheapest tier whose sufficiency probability ≥ τ. Higher τ = safer and pricier.',
+  'λ miss penalty ($, log)': 'Bayes rule: pay for a stronger tier only when λ·P(too hard) exceeds the price gap. Optimizes tasks-per-dollar; known to sacrifice token-heavy tasks.',
+  'Tier 1 | 2 cut (percentile)': 'Tasks below this score percentile go to Tier 1 (cheapest).',
+  'Tier 2 | 3 cut (percentile)': 'Tasks above this score percentile go to Tier 3 (strongest).',
+  'D1 | D2 cut (percentile)': 'Evaluator score percentile splitting difficulty 1 from 2.',
+  'D2 | D3 cut (percentile)': 'Evaluator score percentile splitting difficulty 2 from 3.',
+  // methods
+  method_blend: 'Production default: α·rank(ML difficulty) + (1−α)·heuristic, cut at percentiles. Best balance of agreement and token-weighted quality.',
+  method_score: 'The label-free heuristic alone: signed feature groups, percentile cuts. Fully interpretable.',
+  'method_ml-tau': 'Probabilistic dispatch: cheapest tier with P(D≤t) ≥ τ. The cheapest way to hit a served-% target.',
+  'method_ml-lambda': 'Cost-sensitive Bayes dispatch. Maximum tasks-per-dollar; watch the Weighted-served tile drop.',
+  method_kmeans: 'Unsupervised k-means (k=3) for comparison — it finds workspace structure, not difficulty (measurably dominated).',
+  cost_cache: 'Bills prefix replay at the cached rate (~T·(n−1)/2 tokens). More realistic; per-task routing never pays a reset.',
+  cost_naive: 'Context×in-price + generated×out-price. Ignores caching entirely — fine for relative comparisons only.',
+  // tiles
+  tile_exact: 'Share of tasks where the router tier equals the observed difficulty. Chance with these class sizes ≈ 41.5%; always-Tier1 gets 55%.',
+  tile_adjacent: 'Within one tier. Both sides quantize a continuum, so boundary misses of ±1 are expected.',
+  tile_rho: 'Spearman rank correlation between the router score and the evaluator score — threshold-free skill measure.',
+  tile_under: 'Tasks whose tier is BELOW observed difficulty — the quality risk. The τ method is built to push this down.',
+  tile_served: 'Tier ≥ observed difficulty: the task got at least the capability it needed.',
+  tile_wserved: 'Served, but each task weighted by its Tier-3 cost. Exposes policies that game the count by starving big tasks.',
+  tile_savings: 'Estimated spend of this policy vs sending everything to Tier 3, under the selected cost model. Assumed prices, chars/4 tokens.',
+};
+const CHART_TIPS = {
+  histRouter: 'Distribution of the router\'s difficulty score across all 953 tasks. Colors = the tier each region maps to.',
+  histEval: 'Distribution of observed difficulty (weighted percentile ranks of the effort metrics). Cuts are the D1|D2 and D2|D3 borders.',
+  mixChart: 'How many tasks each side puts in each tier. Cut-based methods match the evaluator marginals by construction; τ/λ float free.',
+  confChart: 'Rows = router decision, columns = what the trajectory revealed. Below the diagonal = under-routed (risk), above = over-routed (waste).',
+  frontChart: 'THE headline artifact: quality kept vs money spent, traced by sweeping the active method\'s own knob. Two quality definitions, one cost axis.',
+  scatChart: 'Every dot is a task: routing-time score vs observed difficulty. Hover any dot for its trigger, counts, probabilities and the model that actually ran.',
+  sigChart: 'Spearman correlation of each routing-time feature with observed difficulty — the nameable structure the router runs on. Blue right = marks hard, red left = marks easy.',
+};
 
 function histogram(el, scores, cuts, title) {
   const W = 660, H = 210, L = 34, Rm = 10, T = 12, B = 26, bins = 34;
@@ -682,7 +768,8 @@ function disTable() {
 function slider(parent, label, value, min, max, step, oninput, opts) {
   const d = document.createElement('div'); d.className = 'ctl';
   const sign = opts && opts.sign ? (opts.sign === -1 ? '&minus; ' : '+ ') : '';
-  d.innerHTML = `<label><span>${sign}${label}</span><b></b></label>
+  const ex = EXPLAIN[label] ? ` data-tip="${EXPLAIN[label].replace(/"/g,'&quot;')}"` : '';
+  d.innerHTML = `<label><span${ex}>${sign}${label}</span><b></b></label>
     <input type="range" min="${min}" max="${max}" step="${step}" value="${value}">`;
   const b = d.querySelector('b'), inp = d.querySelector('input');
   const show = v => b.textContent = (opts && opts.fmt) ? opts.fmt(v) : (+v).toFixed(2);
@@ -777,17 +864,18 @@ document.getElementById('exportCsv').addEventListener('click', () => {
 // ---------- render ----------
 function tiles() {
   const items = [
-    ['Exact agreement', fmtPct(C.exact), 'router tier = observed difficulty'],
-    ['Adjacent agreement', fmtPct(C.adj), 'within one tier'],
-    ['Rank correlation', C.rho.toFixed(3), 'Spearman, scores'],
-    ['Under-routed', fmtPct(C.under), 'quality risk: tier below difficulty'],
-    ['Served', fmtPct(C.served), 'tier &ge; observed difficulty'],
-    ['Weighted served', fmtPct(C.wServed), 'big tasks count more'],
+    ['Exact agreement', fmtPct(C.exact), 'router tier = observed difficulty', 'tile_exact'],
+    ['Adjacent agreement', fmtPct(C.adj), 'within one tier', 'tile_adjacent'],
+    ['Rank correlation', C.rho.toFixed(3), 'Spearman, scores', 'tile_rho'],
+    ['Under-routed', fmtPct(C.under), 'quality risk: tier below difficulty', 'tile_under'],
+    ['Served', fmtPct(C.served), 'tier &ge; observed difficulty', 'tile_served'],
+    ['Weighted served', fmtPct(C.wServed), 'big tasks count more', 'tile_wserved'],
     ['Est. savings', fmtPct(1 - C.costShare), fmt$(C.cost) + ' vs ' + fmt$(C.top) +
-       (state.costModel === 'cache' ? ' (cache-aware)' : ' (naive)')],
+       (state.costModel === 'cache' ? ' (cache-aware)' : ' (naive)'), 'tile_savings'],
   ];
-  document.getElementById('tiles').innerHTML = items.map(([l, v, c]) =>
-    `<div class="tile"><div class="lb">${l}</div><div class="vl">${v}</div><div class="ct">${c}</div></div>`).join('');
+  document.getElementById('tiles').innerHTML = items.map(([l, v, c, k]) =>
+    `<div class="tile" data-tip="${EXPLAIN[k].replace(/"/g,'&quot;')}">
+       <div class="lb">${l}</div><div class="vl">${v}</div><div class="ct">${c}</div></div>`).join('');
 }
 function chips() {
   document.getElementById('chips').innerHTML = [
@@ -824,9 +912,83 @@ function renderAll() {
 let timer = null;
 function schedule() { clearTimeout(timer); timer = setTimeout(renderAll, 70); }
 
+// ---------- pipeline findings (static; from findings.js) ----------
+function renderFindings() {
+  const F = window.VIKTOR_FINDINGS || {};
+  const tierCols = { 1: 'var(--tier1)', 2: 'var(--tier2)', 3: 'var(--tier3)' };
+  if (F.modelTiers) {
+    const rows = F.modelTiers.models;
+    const mx = Math.max(...rows.map(r => Math.abs(r.struggle_z))) || 1;
+    document.getElementById('fndTiers').innerHTML =
+      `<div class="headline">Matched-struggle ranking. Null result worth naming: the
+        logged dispatch was NOT difficulty-aware — that headroom is what the router exploits.</div>
+      <table><tr><th>model</th><th class="n">n</th><th>struggle</th><th class="n">tier</th><th class="n">stable</th></tr>` +
+      rows.map(r => {
+        const w = Math.abs(r.struggle_z) / mx * 60;
+        const col = r.struggle_z >= 0 ? 'var(--div-neg)' : 'var(--s1)';
+        const ink = r.tier === 1 ? '#0b0b0b' : '#fff';
+        return `<tr data-tip="struggle-z ${r.struggle_z} (error rate + retry streak, z-scored within matched difficulty buckets). ${r.low_confidence ? 'Too few tasks to trust — inherits its neighbour’s tier.' : 'Bootstrap: lands in this tier ' + Math.round(r.bootstrap_stability*100) + '% of 200 resamples.'}">
+          <td>${esc(r.model)}${r.low_confidence ? ' <span style="color:var(--ink-3)">*</span>' : ''}</td>
+          <td class="n">${r.n}</td>
+          <td><span class="mini" style="width:${Math.max(w,2)}px;background:${col}"></span></td>
+          <td class="n"><span class="tierchip" style="background:${tierCols[r.tier]};color:${ink}">T${r.tier}</span></td>
+          <td class="n">${r.low_confidence ? '—' : Math.round(r.bootstrap_stability*100) + '%'}</td></tr>`;
+      }).join('') + `</table>
+      <div class="verdict">* n &lt; ${F.modelTiers.min_n}: low confidence. Extremes reproduce the assumed
+        price sheet independently (fable-5 top, luna bottom); the middle band is genuinely fuzzy.</div>`;
+  }
+  if (F.cacheTrap) {
+    const P = F.cacheTrap.policies;
+    document.getElementById('fndCache').innerHTML =
+      `<div class="headline">Per-call switching looks brilliant under naive costing — until
+        resets are priced.</div>
+      <table><tr><th>policy</th><th class="n">naive saved</th><th class="n">cache-aware saved</th><th class="n">switches</th></tr>` +
+      Object.entries(P).map(([nm, p]) =>
+        `<tr data-tip="naive ${fmt$(p.usd_naive)} vs cache-aware ${fmt$(p.usd_cache_aware)} on the ${F.cacheTrap.n_trajectories} trajectories with ≥2 logged calls (input side only)">
+          <td>${esc(nm)}</td><td class="n">${p.savings_naive_pct}%</td>
+          <td class="n">${p.savings_cache_aware_pct}%</td><td class="n">${p.switches}</td></tr>`).join('') +
+      `</table>
+      <div class="verdict">Sampling hides switch points (~1 logged call/task), so the measured table is a
+        floor. Model-based full-trajectory estimate: the switching policy pays
+        <b>~$${Math.round(F.cacheTrap.model_based_full_penalty_usd)}</b> in cache resets — over half the
+        ~$259 it costs to send <i>everything</i> to Tier 3. Per-task routing pays zero resets.</div>`;
+  }
+  if (F.matching) {
+    const T = F.matching.table, I = F.matching.interaction || {};
+    const cell = c => c ? `${(c.err_rate*100).toFixed(1)}% err · ${c.retry_streak} streak <span style="color:var(--ink-3)">(n=${c.n})</span>` : '—';
+    document.getElementById('fndMatch').innerHTML =
+      `<div class="headline">Do weak models actually struggle more on hard tasks? (validates the
+        'served' assumption)</div>
+      <table><tr><th></th><th>low tier (T1–2)</th><th>high tier (T3)</th></tr>
+        <tr><td>easy tasks</td><td>${cell(T.easy_low_tier)}</td><td>${cell(T.easy_high_tier)}</td></tr>
+        <tr><td>hard tasks</td><td>${cell(T.hard_low_tier)}</td><td>${cell(T.hard_high_tier)}</td></tr>
+      </table>
+      <div class="verdict">Interaction: low-tier models show <b>${I.extra_err_rate_of_low_tier_on_hard >= 0 ? '+' : ''}${(I.extra_err_rate_of_low_tier_on_hard*100).toFixed(2)}pt</b>
+        extra error rate (95% CI [${(I.err_ci95[0]*100).toFixed(1)}, ${(I.err_ci95[1]*100).toFixed(1)}])
+        and <b>+${I.extra_retry_streak_of_low_tier_on_hard}</b> retry streak on matched hard tasks.
+        Directionally supportive, <b>not significant at n=953</b> — so 'served' stays a stated
+        assumption, not a proven effect. That honesty is deliberate.</div>`;
+  }
+}
+
+// what-is-what tips on the chart headers
+for (const [id, txt] of Object.entries(CHART_TIPS)) {
+  const h = document.getElementById(id)?.closest('.card')?.querySelector('h2');
+  if (h && !h.dataset.tip) h.dataset.tip = txt;
+}
+document.querySelectorAll('#methodSeg button').forEach(b => {
+  const k = 'method_' + b.dataset.m;
+  if (EXPLAIN[k]) b.dataset.tip = EXPLAIN[k];
+});
+document.querySelectorAll('#costSeg button').forEach(b => {
+  const k = 'cost_' + b.dataset.c;
+  if (EXPLAIN[k]) b.dataset.tip = EXPLAIN[k];
+});
+
 chips();
 buildControls();
 renderAll();
+renderFindings();
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', renderAll);
 </script>
 </body>

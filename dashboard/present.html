@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>[Team Name] — Viktor Challenge</title>
+<style>
+  :root{--violet:#6748FD;--navy:#150079;--peach:#FFBD9E;--ink:#0d0d1a;--paper:#fbfaff;
+        --grid:#e4e1f4;--muted:#6d67a3}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ink);font-family:'Gellix','Inter',system-ui,-apple-system,'Segoe UI',sans-serif}
+  .slide{display:none;width:100vw;height:100vh;padding:6vh 7vw;background:var(--paper);color:var(--navy);flex-direction:column;justify-content:center}
+  .slide.active{display:flex}
+  .slide.dark{background:var(--navy);color:var(--paper)}
+  h1{font-size:4.8vw;line-height:1.05;letter-spacing:-.02em}
+  h2{font-size:3vw;margin-bottom:3vh;letter-spacing:-.01em}
+  p,li{font-size:1.55vw;line-height:1.5;max-width:66vw}
+  .kicker{color:var(--violet);text-transform:uppercase;letter-spacing:.18em;font-size:1vw;font-weight:700;margin-bottom:2.2vh}
+  .dark .kicker{color:var(--peach)}
+  .big{font-size:2.7vw;font-weight:700;color:var(--violet);margin:2vh 0}
+  .dark .big{color:var(--peach)}
+  .cols{display:flex;gap:3vw;margin-top:1.5vh}
+  .card{flex:1;border:2px solid var(--violet);border-radius:14px;padding:2.2vh 1.6vw}
+  .card h3{color:var(--violet);font-size:1.35vw;margin-bottom:1vh}
+  .card p, .card li{font-size:1.25vw;max-width:none}
+  .dark .card{border-color:var(--peach)}
+  .dark .card h3{color:var(--peach)}
+  svg{width:100%;height:auto;display:block}
+  svg text{font:600 13px 'Gellix','Inter',system-ui,sans-serif;fill:var(--muted)}
+  svg .lab{font-weight:400}
+  .statrow{display:flex;gap:2.5vw;margin-top:2vh}
+  .stat{border-left:4px solid var(--violet);padding:0 1.2vw}
+  .stat .v{font-size:2.6vw;font-weight:700;color:var(--violet);font-variant-numeric:tabular-nums}
+  .stat .l{font-size:1vw;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+  .foot{position:fixed;bottom:2.2vh;right:7vw;font-size:.9vw;color:var(--violet);opacity:.75;z-index:5}
+  .pageno{position:fixed;bottom:2.2vh;left:7vw;font-size:.9vw;color:var(--violet);opacity:.75;z-index:5}
+  code{background:rgba(103,72,253,.1);padding:.1em .35em;border-radius:5px;font-size:.95em}
+  .hint{position:fixed;top:2.2vh;right:7vw;font-size:.85vw;color:var(--muted);opacity:.8;z-index:5}
+  table.mini{border-collapse:collapse;font-size:1.1vw;margin-top:1vh}
+  table.mini th{color:var(--muted);font-weight:600;text-align:left;padding:.4vh .9vw;border-bottom:2px solid var(--grid)}
+  table.mini td{padding:.5vh .9vw;border-bottom:1px solid var(--grid);font-variant-numeric:tabular-nums}
+  .tag{display:inline-block;background:var(--violet);color:#fff;border-radius:6px;padding:.05em .5em;font-size:.85em;font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- 1 · TITLE -->
+<section class="slide dark active">
+  <div class="kicker">Viktor Challenge · TUM.ai · Build the Router</div>
+  <h1>[Team Name]</h1>
+  <p class="big" id="t-claim">…</p>
+  <p>[Members — fill in]. Every number on these slides is computed live from the same
+     pipeline outputs the demo dashboard uses.</p>
+</section>
+
+<!-- 2 · OBJECTIVE -->
+<section class="slide">
+  <div class="kicker">Objective</div>
+  <h2>The trade-off we chose</h2>
+  <p><b>Cost per adequately-served task, routed per task.</b> A task is "served" when its
+     tier ≥ the difficulty its full trajectory later revealed. We route whole tasks, not
+     single calls — a model switch resets the provider's prefix cache, so per-call routing
+     pays for its cleverness (slide 5).</p>
+  <div class="statrow">
+    <div class="stat"><div class="v" id="o-n">…</div><div class="l">real trajectories</div></div>
+    <div class="stat"><div class="v">0</div><div class="l">quality labels shipped</div></div>
+    <div class="stat"><div class="v">2</div><div class="l">independent graders: router vs evaluator</div></div>
+  </div>
+</section>
+
+<!-- 3 · THE SIGNAL -->
+<section class="slide">
+  <div class="kicker">The signal</div>
+  <h2>What the router reads — before the first token is generated</h2>
+  <div class="cols">
+    <div class="card" style="flex:1.4"><h3>Nameable structure (live from the traces)</h3>
+      <div id="sig-chart"></div></div>
+    <div class="card"><h3>Plus the words themselves</h3>
+      <p>Word + character n-grams of the first user message, into ordinal logistic
+         regression → <b>P(difficulty ≤ tier)</b> per task. Text beat every boosted tree
+         we benchmarked.</p>
+      <p style="margin-top:1.2vh"><b>Null result worth naming:</b> the logged dispatch was
+         <i>not</i> difficulty-aware (flat served-difficulty across models). That headroom
+         is what the router exploits.</p></div>
+  </div>
+</section>
+
+<!-- 4 · THE ONE CHART -->
+<section class="slide" id="frontier-slide">
+  <div class="kicker">The one chart</div>
+  <h2>Cost–quality frontier <span style="font-size:.5em">· out-of-fold · cache-aware pricing · knob replay <span class="tag" id="f-knob">τ</span></span></h2>
+  <div id="front-chart"></div>
+  <div class="statrow">
+    <div class="stat"><div class="v" id="f-served">…</div><div class="l">tasks served</div></div>
+    <div class="stat"><div class="v" id="f-wserved">…</div><div class="l">token-weighted</div></div>
+    <div class="stat"><div class="v" id="f-cost">…</div><div class="l">of all-top-tier cost</div></div>
+  </div>
+</section>
+
+<!-- 5 · HONESTY -->
+<section class="slide">
+  <div class="kicker">Honesty</div>
+  <h2>The off-policy estimate — and where it breaks</h2>
+  <div class="cols">
+    <div class="card"><h3>Method</h3>
+      <p>Difficulty graded from the full trajectory by a frozen rule-based evaluator;
+         router validated <b>out-of-fold</b> (GroupKFold by workspace, nested config
+         selection — measured selection bias ≈ 1pt). Matched cross-model check:
+         <span id="h-match">…</span></p></div>
+    <div class="card"><h3>Cache trap</h3>
+      <p id="h-cache">…</p></div>
+    <div class="card"><h3>Weakest point</h3>
+      <p>Difficulty = <i>observed effort</i> on chars/4 token estimates under assumed
+         prices. Two reasonable evaluator configs agree only ~93% with each other —
+         nothing above that ceiling is measurable. Quote the ratios, not the dollars.</p></div>
+  </div>
+</section>
+
+<!-- 6 · CLOSE -->
+<section class="slide dark">
+  <div class="kicker">Close</div>
+  <h1 style="font-size:3.2vw" id="c-claim">…</h1>
+  <p class="big" id="c-number">…</p>
+  <p id="c-weak">…</p>
+</section>
+
+<div class="pageno"><span id="pg">1</span> / 6</div>
+<div class="foot">Viktor challenge · TUM.ai</div>
+<div class="hint">← → navigate · f fullscreen · numbers computed live from pipeline data</div>
+
+<script src="data.js"></script>
+<script src="findings.js"></script>
+<script>
+'use strict';
+const D = window.VIKTOR_DATA, F = window.VIKTOR_FINDINGS || {}, M = D.meta, R = D.rows, N = R.length;
+const DEF = M.defaults;
+
+// ---------- minimal math (mirrors the dashboard; defaults only) ----------
+function ranksOf(vals){const n=vals.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>vals[a]-vals[b]);
+  const out=new Float64Array(n);let i=0;
+  while(i<n){let j=i;while(j+1<n&&vals[idx[j+1]]===vals[idx[i]])j++;
+    const avg=(i+j)/2;for(let k=i;k<=j;k++)out[idx[k]]=avg;i=j+1}
+  const mx=n-1||1;for(let k=0;k<n;k++)out[k]/=mx;return out}
+function quantile(sorted,q){const x=q*(sorted.length-1),lo=Math.floor(x),hi=Math.ceil(x);
+  return sorted[lo]+(sorted[hi]-sorted[lo])*(x-lo)}
+const evScores=(()=>{const w=DEF.evWeights;let tw=0;for(const k in w)tw+=w[k];
+  return R.map(r=>{let s=0;M.evNames.forEach((k,c)=>s+=(w[k]||0)*r.evRank[c]);return s/tw})})();
+const evSorted=[...evScores].sort((a,b)=>a-b);
+const ec1=quantile(evSorted,DEF.evCuts[0]),ec2=quantile(evSorted,DEF.evCuts[1]);
+const diffs=R.map((r,i)=>{
+  if(r.ev.n_tool_errors>=DEF.overrides.errors_t3||r.ev.n_tool_calls>=DEF.overrides.tool_calls_t3)return 3;
+  return evScores[i]<=ec1?1:evScores[i]<=ec2?2:3});
+const CUM=R.map(r=>r.cum);
+const Cm=R.map(r=>{const e=r.ev,T=e.context_tokens,g=e.gen_tokens,n=Math.max(e.n_llm_calls,1);
+  return [1,2,3].map(t=>{const[pin,pc,pout]=DEF.tierPrices[t];
+    return (T*pin+T*(n-1)/2*pc+g*pout)/1e6})});
+function policy(tiers){let cost=0,top=0,served=0,ws=0,wt=0;
+  for(let i=0;i<N;i++){cost+=Cm[i][tiers[i]-1];top+=Cm[i][2];
+    const ok=tiers[i]>=diffs[i];if(ok)served++;wt+=Cm[i][2];if(ok)ws+=Cm[i][2]}
+  return {cost:cost/top,served:served/N,ws:ws/wt}}
+const tauTiers=t=>R.map((r,i)=>CUM[i][0]>=t?1:CUM[i][1]>=t?2:3);
+
+// ---------- slide 1 + 2 + 6: numbers ----------
+const opSafe=policy(tauTiers(DEF.tau));
+document.getElementById('t-claim').textContent=
+  `${(opSafe.served*100).toFixed(0)}% of tasks fully served at ${(opSafe.cost*100).toFixed(0)}% of the all-top-tier cost — decided before the first token.`;
+document.getElementById('o-n').textContent=N;
+document.getElementById('c-claim').textContent='Route the task, not the call — the ask already tells you enough.';
+document.getElementById('c-number').textContent=
+  `${(opSafe.served*100).toFixed(1)}% served · ${(100-opSafe.cost*100).toFixed(0)}% saved (τ=${DEF.tau}, cache-aware)`;
+document.getElementById('c-weak').textContent=
+  'Weakness we own: difficulty is observed effort, not ground truth — and it is partly shaped by whichever model ran. '
+  + 'Next step: judge-model rescoring of matched pairs to turn the served assumption into a measurement.';
+
+// ---------- slide 3: live signal chart ----------
+(function(){
+  const eR=ranksOf(evScores);let base=0;const rows=[];
+  const pearson=(a,b)=>{let ma=0,mb=0;for(let i=0;i<a.length;i++){ma+=a[i];mb+=b[i]}ma/=a.length;mb/=a.length;
+    let sab=0,sa=0,sb=0;for(let i=0;i<a.length;i++){const x=a[i]-ma,y=b[i]-mb;sab+=x*y;sa+=x*x;sb+=y*y}
+    return sab/Math.sqrt(sa*sb||1)};
+  for(const[g,spec]of Object.entries(M.featureGroups)){
+    spec.features.forEach((f,k)=>{const col=base+k;const v=new Float64Array(N);
+      for(let i=0;i<N;i++)v[i]=R[i].rank[col];rows.push({f,rho:pearson(v,eR)})});
+    base+=spec.features.length}
+  rows.sort((a,b)=>b.rho-a.rho);
+  const top=rows.slice(0,5).concat(rows.slice(-3));
+  const W=560,rh=34,T=6,H=T+top.length*rh+8,mid=300,scale=230/Math.max(...top.map(r=>Math.abs(r.rho)));
+  let out=`<line x1="${mid}" y1="${T}" x2="${mid}" y2="${H-6}" stroke="var(--grid)" stroke-width="2"/>`;
+  top.forEach((r,i)=>{const y=T+i*rh,w=Math.abs(r.rho)*scale,pos=r.rho>=0;
+    out+=`<rect x="${pos?mid:mid-w}" y="${y+6}" width="${Math.max(w,2)}" height="${rh-14}" rx="5"
+      fill="${pos?'var(--violet)':'var(--peach)'}"/>
+      <text class="lab" x="${mid-(pos?8:w+8)}" y="${y+rh-13}" text-anchor="end">${r.f}</text>
+      <text x="${mid+(pos?w+7:8)}" y="${y+rh-13}">${r.rho>=0?'+':''}${r.rho.toFixed(2)}</text>`});
+  document.getElementById('sig-chart').innerHTML=
+    `<svg viewBox="0 0 ${W} ${H}">${out}</svg>
+     <p style="font-size:1vw;color:var(--muted);max-width:none;margin-top:.6vh">
+       Spearman vs observed difficulty. Violet = marks hard (entity density, questions,
+       action verbs). Peach = marks easy (broad toolsets, mid-thread triggers).</p>`;
+})();
+
+// ---------- slide 4: live frontier + animated knob replay ----------
+const front={pts:[],cur:0,timer:null,dir:-1,tau:0.995};
+(function(){
+  for(let t=0.30;t<=0.996;t+=0.01)front.pts.push({tau:t,...policy(tauTiers(t))});
+})();
+function drawFrontier(){
+  const W=980,H=340,L=64,Rm=20,T=16,B=44;
+  const ymin=0.15;
+  const x=v=>L+Math.min(v,1)*(W-L-Rm);
+  const y=v=>H-B-(Math.max(v,ymin)-ymin)/(1-ymin)*(H-T-B);
+  let grid='';
+  for(const g of[.2,.4,.6,.8,1])grid+=`<line x1="${L}" y1="${y(g)}" x2="${W-Rm}" y2="${y(g)}" stroke="var(--grid)"/>
+    <text x="${L-8}" y="${y(g)+4}" text-anchor="end">${Math.round(g*100)}%</text>`;
+  for(const g of[.25,.5,.75,1])grid+=`<text x="${x(g)}" y="${H-16}" text-anchor="middle">${Math.round(g*100)}%</text>`;
+  const line=(key,col)=>{let p='';front.pts.forEach((pt,i)=>{p+=(i?'L':'M')+x(pt.cost).toFixed(1)+' '+y(pt[key]).toFixed(1)});
+    return `<path d="${p}" fill="none" stroke="${col}" stroke-width="3.5" stroke-linejoin="round"/>`};
+  const cur=front.pts[front.cur];
+  const dot=(key,col)=>`<circle cx="${x(cur.cost)}" cy="${y(cur[key])}" r="10" fill="${col}" stroke="var(--paper)" stroke-width="3"/>`;
+  document.getElementById('front-chart').innerHTML=
+    `<svg viewBox="0 0 ${W} ${H}">
+      ${grid}
+      <line x1="${L}" y1="${H-B}" x2="${W-Rm}" y2="${H-B}" stroke="var(--muted)"/>
+      ${line('ws','var(--peach)')}${line('served','var(--violet)')}
+      ${dot('ws','var(--peach)')}${dot('served','var(--violet)')}
+      <text x="${W-Rm}" y="${y(front.pts[front.pts.length-1].served)-12}" text-anchor="end" style="fill:var(--violet)">served (per task)</text>
+      <text x="${W-Rm}" y="${y(front.pts[front.pts.length-1].ws)+22}" text-anchor="end" style="fill:#d98a5f">served (token-weighted)</text>
+      <text x="${(W+L)/2}" y="${H-16}" text-anchor="middle" style="font-weight:400">est. cost vs sending everything to the top tier →</text>
+    </svg>`;
+  document.getElementById('f-served').textContent=(cur.served*100).toFixed(1)+'%';
+  document.getElementById('f-wserved').textContent=(cur.ws*100).toFixed(1)+'%';
+  document.getElementById('f-cost').textContent=(cur.cost*100).toFixed(1)+'%';
+  document.getElementById('f-knob').textContent='τ = '+cur.tau.toFixed(2);
+}
+function startReplay(){
+  stopReplay();
+  front.cur=front.pts.length-1;front.dir=-1;
+  front.timer=setInterval(()=>{
+    front.cur+=front.dir;
+    if(front.cur<=0||front.cur>=front.pts.length-1)front.dir*=-1;
+    drawFrontier();
+  },90);
+}
+function stopReplay(){if(front.timer){clearInterval(front.timer);front.timer=null}}
+drawFrontier();
+
+// ---------- slide 5: findings text ----------
+(function(){
+  if(F.matching&&F.matching.interaction){
+    const I=F.matching.interaction;
+    document.getElementById('h-match').innerHTML=
+      `low-tier models show +${(I.extra_err_rate_of_low_tier_on_hard*100).toFixed(1)}pt errors and
+       +${I.extra_retry_streak_of_low_tier_on_hard} retry streak on matched hard tasks —
+       <b>directionally supportive, not significant at n=${N}</b>. We say so.`}
+  if(F.cacheTrap){
+    const g=F.cacheTrap.policies['per-call cheap-tool-loops']||{};
+    document.getElementById('h-cache').innerHTML=
+      `A per-call "cheap model for tool loops" policy claims <b>${g.savings_naive_pct}% saved</b> under
+       naive costing. Priced with cache resets over full trajectories it pays
+       <b>~$${Math.round(F.cacheTrap.model_based_full_penalty_usd)}</b> in resets — over half the
+       all-top-tier budget. Our per-task policy pays <b>zero</b> resets by construction.`}
+})();
+
+// ---------- navigation ----------
+const s=[...document.querySelectorAll('.slide')];let i=0;
+const show=n=>{s[i].classList.remove('active');i=(n+s.length)%s.length;s[i].classList.add('active');
+  document.getElementById('pg').textContent=i+1;
+  if(s[i].id==='frontier-slide')startReplay();else stopReplay()};
+addEventListener('keydown',e=>{
+  if(['ArrowRight',' ','PageDown'].includes(e.key))show(i+1);
+  if(['ArrowLeft','PageUp'].includes(e.key))show(i-1);
+  if(e.key==='f')document.documentElement.requestFullscreen()});
+addEventListener('click',e=>{if(!e.target.closest('a'))show(i+1)});
+</script>
+</body>
+</html>

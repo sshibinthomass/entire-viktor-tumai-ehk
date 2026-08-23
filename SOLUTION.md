@@ -181,6 +181,40 @@ client-side in ~10 ms per change:
 Data loads dynamically from `dashboard/data.js` — rerun `python run_pipeline.py`
 (new export chunk, new features) and reload the page; no dashboard edits needed.
 
+## Deck-requirement closures (round 3)
+
+- **Inferred model tier order** (`infer_tiers.py` → `results/model_tiers.json`):
+  within matched difficulty buckets, weaker models show more tool errors and
+  longer retry streaks. Bootstrap-stable extremes: fable-5 / opus-5 top (94 %),
+  luna bottom (100 %); fuzzy middle flagged honestly. Independent of the price
+  sheet, yet reproduces its extremes. **Null result worth naming:** served
+  difficulty is flat across models — the logged dispatch was not
+  difficulty-aware; that headroom is what the router exploits.
+- **The cache trap, demonstrated** (`cache_trap.py` → `results/cache_trap.json`):
+  a per-call "cheap model for tool loops" policy claims 96 % savings under naive
+  costing; priced with cache resets over full trajectories it pays ~$148 in
+  resets alone — over half the ~$259 all-Tier-3 input budget. The measured
+  multi-call subset is a floor (sampling hides switch points); per-task routing
+  pays zero resets by construction.
+- **Matched cross-model check** (`matching_check.py` →
+  `results/matching_check.json`): low-tier models show +0.6 pt error rate and
+  +1.33 retry streak on matched hard tasks (difference-in-differences).
+  Directionally supportive, **not significant at n=953** — the "served"
+  assumption stays an assumption, stated as such.
+- **The 5-minute defense deck** (`dashboard/present.html`): follows the
+  make-presentation template (brand, fixed slide order, keys/fullscreen) but
+  every number and chart is **computed live** from `data.js`/`findings.js` —
+  including an auto-playing τ-sweep replay on the frontier slide. Team
+  name/members are the only fill-in slots left.
+- **Dashboard explainability layer**: every tile, slider, method, cost model,
+  chart and finding now explains itself on hover (delegated tooltip layer);
+  pipeline findings render as three cards below the live charts.
+
+Reproduction order:
+`run_pipeline.py` → `infer_tiers.py` → `cache_trap.py` → `matching_check.py`
+→ `build_findings.py`; then open `dashboard/index.html` (lab) and
+`dashboard/present.html` (deck) — both work statically, no server needed.
+
 ## Honesty notes (the known weaknesses)
 
 - **Effort ≠ difficulty.** The evaluator measures observed effort; a task can be
