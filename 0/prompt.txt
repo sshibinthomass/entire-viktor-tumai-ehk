@@ -1,0 +1,1 @@
+I can also use a smaller model or finetune a model specifically for routing or also use a github opensource routing repo also consider those approches
