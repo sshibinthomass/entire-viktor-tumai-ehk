@@ -1,0 +1,1 @@
+Can we also dynamically show a table in dashboard to show how much money saved from Logged to our thing and how much performance is increased as well?
