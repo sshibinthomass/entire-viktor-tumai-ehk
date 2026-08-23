@@ -154,12 +154,16 @@ as a labeled reference ("known deployment marginals"). Method ladder
 | nested stack | 64.8% / 65.5% | 57.8% | 49.4% |
 
 **Honest final number (nested selection over the FULL 30-config grid, deployable
-cuts): see `results/final_validation.json`** — the inner CV re-picks the config
-inside every training fold, the outer cuts come from train labels only, and the
-grid-selection bias is *measured* (best pooled-grid config minus the nested
-number), not asserted. The earlier "zero grid optimism" claim was wrong twice: the
-old 8-config grid had been pre-filtered on the same folds, and the old fold-pick
-sentence ("all five folds picked the same config") did not match its own artifact.
+cuts): 66.0% exact, 59.6% balanced, 96.3% adjacent, D3 recall 52.5%, ρ 0.695**
+(`results/final_validation.json`) — the inner CV re-picks the config inside every
+training fold (the five folds picked FOUR different configs, stated as such), the
+outer cuts come from train labels only, and the grid-selection bias is
+*measured*, not asserted: the optimistic pooled-grid best is 67.1%, so selection
+bias = **+1.2 pts**. The known-marginals reference (transductive cuts) is 66.4%.
+The earlier "zero grid optimism / all five folds agreed" claims were wrong: the
+old 8-config grid had been pre-filtered on the same folds, and the fold picks
+never matched the artifact. Chance with these marginals is ~41%; always-T1 gets
+55.0%; the evaluator-agreement ceiling is 94.9%.
 
 Recommended operating points (defaults; cache-aware costs; from
 `results/sweeps.json` + `results/comparison.json`):

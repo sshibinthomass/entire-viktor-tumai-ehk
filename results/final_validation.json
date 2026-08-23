@@ -1,33 +1,72 @@
 {
   "metrics": {
-    "exact": 0.6138509968520461,
-    "balanced": 0.5423317140874393,
-    "adjacent": 0.9559286463798531,
-    "d3_recall": 0.43356643356643354,
+    "exact": 0.6595121951219513,
+    "balanced": 0.5961454332681448,
+    "adjacent": 0.9629268292682926,
+    "d3_recall": 0.525,
     "conf": [
       [
-        400,
-        103,
-        21
+        454,
+        98,
+        15
       ],
       [
-        103,
-        123,
-        60
+        87,
+        138,
+        61
       ],
       [
-        21,
-        60,
-        62
+        23,
+        65,
+        84
       ]
     ],
-    "spearman": 0.5771208876609761
+    "spearman": 0.6948019510700386,
+    "exact_known_marginals": 0.6643902439024391
   },
   "fold_picks": [
     "usr-word+char/C=1.0/multi",
-    "usr-word+char/C=1.0/multi",
-    "usr-word+char/C=1.0/ord",
-    "usr-word+char/C=1.0/multi",
-    "usr-word+char/C=1.0/ord"
-  ]
+    "usr-word+char+sys/tools/C=2.0/multi",
+    "usr-word/C=1.0/multi",
+    "usr-word+char+sys/tools/C=2.0/ord",
+    "usr-word+char+sys/tools/C=2.0/multi"
+  ],
+  "n_configs_in_grid": 30,
+  "grid_best": {
+    "name": "usr-char/C=2.0/multi",
+    "exact": 0.671219512195122
+  },
+  "selection_bias_pts": 1.17,
+  "grid_exact_by_config": {
+    "usr-word/C=0.5/multi": 0.6360975609756098,
+    "usr-word/C=0.5/ord": 0.6273170731707317,
+    "usr-word/C=1.0/multi": 0.646829268292683,
+    "usr-word/C=1.0/ord": 0.6370731707317073,
+    "usr-word/C=2.0/multi": 0.6575609756097561,
+    "usr-word/C=2.0/ord": 0.6497560975609756,
+    "usr-char/C=0.5/multi": 0.6429268292682927,
+    "usr-char/C=0.5/ord": 0.6331707317073171,
+    "usr-char/C=1.0/multi": 0.6458536585365854,
+    "usr-char/C=1.0/ord": 0.6439024390243903,
+    "usr-char/C=2.0/multi": 0.671219512195122,
+    "usr-char/C=2.0/ord": 0.6487804878048781,
+    "usr-word+char/C=0.5/multi": 0.646829268292683,
+    "usr-word+char/C=0.5/ord": 0.646829268292683,
+    "usr-word+char/C=1.0/multi": 0.6585365853658537,
+    "usr-word+char/C=1.0/ord": 0.6517073170731708,
+    "usr-word+char/C=2.0/multi": 0.6653658536585366,
+    "usr-word+char/C=2.0/ord": 0.6565853658536586,
+    "usr+sys+tools-word/C=0.5/multi": 0.6321951219512195,
+    "usr+sys+tools-word/C=0.5/ord": 0.6263414634146341,
+    "usr+sys+tools-word/C=1.0/multi": 0.64,
+    "usr+sys+tools-word/C=1.0/ord": 0.6370731707317073,
+    "usr+sys+tools-word/C=2.0/multi": 0.6595121951219513,
+    "usr+sys+tools-word/C=2.0/ord": 0.6487804878048781,
+    "usr-word+char+sys/tools/C=0.5/multi": 0.6536585365853659,
+    "usr-word+char+sys/tools/C=0.5/ord": 0.6565853658536586,
+    "usr-word+char+sys/tools/C=1.0/multi": 0.6624390243902439,
+    "usr-word+char+sys/tools/C=1.0/ord": 0.6526829268292683,
+    "usr-word+char+sys/tools/C=2.0/multi": 0.6634146341463415,
+    "usr-word+char+sys/tools/C=2.0/ord": 0.6604878048780488
+  }
 }
