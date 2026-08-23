@@ -19,3 +19,6 @@ outputs/
 
 # per-dataset lab files: previews hold verbatim task text (see dashboard/previews.js)
 dashboard/data/*.previews.js
+
+# browser uploads staged by scripts/lab_server.py (licensed dataset)
+uploads/

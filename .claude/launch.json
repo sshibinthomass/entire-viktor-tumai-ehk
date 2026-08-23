@@ -4,13 +4,21 @@
     {
       "name": "dashboard",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8017", "-d", "dashboard"],
+      "runtimeArgs": [
+        "scripts/lab_server.py",
+        "--port",
+        "8017"
+      ],
       "port": 8017
     },
     {
       "name": "dashboard-alt",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8018", "-d", "dashboard"],
+      "runtimeArgs": [
+        "scripts/lab_server.py",
+        "--port",
+        "8018"
+      ],
       "port": 8018
     }
   ]

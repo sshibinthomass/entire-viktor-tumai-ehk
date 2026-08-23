@@ -43,9 +43,37 @@ python freeze_router.py                   # deployable frozen-router artifact
 python apply_frozen.py export_linked/trajectories_v1_02.jsonl
 ```
 
-Open the lab and the deck with `python -m http.server 8017 -d dashboard`
-(or the `dashboard` entry in `.claude/launch.json`): `index.html` is the
-interactive lab, `present.html` the 5-minute deck.
+Open the lab and the deck with `python scripts/lab_server.py` (or the
+`dashboard` entry in `.claude/launch.json`): `index.html` is the interactive
+lab, `present.html` the 5-minute deck. `python -m http.server 8017 -d dashboard`
+still works and gives you everything except the upload button.
+
+### More than one chunk
+
+Every pipeline run writes its own `dashboard/data/<chunk>.js` and refreshes
+`dashboard/datasets.js`, so the lab header carries a **dataset dropdown** and the
+deck footer the same one — pick a chunk and every tile, chart, card and slide
+recomputes from it (`?dataset=<id>` is the shareable link; the choice is
+remembered). A chunk registers itself: run the pipeline on it and it is in the
+list.
+
+Two ways to add one:
+
+```bash
+# from the command line
+python scripts/enrich_dataset.py export/ export_linked/
+python run_pipeline.py export_linked/trajectories_v1_03.jsonl && python build_findings.py
+```
+
+or **from the browser** — with `scripts/lab_server.py` serving, the `+ add chunk`
+chip takes a `.jsonl`, `.jsonl.gz` or `.tar.gz` export, validates the first line
+against the challenge schema, runs the same Mode-B chain (enrich → pipeline →
+tiers → matched check → cache trap → findings) and switches to the new dataset
+when it finishes (~2–4 min for 1k tasks; uploads land in the gitignored
+`uploads/`). The heavy ladder (`exp_final.py`, `sweep_defaults.py`,
+`tune_router.py`) is *not* re-run per chunk — the lab's footer names any finding
+panel that is carried over from an earlier run rather than passing it off as the
+current chunk's.
 
 ## For judges: run it on YOUR data
 

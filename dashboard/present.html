@@ -222,12 +222,40 @@ tier = <span class="k">1</span> if p1 &#8805; &#964;         <span class="c"># &
 
 <div class="pageno"><span id="pg">1</span> / 8</div>
 <div class="timer" id="timer" style="display:none">0:00</div>
-<div class="foot">Viktor challenge · TUM.ai</div>
+<div class="foot">Viktor challenge · TUM.ai<span id="deckDataset"></span></div>
 <div class="hint">← → navigate · f fullscreen · t timer · n notes · p pause replay</div>
 
-<script src="data.js"></script>
-<script src="findings.js"></script>
-<script src="previews.js" onerror="/* previews are local-only (gitignored): optional */"></script>
+<script src="datasets.js" onerror="/* no manifest yet: single-dataset mode */"></script>
+<script>
+// Same dataset selection as the lab (see dashboard/index.html): ?dataset=<id>
+// picks one of the chunks listed in datasets.js, remembered in localStorage, and
+// the chosen files are document.write-n so they load before the deck script
+// below. Every slide is computed from them, so the whole deck follows the chunk.
+(function () {
+  const list = Array.isArray(window.VIKTOR_DATASETS) ? window.VIKTOR_DATASETS : [];
+  const want = new URLSearchParams(location.search).get('dataset')
+            || (function () { try { return localStorage.getItem('viktorDataset'); }
+                              catch (e) { return null; } })();
+  const pick = list.find(d => d.id === want) || list[0] || null;
+  window.VIKTOR_DATASET = pick;
+  const files = pick
+    ? ['data/' + pick.id + '.js', 'data/' + pick.id + '.findings.js',
+       'data/' + pick.id + '.previews.js']
+    : ['data.js', 'findings.js', 'previews.js'];
+  document.write(files.map(s =>
+    '<scr' + 'ipt src="' + s + '" onerror="void 0"></scr' + 'ipt>').join(''));
+})();
+</script>
+<script>
+// safety net: if the manifest named files that are not here (a partial copy of
+// dashboard/), fall back to the single-dataset files rather than a blank page
+if (!window.VIKTOR_DATA) {
+  window.VIKTOR_DATASET = null;
+  document.write('<scr' + 'ipt src="data.js"></scr' + 'ipt>'
+    + '<scr' + 'ipt src="findings.js"></scr' + 'ipt>'
+    + '<scr' + 'ipt src="previews.js" onerror="void 0"></scr' + 'ipt>');
+}
+</script>
 <script>
 'use strict';
 const D = window.VIKTOR_DATA, F = window.VIKTOR_FINDINGS || {}, M = D.meta, R = D.rows, N = R.length;
@@ -583,7 +611,26 @@ addEventListener('keydown',e=>{
   if(e.key==='t')toggleTimer();
   if(e.key==='n')document.body.classList.toggle('shownotes');
   if(e.key==='p'&&s[i].id==='frontier-slide'){front.timer?stopReplay():startReplay()}});
-addEventListener('click',e=>{if(!e.target.closest('a'))show(i+1)});
+addEventListener('click',e=>{if(!e.target.closest('a,select,#deckDataset'))show(i+1)});
+
+// ---------- which chunk is on the slides ----------
+// The deck is the same deck for every dataset — the numbers are read from the
+// loaded chunk, so this only has to say WHICH, and let the presenter switch.
+(function(){
+  const sets=Array.isArray(window.VIKTOR_DATASETS)?window.VIKTOR_DATASETS:[];
+  const cur=window.VIKTOR_DATASET, el=document.getElementById('deckDataset');
+  if(!el) return;
+  if(sets.length<2){ el.textContent=' · '+M.source; return; }
+  el.innerHTML=' · <select id="deckPick" style="font:inherit;color:inherit;'
+    +'background:transparent;border:0;cursor:pointer;outline:none">'
+    +sets.map(d=>'<option value="'+d.id+'"'+(cur&&d.id===cur.id?' selected':'')
+      +' style="color:#111;background:#fff">'+d.label+'</option>').join('')+'</select>';
+  document.getElementById('deckPick').onchange=function(){
+    try{localStorage.setItem('viktorDataset',this.value);}catch(e){}
+    const u=new URL(location.href); u.searchParams.set('dataset',this.value);
+    location.href=u.href;
+  };
+})();
 </script>
 </body>
 </html>

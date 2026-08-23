@@ -33,8 +33,9 @@ planning turn).
 
 Writes results/cache_trap.json.
 
-Usage: python cache_trap.py
+Usage: python cache_trap.py [export_linked/chunk.jsonl]   (default: export_linked/)
 """
+import argparse
 import json
 from pathlib import Path
 
@@ -78,11 +79,15 @@ def price(profile, route, cache_aware):
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("export", nargs="?", default=DEFAULT_EXPORT,
+                    help="the enriched chunk (or directory) the tiers were built from")
+    a = ap.parse_args()
     task_tier = {json.loads(l)["trajectory_id"]: json.loads(l)["router_tier"]
                  for l in open("results/tiers.jsonl", encoding="utf-8")}
 
     # regroup ALL calls per trajectory (load_trajectories keeps only first/deepest)
-    p = Path(DEFAULT_EXPORT)
+    p = Path(a.export)
     files = sorted(p.glob("*.jsonl")) if p.is_dir() else [p]
     calls_of = {}
     for fp in files:

@@ -39,7 +39,7 @@ Not required: Docker, node, a database, any cloud account.
 - [ ] **Serve the dashboard** from the repo root — stdlib only, no dependencies needed for this level:
 
   ```bash
-  python -m http.server 8017 -d dashboard
+  python scripts/lab_server.py        # upload-capable; or: python -m http.server 8017 -d dashboard
   ```
 
   In Claude Code / VS Code you can instead launch the `dashboard` entry in `.claude/launch.json`.

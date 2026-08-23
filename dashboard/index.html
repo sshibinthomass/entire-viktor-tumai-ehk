@@ -260,6 +260,16 @@ its own outcome.</div>
 })();
 </script>
 <script>
+// safety net: if the manifest named files that are not here (a partial copy of
+// dashboard/), fall back to the single-dataset files rather than a blank page
+if (!window.VIKTOR_DATA) {
+  window.VIKTOR_DATASET = null;
+  document.write('<scr' + 'ipt src="data.js"></scr' + 'ipt>'
+    + '<scr' + 'ipt src="findings.js"></scr' + 'ipt>'
+    + '<scr' + 'ipt src="previews.js" onerror="void 0"></scr' + 'ipt>');
+}
+</script>
+<script>
 'use strict';
 const D = window.VIKTOR_DATA, M = D.meta, R = D.rows, N = R.length;
 // verbatim task text ships only in the gitignored previews.js (license: no redistribution)
@@ -1125,8 +1135,12 @@ function chips() {
       sets.map(d => `<option value="${esc(d.id)}"${cur && d.id === cur.id ? ' selected' : ''}
          style="color:#111;background:#fff">${esc(d.label)}</option>`).join('') + '</select>'
     : esc(M.source);
+  const deckHref = 'present.html' + (cur ? '?dataset=' + encodeURIComponent(cur.id) : '');
   document.getElementById('chips').innerHTML = [
     `${N} trajectories`, source,
+    `<span id="uploadChip" style="cursor:pointer;display:none"
+       title="Run the pipeline on a new chunk and add it to the dropdown">+ add chunk</span>`,
+    `<a href="${deckHref}" style="color:inherit;text-decoration:none">deck &#8599;</a>`,
     'tokens = chars/4 estimates', 'router never sees the logged model',
     'ML probs: out-of-fold (GroupKFold by workspace)',
   ].map(c => `<span class="chip">${c}</span>`).join('');
@@ -1137,6 +1151,75 @@ function chips() {
     u.searchParams.set('dataset', pick.value);            // newly loaded chunk
     location.href = u.href;
   };
+  wireUpload();
+}
+
+// A Mode-B run recomputes the router, the evaluator and the three finding
+// cards, but not the heavy ladder (nested validation, sweeps, frontier
+// benchmark). build_findings.py marks anything older than this chunk's data
+// file, so a switched-to or uploaded dataset says which panels are not its own.
+function carriedOverNote() {
+  const c = ((window.VIKTOR_FINDINGS || {})._provenance || {}).carriedOver || [];
+  if (!c.length) return '';
+  const NAME = { finalValidation: 'nested validation', sweeps: 'the α/τ/λ sweeps',
+                 tuning: 'the frontier benchmark', comparison: 'the headline comparison',
+                 modelTiers: 'the tier map', cacheTrap: 'the cache trap',
+                 matching: 'the matched check' };
+  return `<br><br><b>Not from this chunk:</b> ${c.map(k => NAME[k] || k).join(', ')} —
+    carried over from the previous run. Those come from the experiment ladder
+    (<code>exp_final.py</code>, <code>sweep_defaults.py</code>, <code>tune_router.py</code>),
+    which a Mode-B run does not re-execute; run them to refresh.`;
+}
+
+// ---------- upload a new chunk ----------
+// Only possible when the page is served by scripts/lab_server.py (a static
+// server has no /api). The server runs the same Mode-B chain the README
+// documents; when it finishes, the chunk is in the manifest and we jump to it.
+function wireUpload() {
+  const chip = document.getElementById('uploadChip');
+  if (!chip) return;
+  fetch('api/health').then(r => r.ok ? r.json() : null).then(h => {
+    if (!h || !h.upload) return;                          // static server: stay hidden
+    chip.style.display = '';
+    let file = document.getElementById('uploadFile');
+    if (!file) {
+      file = document.createElement('input');
+      file.type = 'file'; file.id = 'uploadFile'; file.style.display = 'none';
+      file.accept = '.jsonl,.gz,.tgz';
+      document.body.appendChild(file);
+    }
+    const say = t => { chip.textContent = t; };
+    chip.onclick = () => file.click();
+    file.onchange = async () => {
+      const f = file.files[0]; if (!f) return;
+      chip.onclick = null;
+      say(`uploading ${f.name} (${(f.size / 1e6).toFixed(1)} MB)…`);
+      let job;
+      try {
+        const r = await fetch('api/upload', { method: 'POST', body: f,
+          headers: { 'X-Filename': f.name, 'Content-Type': 'application/octet-stream' } });
+        job = await r.json();
+      } catch (e) { say('upload failed: ' + e.message); return; }
+      if (!job || job.error) { say('rejected: ' + ((job && job.error) || 'unknown')); return; }
+      say('processing… (pipeline, ~2–4 min for 1k tasks)');
+      const timer = setInterval(async () => {
+        let s; try { s = await (await fetch('api/job?id=' + job.job)).json(); }
+        catch (e) { return; }
+        const last = (s.log || []).filter(l => l && !l.startsWith('$')).pop();
+        if (s.state === 'running' || s.state === 'queued') { say('processing… ' + (last || '')); return; }
+        clearInterval(timer);
+        if (s.state === 'error') { say('failed: ' + (s.error || 'see server log')); return; }
+        if ((s.failed_steps || []).length) {               // dataset is usable;
+          say('done, but ' + s.failed_steps.join(', ') + ' failed — loading anyway');
+          await new Promise(r => setTimeout(r, 2500));     // some cards will be empty
+        } else say('done — loading ' + s.dataset);
+        try { localStorage.setItem('viktorDataset', s.dataset); } catch (e) {}
+        const u = new URL(location.href);
+        u.searchParams.set('dataset', s.dataset);
+        location.href = u.href;
+      }, 1500);
+    };
+  }).catch(() => {});                                     // no API -> no upload chip
 }
 function renderAll() {
   tip.style.display = 'none';
@@ -1162,7 +1245,7 @@ function renderAll() {
     token-heavy tasks — the weighted-served tile and orange frontier line make that visible. ML probabilities
     are out-of-fold and were trained against the evaluator's default settings; rerun the pipeline after
     changing the evaluator. reasoning_tokens exist only for the gpt family — keep its weight small or you
-    grade providers, not tasks.`;
+    grade providers, not tasks.` + carriedOverNote();
 }
 let timer = null;
 function schedule() { clearTimeout(timer); timer = setTimeout(renderAll, 70); }

@@ -34,9 +34,20 @@ def main():
             bundle[key] = json.loads(p.read_text(encoding="utf-8"))
         else:
             print(f"skipping {key}: {path} not found")
+    # provenance: run_pipeline.py rewrites dashboard/data.js for the chunk being
+    # analysed, so any results/ file OLDER than it belongs to a previous chunk.
+    # The heavy ladder (exp_final / sweep_defaults / tune_router) is not part of
+    # a plain Mode-B run, so those parts are usually the carried-over ones — the
+    # lab prints them as such instead of passing them off as this chunk's.
+    data_mtime = DATA.stat().st_mtime if DATA.exists() else 0
+    carried = sorted(k for k, path in PARTS.items()
+                     if k in bundle and Path(path).stat().st_mtime < data_mtime - 1)
+    bundle["_provenance"] = {"carriedOver": carried}
+
     OUT.write_text("window.VIKTOR_FINDINGS = " + json.dumps(bundle, separators=(",", ":"))
                    + ";\n", encoding="utf-8")
-    print(f"wrote {OUT} with: {', '.join(bundle)}")
+    print(f"wrote {OUT} with: {', '.join(k for k in bundle if k != '_provenance')}"
+          + (f"  (carried over from an earlier chunk: {', '.join(carried)})" if carried else ""))
     # the findings above describe whichever chunk run_pipeline.py last ran on —
     # keep a copy next to that chunk's data file so the lab's dataset dropdown
     # switches cards and numbers together (see scripts/dashboard_datasets.py)

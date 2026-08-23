@@ -25,7 +25,9 @@ matching_check.py applies that map to the ODD half only. The full-data map
 struggle-based validation is claimed.
 
 Small-sample ids (n < MIN_N) inherit the nearest solid neighbour's tier and
-are flagged instead of over-read.
+are flagged instead of over-read. On a chunk small enough that NO id clears
+MIN_N (chunk 00's 25 trajectories, or a judge's sample), all ids are ranked and
+all are flagged — a fully-flagged table, not a crash.
 
 Writes results/model_tiers.json and prints the table.
 
@@ -63,13 +65,20 @@ def struggle_ranking(rows, models, n_of, min_n, n_boot=200, seed=7):
     struggle = struggle_of(rows, bucket)
     order = sorted(models, key=lambda m: struggle[m])  # least struggle first
     solid = [mo for mo in order if n_of[mo] >= min_n]
+    # a small chunk (a judge's sample, our 25-trajectory chunk 00) can leave NO
+    # id above the threshold. Rank them all rather than crash — every id is then
+    # flagged n<MIN_N, which is exactly what the caller should report.
+    thin = not solid
+    if thin:
+        solid = list(order)
 
     rng = np.random.default_rng(seed)
     tier_votes = {mo: np.zeros(3) for mo in models}
     for _ in range(n_boot):
         pick = rng.integers(0, len(rows), len(rows))
         st = struggle_of([rows[k] for k in pick], bucket[pick])
-        so = [mo for mo in sorted(models, key=lambda m: st[m]) if n_of[mo] >= min_n]
+        so = [mo for mo in sorted(models, key=lambda m: st[m])
+              if thin or n_of[mo] >= min_n]
         for i, mo in enumerate(so):
             t = 3 if i < len(so) / 3 else (2 if i < 2 * len(so) / 3 else 1)
             tier_votes[mo][t - 1] += 1
