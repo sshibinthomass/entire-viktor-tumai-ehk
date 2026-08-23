@@ -1,0 +1,2 @@
+So its only for 1st user message we need to route?
+what about context history from llms and tool calls and sub agents?
