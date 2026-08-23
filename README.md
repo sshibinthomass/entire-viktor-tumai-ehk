@@ -2,8 +2,10 @@
 
 Our solution for the **Viktor Challenge** at the TUM.ai hackathon (Munich, 22–23 Aug 2026):
 a two-part **tier router + trajectory evaluator** with an honest off-policy evaluation.
-The full writeup is in [SOLUTION.md](SOLUTION.md); the license-containment status is in
-[docs/LICENSE_CONTAINMENT.md](docs/LICENSE_CONTAINMENT.md).
+The full writeup is in [SOLUTION.md](SOLUTION.md). **Judging this? Start with
+[docs/JUDGES.md](docs/JUDGES.md)** — the 15-minute evaluation path, the
+claim-to-artifact map, and how to run it on your own data. License-containment
+status is in [docs/LICENSE_CONTAINMENT.md](docs/LICENSE_CONTAINMENT.md).
 
 ## Reproduce from a clean checkout
 
