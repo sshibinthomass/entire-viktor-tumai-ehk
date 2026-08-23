@@ -1,59 +1,45 @@
-# Dataset license containment — status and remaining steps
+# Dataset license containment — status
 
 The challenge dataset is **challenge-use-only, no redistribution** (AGENTS.md hard
-rule). An audit found it publicly reachable through this repo. This file tracks
-the containment.
+rule). An audit found it publicly reachable through this repo. Containment status:
 
-## Done
+## Done (2026-08-23)
 
-- **Repo set to private** (was public) — the dataset is no longer publicly
-  reachable through GitHub's UI.
-- **Working tree clean**: `export/`, `export_linked/`, `*.tar.gz`, `*.zip` are
-  untracked and gitignored.
-- **Committed artifacts stripped**: `results/router_features.jsonl` and
-  `dashboard/data.js` no longer carry verbatim `_preview`/`_trigger` text; the
-  previews live only in the gitignored `dashboard/previews.js`. The experiment
-  cache (`results/exp_cache.npz`, TF-IDF-bearing `results/frozen_router.pkl`)
-  are gitignored because they embed dataset-derived text.
+- **Repo set to private** (was public).
+- **History PURGED and force-pushed**: `git filter-repo` removed from every
+  branch's history: `trajectories_v1_01.jsonl.tar.gz` (31.7 MB raw blob),
+  `export/trajectories_v1_01.jsonl` (LFS pointer), `export/LICENSE`, all
+  historical versions of `dashboard/data.js` and `results/router_features.jsonl`
+  (two versions of each carried verbatim task previews), and the starter zip.
+  Current CLEAN versions of the two artifacts (numbers/ids/model names only,
+  verified zero preview text) were re-committed. All six remote branches were
+  force-updated; repo pack shrank 34 MB → 3.2 MB. A full-blob scan across all
+  branches confirmed no other historical file carries dataset text (needles:
+  preview fields, redaction markers, image placeholders, prompt phrases).
+- **Working tree**: `export/`, `export_linked/`, archives, `dashboard/previews.js`,
+  `results/exp_cache.npz`, `results/frozen_*.pkl` are untracked and gitignored —
+  all dataset-derived text stays local.
+- No tags, no LFS objects referenced by the rewritten history.
 
-## Still required: purge the git HISTORY (destructive — confirm before running)
+## Remaining actions (owner)
 
-The pushed history still contains:
+1. **Anyone with an old clone must re-clone.** Old clones re-introduce the purged
+   blobs if pushed. This includes teammates' machines (branches `ivan_branch`,
+   `router_models_mark` were force-updated).
+2. **This machine still holds pre-purge history in LOCAL-ONLY branches** —
+   `claude/evaluator-architecture-c36cdb`, `claude/trajectories-router-data-2eb29b`,
+   `claude/tumai-challenge-analysis-cb55d5`, `claude/tumai-challenge-solution-602ea6`,
+   `claude/tumai-router-evaluator-1022a9`, `feat/router-pipeline` (several pinned
+   by `.claude/worktrees/`). Local possession is licensed; the hazard is a future
+   `git push --all`, which would re-upload the blobs. When those experiments are
+   no longer needed: `git worktree remove <path>` for each stale worktree, then
+   `git branch -D <branch>`, then `git gc --prune=now`.
+3. **GitHub server-side remnants**: force-pushed-away commits can stay reachable
+   by SHA in GitHub's cache, and the old LFS object may remain in the repo's LFS
+   storage. Ask GitHub Support (sensitive-data-removal flow,
+   https://support.github.com/) to run gc and drop cached views; check
+   Settings → Git LFS for the 105 MB object. Anyone who forked while the repo
+   was public holds an independent copy — support can detach/clear forks.
 
-- `trajectories_v1_01.jsonl.tar.gz` — 31.7 MB raw blob (commit `c21aece`)
-- `export/trajectories_v1_01.jsonl` — Git-LFS pointer to the 105 MB JSONL
-- historical versions of `dashboard/data.js` and `results/router_features.jsonl`
-  with verbatim first-user-message previews
-
-The later "remove from tracking" commit (`261c20c`) removed them from the
-working tree only, not from history. Anyone who cloned/forked while public may
-still hold copies. To purge:
-
-```bash
-# from a FRESH clone (git-filter-repo refuses to run in a dirty original)
-pip install git-filter-repo
-git clone https://github.com/sshibinthomass/entire-viktor-tumai-ehk.git purge-clone
-cd purge-clone
-git filter-repo --invert-paths \
-  --path trajectories_v1_01.jsonl.tar.gz \
-  --path export/trajectories_v1_01.jsonl \
-  --path export/trajectories_v1_00.jsonl \
-  --path dashboard/data.js \
-  --path results/router_features.jsonl
-# re-add the CURRENT (clean) versions of the two regenerated artifacts
-# (copy them from your working repo, commit), then:
-git remote add origin https://github.com/sshibinthomass/entire-viktor-tumai-ehk.git
-git push origin --force --all
-git push origin --force --tags
-```
-
-Then:
-
-1. Ask GitHub support to clear cached views and detach any forks:
-   https://support.github.com/ (the "sensitive data removal" flow).
-2. Every local clone must be re-cloned (old clones re-introduce the blobs on push).
-3. Delete any Git-LFS objects from the repo's LFS storage
-   (Settings → Git LFS, or `git lfs prune` after the rewrite).
-
-Keep the repo private regardless — the dataset license does not allow public
-redistribution even without the raw blobs, and previews are dataset content.
+Keep the repo private regardless: previews are dataset content, and the license
+does not allow public redistribution in any form.
