@@ -156,6 +156,27 @@ reach the same place?
 `results/chunk02/fit_chunk01_comparison_shipped_prices.json` — not the committed
 `results/comparison.json`; see the caveat in section 6.)
 
+**Against the logged dispatch.** The lab's savings-ledger card (from master's
+`c2e46a1`, brought onto this branch so it renders on chunk-02 data) prices the
+log and the router on the same tasks, same assumed prices, one grading for both
+sides — errors and retry streaks zeroed, since those also drove the tier
+inference and would depress the logged row mechanically:
+
+| policy | est. cost | of all-T3 | Δ vs logged | served | Δ | weighted served | Δ |
+|---|---|---|---|---|---|---|---|
+| logged dispatch (repriced) | $131.98 | 70.9% | — | 85.8% | — | 72.2% | — |
+| our router (blend, p55/p85) | $108.03 | 58.0% | −$23.96 (−18.2%) | 82.3% | −3.5 pt | 74.5% | +2.2 pt |
+| budget-matched | $131.87 | 70.8% | −$0.12 | 89.7% | +3.9 pt | 87.8% | +15.5 pt |
+| quality-matched | $120.51 | 64.7% | −$11.47 (−8.7%) | 86.1% | +0.3 pt | 81.4% | +9.2 pt |
+| always top tier | $186.18 | 100.0% | +$54.20 | 100.0% | +14.2 pt | 100.0% | +27.8 pt |
+
+At default knobs the router is cheaper *and* worse than the log on raw served
+share (−3.5 pt) while ahead token-weighted (+2.2 pt); the matched rows are the
+like-for-like read. On chunk 00+01 one knob satisfies both matching criteria and
+the card merges them into a single row — on chunk 02 they differ, hence two
+rows. These figures are computed in the browser from `data.js`, not stored in a
+committed JSON.
+
 **Tier map replicates.** `infer_tiers.py` on chunk 02 reproduces the committed
 tier assignment for all 8 shared ids, and the revealed-preference null result
 (served-difficulty flat across models → the logged dispatcher was not
