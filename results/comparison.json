@@ -1,32 +1,38 @@
 {
-  "n": 953,
-  "exact_agreement": 0.6138509968520461,
-  "adjacent_agreement": 0.9580272822665268,
-  "spearman_scores": 0.5828288361393983,
-  "under_routed": 0.19097586568730326,
-  "over_routed": 0.19517313746065057,
-  "served": 0.8090241343126967,
-  "served_token_weighted": 0.6621848833148153,
+  "n": 1025,
+  "exact_agreement": 0.6526829268292683,
+  "adjacent_agreement": 0.9707317073170731,
+  "spearman_scores": 0.6926922660320833,
+  "under_routed": 0.1775609756097561,
+  "over_routed": 0.16975609756097562,
+  "served": 0.8224390243902439,
+  "served_token_weighted": 0.6877964786996658,
   "confusion": [
     [
-      400,
-      102,
-      22
+      452,
+      98,
+      14
     ],
     [
-      106,
-      122,
-      58
+      96,
+      141,
+      70
     ],
     [
-      18,
+      16,
       62,
-      63
+      76
     ]
   ],
-  "est_cost_policy_usd": 133.21,
-  "est_cost_all_tier3_usd": 259.18,
-  "est_savings_pct": 48.6,
+  "est_cost_policy_usd": 147.61,
+  "est_cost_all_tier3_usd": 270.67,
+  "est_savings_pct": 45.5,
   "method": "blend",
-  "naive_cost": 73.48
+  "residualized_evaluator": false,
+  "cost_cache_blind": 80.37,
+  "tier3_price_sensitivity": {
+    "opus_priced_savings_pct": 45.5,
+    "fable_priced_savings_pct": 53.6,
+    "note": "Tier 3 representative row: opus-5 [5, .5, 25] vs fable-5 [10, 1, 50] $/1M"
+  }
 }

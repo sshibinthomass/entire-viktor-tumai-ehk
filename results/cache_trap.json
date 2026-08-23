@@ -1,36 +1,65 @@
 {
-  "n_trajectories": 24,
+  "n_trajectories": 25,
   "policies": {
     "all-Tier3": {
-      "usd_naive": 5.46,
-      "usd_cache_aware": 5.46,
-      "savings_naive_pct": 0.0,
-      "savings_cache_aware_pct": 0.0,
+      "usd_naive": 0.29,
+      "usd_cache_aware": 0.29,
+      "savings_naive_pct": -0.0,
+      "savings_cache_aware_pct": -0.0,
       "switches": 0
     },
     "per-task (our router)": {
-      "usd_naive": 0.62,
-      "usd_cache_aware": 0.62,
-      "savings_naive_pct": 88.6,
-      "savings_cache_aware_pct": 88.6,
-      "switches": 0
-    },
-    "per-call greedy (size)": {
-      "usd_naive": 3.34,
-      "usd_cache_aware": 3.37,
-      "savings_naive_pct": 38.8,
-      "savings_cache_aware_pct": 38.3,
-      "switches": 9
-    },
-    "per-call cheap-tool-loops": {
-      "usd_naive": 0.22,
-      "usd_cache_aware": 0.22,
+      "usd_naive": 0.01,
+      "usd_cache_aware": 0.01,
       "savings_naive_pct": 96.0,
       "savings_cache_aware_pct": 96.0,
       "switches": 0
+    },
+    "per-call greedy (size)": {
+      "usd_naive": 0.15,
+      "usd_cache_aware": 0.25,
+      "savings_naive_pct": 48.5,
+      "savings_cache_aware_pct": 13.2,
+      "switches": 36
+    },
+    "per-call cheap-tool-loops": {
+      "usd_naive": 0.24,
+      "usd_cache_aware": 0.25,
+      "savings_naive_pct": 17.3,
+      "savings_cache_aware_pct": 15.1,
+      "switches": 25
     }
   },
-  "overstatement_pct_points": 0.0,
-  "model_based_full_penalty_usd": 147.71,
-  "measured_subset_caveat": "sampled logging hides switch points: consecutive logged calls are all mechanical, so the measured 0.0pt is a floor, not the effect"
+  "measured_overstatement_pct_points": 2.2,
+  "modeled_full_trajectory": {
+    "label": "MODELED, not measured \u2014 extrapolation under the three stated assumptions",
+    "assumptions": [
+      "a switch re-pays ~T/2 uncached-vs-cached (T = final context tokens)",
+      "cheap-tool-loops switches ~2x per user/planning turn, capped by call count",
+      "rate delta averaged over the two tiers entered (T1 and T3)",
+      "input side only; token counts are chars/4 estimates"
+    ],
+    "cache_reset_penalty_usd": 159.86,
+    "all_tier3_input_budget_usd": 221.22,
+    "all_tier3_budget_decomposition": {
+      "first_pass_input_usd": 115.24,
+      "cached_replay_usd": 105.98,
+      "note": "input-only \u2014 output cost is NOT in this denominator"
+    },
+    "penalty_share_of_input_budget_pct": 72.3,
+    "naive_claimed_savings_pct": 17.3,
+    "corrected_savings_pct": -55.0,
+    "tier3_price_sensitivity": {
+      "opus_priced": {
+        "penalty_usd": 159.86,
+        "input_budget_usd": 221.22,
+        "penalty_share_pct": 72.3
+      },
+      "fable_priced": {
+        "penalty_usd": 313.57,
+        "input_budget_usd": 442.45,
+        "penalty_share_pct": 70.9
+      }
+    }
+  }
 }
