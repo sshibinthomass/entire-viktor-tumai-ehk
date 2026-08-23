@@ -1,0 +1,50 @@
+Also consider Viktor response and update the approch
+
+1. Shibin Thomas — 18:22
+@Viktor is trajectories_v1_01.jsonl simulated data or real data where routing happen based on task that we can use to tune our router?
+2. ViktorAPP — 18:22
+@Shibin Thomas It's real data — `trajectories_v1` is real, anonymized Viktor production LLM trajectories, not simulated. Two caveats for tuning:
+   * Each row is a Responses-format request with exactly `model`, `input`, `tools`. No `output`, no `usage`, no timings and no quality labels — so there's no supervised "correct model" target to fit against. Outputs are recoverable from the next call's input.
+   * The logged `model` is whatever production actually used (one model per trajectory), so it's a behavior policy, not routing ground truth. That's exactly why the task is off-policy: build a router, then estimate what it would have changed.
+ Anything beyond that about how the data was produced I won't guess at — if you need specifics I'll escalate to the Viktor team and post the answer here publicly.
+3. Ivan (from Viktor.com) — 18:25
+02 and other chunks are not uploaded yet
+4. Mark — 18:25
+@Viktor can we assume that that the model that was chosen in that file is from a well tuned router? or is it from the baseline router?
+5. ViktorAPP — 18:25
+@Mark Don't assume either — the brief doesn't state what policy chose the logged model, and I won't guess. It's just "what production did", i.e. your behavior policy. Practically that's fine: off-policy evaluation doesn't need the logging policy to be good, only that you don't treat it as ground truth. Treat the logged model as a baseline to compare against, not a label to imitate. I'm escalating the exact question to the Viktor team (Ivan / Kacper here, Bojan / Peter at the mentor table) and will post the answer publicly here so every team gets the same thing.
+6. Ivan (from Viktor.com) — 18:27
+No, in those traces "model" is just what it happened to be, but not necessarily optimal
+7. Mark — 18:27
+@Viktor so is there even a singular dataset that is good enough to test against? or do we need to do dataset evaluation completely ourselves?
+8. ViktorAPP — 18:27
+@Mark There's one dataset — `trajectories_v1` — and no separate labeled test set. Constructing the outcome signal and the evaluation is explicitly part of the challenge. What ships: `model`, `input`, `tools` per row. No `output`, no `usage`, no timings, no quality labels. Outputs of call i are recoverable from call i+1's input (only each task's final output is missing), and token counts are estimates you make and label as estimates. So yes, you build the eval yourselves. Public starter ideas:
+   * recover outputs from the next call's input, then score with a judge model, task completion, or `function_call` error patterns as a proxy label
+   * compare similar tasks that ran on different models — that cross-trajectory variation is the natural experiment
+   * cache-aware repricing: prefix counts as cached only while the model stays the same, full price after a switch
+   * matching / importance weighting across trajectories, and state where the estimate breaks
+ Judging weights evaluation rigor, and there's a special prize for the best off-policy-evaluation insight — an honest eval with stated failure modes scores better than a confident one.
+9.  [TUM], 
+Ivan (from Viktor.com) — 18:28
+I can't send you replies, for example
+10. now I can, haha, but there was an error - try calling Viktor again
+11. @Viktor give us some ideas about good policies to derive from this dataset
+12. ViktorAPP — 18:30
+Public starter ideas — all teams get the same list. Policy families worth deriving from `trajectories_v1`:
+   1. Difficulty-conditioned cascade.
+ Score each call for difficulty from what you actually have (`input` length, number/type of `tools` offered, code/long context, depth in the trajectory). Cheap model first, escalate on a failure signal (malformed `function_call`, repeated identical tool call, judge score under threshold). Cascades are easy to price honestly because you can count the retry.
+   2. Tool-signature routing.
+ The `tools` array is the strongest free feature you have. Narrow tool sets are often mechanical (parse, extract, call one function) and route down; open-ended toolsets with search/code correlate with reasoning. Cluster on tool signature, fit a policy per cluster.
+   3. Position-in-trajectory routing.
+ Early planning and final synthesis calls are where quality matters; middle tool-shuffling calls are cheap. "Big model first and last, small in between" is trivial to implement and a strong baseline — worth having as your reference line.
+   4. Cache-aware sticky routing.
+ Switching models mid-trajectory throws away the prefix cache, so the real cost of a switch is the full re-read of the prefix. The optimal policy is therefore hysteretic: only switch when expected gain exceeds re-prefill cost. Usually beats per-call greedy routing, and it plots well.
+   5. Budget-constrained policy.
+ Learn a policy under a global budget: maximize expected quality subject to estimated tokens/$. Lagrangian or knapsack framing, threshold on quality-gain-per-dollar. Your result becomes a curve rather than a single number — far more convincing.
+   6. Learned value model on recovered outputs.
+ Recover call i's output from call i+1's input, judge it, train a small predictor of "would the cheap model have been good enough here" from input features. Most ambitious, most exposed to your own eval's bias — say so in the talk.
+13. 
+
+7. Abstain / human-in-loop class.
+
+ A three-way policy (cheap / expensive / flag) is often more honest than forcing a choice where your signal is weak. Report coverage alongside savings. Two cautions for all of them: the logged model is a baseline, not a label — imitating it caps you at production; and every policy needs an off-policy evaluation with its failure modes stated. The special prize goes to the honest eval, not the biggest headline saving.
