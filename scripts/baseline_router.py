@@ -4,12 +4,17 @@
 Policy: short-prompt calls early in a trajectory go to a cheaper sibling model;
 everything else stays on the logged model. Deliberately simple — an honest floor.
 
+results/routes.jsonl uses the SAME sequential trajectory_id (1..N) that
+scripts/enrich_dataset.py writes into export_linked/, so the documented PK/FK
+link between the two actually joins; the reconstruction hash is kept as
+`trajectory_key`.
+
 Usage: python scripts/baseline_router.py export/   -> writes results/routes.jsonl
 """
 import json, sys
 from pathlib import Path
 from load_trajectories import iter_requests, group_trajectories, est_tokens
-from cost_model import trajectory_cost, logged_route, load_pricing
+from cost_model import trajectory_cost, logged_route, load_pricing, call_token_profiles
 
 # Cheaper sibling per family, per the posted price sheet (scripts/pricing.json):
 # claude-fable-5 is the MOST expensive id and gpt-5.6-luna the cheapest, so the
@@ -37,14 +42,16 @@ def main():
     pricing = load_pricing()
     groups = group_trajectories(r for _, _, r in iter_requests(export))
     Path("results").mkdir(exist_ok=True)
-    out = open("results/routes.jsonl", "w")
+    out = open("results/routes.jsonl", "w", encoding="utf-8")
     tot_logged = tot_routed = 0.0
-    for key, calls in groups.items():
+    for tid, (key, calls) in enumerate(groups.items(), start=1):
+        profiles = call_token_profiles(calls)  # serialize items once, reuse per route
         logged = logged_route(calls); routed = route_trajectory(calls)
-        c_logged, _ = trajectory_cost(calls, logged, pricing)
-        c_routed, _ = trajectory_cost(calls, routed, pricing)
+        c_logged, _ = trajectory_cost(calls, logged, pricing, profiles=profiles)
+        c_routed, _ = trajectory_cost(calls, routed, pricing, profiles=profiles)
         tot_logged += c_logged; tot_routed += c_routed
-        out.write(json.dumps({"trajectory": key, "n_calls": len(calls), "logged_model": logged[0],
+        out.write(json.dumps({"trajectory_id": tid, "trajectory_key": key,
+                              "n_calls": len(calls), "logged_model": logged[0],
                               "route": routed, "cost_logged_usd": round(c_logged, 6),
                               "cost_routed_usd": round(c_routed, 6),
                               "switches": sum(1 for i in range(1, len(routed)) if routed[i] != routed[i-1])}) + "\n")

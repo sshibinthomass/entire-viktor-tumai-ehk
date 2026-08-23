@@ -21,25 +21,30 @@ Rigor rules baked in:
     model bills the replayed prefix at the cached rate (linear-growth
     approximation) and is the primary axis. Routing whole tasks (not single
     calls) means a policy never pays the cache-reset penalty.
+  - lambda-Bayes comes in TWO flavors and they are not the same claim:
+    "lambda-oracle" plugs each task's REALIZED cost into the dispatch rule —
+    unknowable at routing time, so it is an upper bound, never a router
+    result. "lambda-pred" uses an OOF routing-time cost prediction and is the
+    deployable rule.
 
 Usage: python tune_router.py [export.jsonl] [--fast]
 """
 import argparse
-import hashlib
 import json
-import re
-import sys
 from pathlib import Path
 
 import numpy as np
 
-from router.features import extract as extract_router, FEATURE_GROUPS, PII_RE
+from router.features import extract as extract_router, FEATURE_GROUPS
 from router.tiering import DEFAULT_GROUP_WEIGHTS
+from router.ml import workspace_of
+from rank_utils import ecdf_ranks
 from evaluator.metrics import trajectory_metrics
 from evaluator.difficulty import (DEFAULT_WEIGHTS as EV_WEIGHTS,
                                   DEFAULT_CUTS as EV_CUTS,
                                   DEFAULT_OVERRIDES)
-from run_pipeline import load_trajectories, TIER_PRICES, DEFAULT_EXPORT
+from run_pipeline import (load_trajectories, TIER_PRICES, DEFAULT_EXPORT,
+                          oof_predicted_costs)
 
 RNG = np.random.default_rng(7)
 COST_GRID = np.linspace(0.25, 1.0, 76)   # frontier integration grid
@@ -51,8 +56,7 @@ LAM_SWEEP = np.geomspace(1e-4, 30, 40)
 
 # ---------------------------------------------------------------- data
 def fold_ranks(train_vals, all_vals):
-    s = np.sort(np.asarray(train_vals, dtype=float))
-    return np.searchsorted(s, np.asarray(all_vals, dtype=float), side="right") / max(len(s), 1)
+    return ecdf_ranks(train_vals, all_vals)
 
 
 def build_dataset(export):
@@ -60,23 +64,15 @@ def build_dataset(export):
     tids = sorted(trajs)
     feats = [extract_router(trajs[t]["first"]) for t in tids]
     mets = [trajectory_metrics(trajs[t]["deepest"], trajs[t]["n_calls"]) for t in tids]
-    # workspace fingerprint for grouped CV (skill set of the system prompt)
-    groups = []
-    for t in tids:
-        sysp = next((i.get("content") for i in trajs[t]["first"]["input"]
-                     if i.get("role") == "system"), "") or ""
-        if not isinstance(sysp, str):
-            sysp = json.dumps(sysp)
-        skills = ",".join(sorted(re.findall(r"^\-\s\*\*([a-zA-Z0-9_\- ]+)\*\*", sysp, re.M)))
-        groups.append(hashlib.md5(skills.encode()).hexdigest()[:8])
-    # first-user text for the TF-IDF variant (PII collapsed)
-    texts = []
-    for t in tids:
-        fu = next((i for i in trajs[t]["first"]["input"] if i.get("role") == "user"), None)
-        c = (fu or {}).get("content")
-        txt = c if isinstance(c, str) else "\n".join(
-            p.get("text", "") for p in (c or []) if isinstance(p, dict))
-        texts.append(PII_RE.sub("<E>", txt)[:8000])
+    # workspace fingerprint for grouped CV — the SAME parts-aware function the
+    # ML head uses (router.ml.workspace_of); the old duplicate here broke on
+    # parts-list system content and collapsed 76% of rows into one group
+    groups = [workspace_of(trajs[t]["first"]) for t in tids]
+    # first-user text for the TF-IDF variant — the SAME extractor and length
+    # limit the pipeline head uses (router.ml.first_user_text), so benchmark
+    # and shipped numbers stay comparable
+    from router.ml import first_user_text
+    texts = [first_user_text(trajs[t]["first"]) for t in tids]
     return tids, feats, mets, np.array(groups), texts
 
 
@@ -178,25 +174,31 @@ def sweep_tau(cum, D, C):
     return pts
 
 
-def sweep_lambda(cum, D, C):
+def sweep_lambda(cum, D, C, C_dispatch=None):
     """Bayes rule with task-specific costs: argmin_t cost$(t) + lam*P(D>t).
-    Optimizes tasks-served-per-dollar; can sacrifice token-heavy tasks."""
+
+    C_dispatch is what the RULE sees; C is what the EVALUATION prices. Passing
+    the realized C as dispatch input makes this an ORACLE (the rule knows each
+    task's hindsight size); pass an OOF routing-time prediction for the
+    deployable version."""
+    Cd = C if C_dispatch is None else C_dispatch
     p_over = np.stack([1 - cum[:, 0], 1 - cum[:, 1], np.zeros(len(cum))], axis=1)
     pts = []
     for lam in LAM_SWEEP:
-        tiers = np.argmin(C + lam * p_over, axis=1) + 1
+        tiers = np.argmin(Cd + lam * p_over, axis=1) + 1
         pts.append(eval_tiers(tiers, D, C))
     return pts
 
 
-def sweep_lambda_sized(cum, D, C):
+def sweep_lambda_sized(cum, D, C, C_dispatch=None):
     """Size-weighted Bayes rule: the miss penalty scales with the task's own
     top-tier cost — argmin_t cost$(t) + lam*C(3)*P(D>t). Bayes-optimal for the
-    token-weighted quality objective."""
+    token-weighted quality objective. Same C_dispatch caveat as sweep_lambda."""
+    Cd = C if C_dispatch is None else C_dispatch
     p_over = np.stack([1 - cum[:, 0], 1 - cum[:, 1], np.zeros(len(cum))], axis=1)
     pts = []
     for lam in np.geomspace(0.02, 50, 40):
-        tiers = np.argmin(C + lam * C[:, 2:3] * p_over, axis=1) + 1
+        tiers = np.argmin(Cd + lam * Cd[:, 2:3] * p_over, axis=1) + 1
         pts.append(eval_tiers(tiers, D, C))
     return pts
 
@@ -364,13 +366,21 @@ def main():
         out[:, 0] = 1 - p2; out[:, 1] = p2 - p3; out[:, 2] = p3
         return out
 
+    # routing-time cost prediction for the deployable lambda rules (OOF)
+    print("predicting routing-time costs (OOF regressors) ...", flush=True)
+    C_hat = oof_predicted_costs(feats, mets, np.asarray(groups))
+
+    ORACLE = "(oracle: dispatch saw realized cost — upper bound, NOT a router)"
     cum_lr = oof_cum(fit_logreg)
     record("logreg/tau", sweep_tau(cum_lr, D, C))
-    record("logreg/lambda", sweep_lambda(cum_lr, D, C))
+    record("logreg/lambda-pred", sweep_lambda(cum_lr, D, C, C_dispatch=C_hat))
+    record("logreg/lambda-oracle", sweep_lambda(cum_lr, D, C), ORACLE)
     cum_ord = oof_cum(fit_ordlog)
     record("ordlog/tau", sweep_tau(cum_ord, D, C))
-    record("ordlog/lambda", sweep_lambda(cum_ord, D, C))
-    record("ordlog/lambda-sized", sweep_lambda_sized(cum_ord, D, C))
+    record("ordlog/lambda-pred", sweep_lambda(cum_ord, D, C, C_dispatch=C_hat))
+    record("ordlog/lambda-oracle", sweep_lambda(cum_ord, D, C), ORACLE)
+    record("ordlog/lambda-sized-pred", sweep_lambda_sized(cum_ord, D, C, C_dispatch=C_hat))
+    record("ordlog/lambda-sized-oracle", sweep_lambda_sized(cum_ord, D, C), ORACLE)
 
     # ---- cost-weighted training: be right where being wrong is expensive
     def oof_cum_weighted(fit_fn):
@@ -389,10 +399,10 @@ def main():
 
     cum_wlr = oof_cum_weighted(fit_logreg_sw)
     record("wlogreg/tau", sweep_tau(cum_wlr, D, C))
-    record("wlogreg/lambda-sized", sweep_lambda_sized(cum_wlr, D, C))
+    record("wlogreg/lambda-sized-pred", sweep_lambda_sized(cum_wlr, D, C, C_dispatch=C_hat))
     cum_hgb = oof_cum(fit_hgb)
     record("hgb/tau", sweep_tau(cum_hgb, D, C))
-    record("hgb/lambda", sweep_lambda(cum_hgb, D, C))
+    record("hgb/lambda-pred", sweep_lambda(cum_hgb, D, C, C_dispatch=C_hat))
 
     # ---- 7. text: TF-IDF + SVD + numeric ranks -> logistic
     from sklearn.feature_extraction.text import TfidfVectorizer
@@ -412,41 +422,68 @@ def main():
         p = align_probs(m, Xte)
         cum_tx[te, 0] = p[:, 0]; cum_tx[te, 1] = p[:, 0] + p[:, 1]
     record("tfidf+logreg/tau", sweep_tau(cum_tx, D, C))
-    record("tfidf+logreg/lambda", sweep_lambda(cum_tx, D, C))
+    record("tfidf+logreg/lambda-pred", sweep_lambda(cum_tx, D, C, C_dispatch=C_hat))
+    record("tfidf+logreg/lambda-oracle", sweep_lambda(cum_tx, D, C), ORACLE)
 
-    # ---- 8. random baseline
-    record("random", sweep_cuts(RNG.permutation(s_def), D, C))
+    # ---- 8. random baseline: 100 permutations, not one lucky draw
+    rand_aucs, rand_w50 = [], []
+    rand_pts_first = None
+    for i in range(100):
+        pts = sweep_cuts(RNG.permutation(s_def), D, C)
+        if rand_pts_first is None:
+            rand_pts_first = pts
+        fm = frontier_metrics(pts)
+        rand_aucs.append(fm["auc"])
+        rand_w50.append(fm["served@50%budget"])
+    record("random", rand_pts_first,
+           f"(100 perms: AUC {np.mean(rand_aucs):.3f} +/- {1.96 * np.std(rand_aucs):.3f})")
+    results["random"]["auc_mean_100perm"] = float(np.mean(rand_aucs))
+    results["random"]["auc_ci95_100perm"] = [
+        float(np.percentile(rand_aucs, 2.5)), float(np.percentile(rand_aucs, 97.5))]
+    # honest context: most of any method's AUC is the 55%-D1 floor — quote the
+    # margin over random, not the absolute AUC
+    print(f"  random AUC over 100 permutations: {np.mean(rand_aucs):.3f} "
+          f"(95% CI [{results['random']['auc_ci95_100perm'][0]:.3f}, "
+          f"{results['random']['auc_ci95_100perm'][1]:.3f}])")
 
-    # ---- winner under the naive cost model too (comparability)
-    best = max((k for k in results if k != "random"), key=lambda k: results[k]["auc"])
-    print(f"\nwinner by OOF frontier AUC: {best}")
-    win_pts_naive = None
+    # ---- winner under the cache-blind cost model too (comparability).
+    # Oracle rows are upper bounds, not routers — excluded from the winner pick.
+    best = max((k for k in results if k != "random" and "oracle" not in k),
+               key=lambda k: results[k]["auc"])
+    print(f"\nwinner by OOF frontier AUC (oracle rows excluded): {best}")
     cums = {"logreg": cum_lr, "ordlog": cum_ord, "hgb": cum_hgb,
             "tfidf+logreg": cum_tx, "wlogreg": cum_wlr}
-    sweeps = {"tau": sweep_tau, "lambda": sweep_lambda, "lambda-sized": sweep_lambda_sized}
-    if best.split("/")[0] in cums:
-        cum = cums[best.split("/")[0]]
-        win_pts_naive = sweeps[best.split("/")[1]](cum, D, C_naive)
-    else:
-        win_pts_naive = sweep_cuts(s_tuned if best == "score/tuned" else s_def, D, C_naive)
-    fmn = frontier_metrics(win_pts_naive)
-    print(f"  same winner under naive (cache-blind) costs: AUC {fmn['auc']:.3f}, "
+
+    def run_method(name, Dv, C_eval):
+        head, _, rule = name.partition("/")
+        if head in cums:
+            cum = cums[head]
+            if rule == "tau":
+                return sweep_tau(cum, Dv, C_eval)
+            if rule.startswith("lambda-sized"):
+                return sweep_lambda_sized(cum, Dv, C_eval,
+                                          C_dispatch=C_hat if rule.endswith("pred") else None)
+            return sweep_lambda(cum, Dv, C_eval,
+                                C_dispatch=C_hat if rule.endswith("pred") else None)
+        return sweep_cuts(s_tuned if name == "score/tuned" else s_def, Dv, C_eval)
+
+    fmn = frontier_metrics(run_method(best, D, C_naive))
+    print(f"  same winner under cache-blind costs: AUC {fmn['auc']:.3f}, "
           f"knee {fmn['knee']['served']:.2f}served/{fmn['knee']['cost']:.2f}cost")
 
     # ---- evaluator sensitivity for the winner (is the win an artifact?)
     print("\nevaluator sensitivity (30 perturbed evaluators, winner's served@50%budget):")
     rng = np.random.default_rng(11)
-    vals = []
+    vals, label_agreement = [], []
     for _ in range(30):
         Dv = evaluator_variant(mets, rng)
-        if "/" in best and best.split("/")[0] in cums:
-            pts = sweeps[best.split("/")[1]](cums[best.split("/")[0]], Dv, C)
-        else:
-            pts = sweep_cuts(s_tuned if best == "score/tuned" else s_def, Dv, C)
-        vals.append(frontier_metrics(pts)["served@50%budget"])
+        label_agreement.append(float((Dv == D).mean()))
+        vals.append(frontier_metrics(run_method(best, Dv, C))["served@50%budget"])
     print(f"  mean {np.mean(vals):.3f}  sd {np.std(vals):.3f}  "
           f"min {np.min(vals):.3f} (frozen-evaluator value: "
           f"{results[best]['served@50%budget']:.3f})")
+    print(f"  perturbed evaluators agree with the frozen labels "
+          f"{np.mean(label_agreement):.1%} on average — that agreement bounds any router")
 
     out = {
         "objective": "cost-to-performance frontier, OOF, GroupKFold(workspace), cache-aware costs",
@@ -455,9 +492,18 @@ def main():
         "frontiers": frontiers,
         "tuned_group_weights_consensus": consensus,
         "winner": best,
+        "lambda_note": "lambda-oracle rows dispatch on realized (hindsight) cost: "
+                       "upper bounds, not router results; lambda-pred rows use an "
+                       "OOF routing-time cost prediction and are deployable",
         "evaluator_sensitivity_served@50": {
             "mean": float(np.mean(vals)), "sd": float(np.std(vals)),
             "min": float(np.min(vals))},
+        "evaluator_label_agreement": {
+            "mean": float(np.mean(label_agreement)),
+            "min": float(np.min(label_agreement)),
+            "n_variants": 30,
+            "note": "exact agreement of perturbed evaluator configs (weights x0.5-2, "
+                    "cuts +/-5pts) with the frozen default labels"},
     }
     Path("results").mkdir(exist_ok=True)
     with open("results/tuning_report.json", "w", encoding="utf-8") as f:
