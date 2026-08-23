@@ -36,7 +36,8 @@ import numpy as np
 from router.features import extract as extract_router, FEATURE_GROUPS
 from router.tiering import (route, rank_matrix, composite_scores, tiers_by_cuts,
                             tiers_by_kmeans, DEFAULT_GROUP_WEIGHTS, DEFAULT_CUTS)
-from router.ml import workspace_of, oof_cumulative_probs, blend_scores, fold_ranks
+from router.ml import (workspace_of, oof_cumulative_probs, blend_scores,
+                       fold_ranks, first_user_text)
 from evaluator.metrics import trajectory_metrics
 from evaluator.difficulty import (grade, percentile_ranks, DEFAULT_WEIGHTS,
                                   DEFAULT_CUTS as EV_CUTS, DEFAULT_OVERRIDES)
@@ -49,8 +50,9 @@ DEFAULT_EXPORT = r"D:\Github-Projects\entire-viktor-tumai-ehk\export_linked\traj
 # pricing is an assumption)
 TIER_PRICES = {1: [0.2, 0.02, 1.2], 2: [2.0, 0.2, 10.0], 3: [5.0, 0.5, 25.0]}
 
-# dispatch defaults picked from the tuned frontiers (tune_router.py knees)
-DEFAULT_ALPHA, DEFAULT_TAU, DEFAULT_LAMBDA = 0.5, 0.80, 0.3
+# dispatch defaults picked from the tuned frontiers (alpha sweep: exact peaks
+# at 1.0, weighted AUC at ~0.85 — 0.85 keeps both near their best)
+DEFAULT_ALPHA, DEFAULT_TAU, DEFAULT_LAMBDA = 0.85, 0.80, 0.3
 
 
 def load_trajectories(path):
@@ -143,8 +145,9 @@ def main():
     # heuristic score + OOF ML probabilities
     ranks, feat_names = rank_matrix(feat_rows)
     h_scores = composite_scores(ranks, feat_names)
-    print("training ML head (ordinal logistic, GroupKFold OOF) ...")
-    cum = oof_cumulative_probs(feat_rows, diffs, groups)
+    print("training ML head (word+char TF-IDF + numeric, ordinal, GroupKFold OOF) ...")
+    texts = [first_user_text(trajs[t]["first"]) for t in tids]
+    cum = oof_cumulative_probs(feat_rows, diffs, groups, texts=texts)
 
     # dispatch
     if a.method == "score":

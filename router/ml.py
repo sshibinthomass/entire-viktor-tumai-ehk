@@ -1,17 +1,17 @@
 """Supervised probabilistic router head.
 
-Ordinal logistic regression on the routing-time rank features, trained on the
-EVALUATOR's difficulty labels (never the logged model id). Produces cumulative
-sufficiency probabilities per task:
+Winner of the method ladder (experiments.py / exp_text.py, validated with
+nested selection in exp_final.py): ORDINAL cumulative logistic regression on
+sparse word(1-2) + char_wb(3-5) TF-IDF of the first user message, concatenated
+with the numeric rank features. Trained on the EVALUATOR's difficulty labels
+(never the logged model id). Produces cumulative sufficiency probabilities:
 
     cum1 = P(difficulty <= 1),  cum2 = P(difficulty <= 2)
 
-which the dispatch layer turns into tiers three ways (all benchmarked in
+which the dispatch layer turns into tiers three ways (benchmarked in
 tune_router.py):
 
     cuts on a blended score  - alpha * rank(ML difficulty) + (1-alpha) * heuristic
-                               (balanced winner: improves both per-task AND
-                               token-weighted frontiers over the heuristic)
     tau-sufficiency          - cheapest tier with cum >= tau (size-blind;
                                cheapest way to 90% served)
     lambda-Bayes             - argmin_t cost$(t) + lambda * P(D > t)
@@ -27,9 +27,24 @@ import re
 
 import numpy as np
 
-from .features import FEATURE_GROUPS
+from .features import FEATURE_GROUPS, ML_EXTRA_FEATURES, PII_RE
 
-FEAT_NAMES = [f for g in FEATURE_GROUPS.values() for f in g["features"]]
+FEAT_NAMES = ([f for g in FEATURE_GROUPS.values() for f in g["features"]]
+              + ML_EXTRA_FEATURES)
+
+WORD_TFIDF = dict(ngram_range=(1, 2), min_df=2, max_features=40000,
+                  sublinear_tf=True, strip_accents="unicode")
+CHAR_TFIDF = dict(analyzer="char_wb", ngram_range=(3, 5), min_df=3,
+                  max_features=60000, sublinear_tf=True)
+
+
+def first_user_text(req, limit=12000):
+    """PII-collapsed text of the first user message (routing-time input)."""
+    fu = next((i for i in req["input"] if i.get("role") == "user"), None)
+    c = (fu or {}).get("content")
+    txt = c if isinstance(c, str) else "\n".join(
+        p.get("text", "") for p in (c or []) if isinstance(p, dict))
+    return PII_RE.sub("<E>", txt)[:limit]
 
 
 def workspace_of(req):
@@ -54,26 +69,42 @@ def _rank_matrix(feat_rows, tr_idx):
     return out
 
 
-def _fit_ordinal(Xtr, ytr, Xte):
+def _fit_ordinal(Xtr, ytr, Xte, C=1.0):
     """Two cumulative binary logits -> class probs, monotone-corrected."""
     from sklearn.linear_model import LogisticRegression
-    p2 = LogisticRegression(max_iter=2000).fit(Xtr, (ytr >= 2).astype(int)) \
+    p2 = LogisticRegression(max_iter=3000, C=C).fit(Xtr, (ytr >= 2).astype(int)) \
         .predict_proba(Xte)[:, 1]
-    p3 = LogisticRegression(max_iter=2000).fit(Xtr, (ytr >= 3).astype(int)) \
+    p3 = LogisticRegression(max_iter=3000, C=C).fit(Xtr, (ytr >= 3).astype(int)) \
         .predict_proba(Xte)[:, 1]
     p3 = np.minimum(p2, p3)
     return np.column_stack([1 - p2, p2 - p3, p3])
 
 
-def oof_cumulative_probs(feat_rows, labels, groups, n_splits=5, seed=13):
-    """(n, 2) out-of-fold [P(D<=1), P(D<=2)] via GroupKFold on workspace."""
+def oof_cumulative_probs(feat_rows, labels, groups, texts=None, n_splits=5):
+    """(n, 2) out-of-fold [P(D<=1), P(D<=2)] via GroupKFold on workspace.
+
+    With `texts` (first-user texts, PII-collapsed) the head is the full
+    word+char TF-IDF + numeric ordinal model; without, numeric-only."""
     from sklearn.model_selection import GroupKFold
     n = len(feat_rows)
     labels = np.asarray(labels)
     cum = np.zeros((n, 2))
     for tr, te in GroupKFold(n_splits=n_splits).split(np.zeros(n), groups=groups):
         R = _rank_matrix(feat_rows, tr)
-        p = _fit_ordinal(R[tr], labels[tr], R[te])
+        if texts is not None:
+            from scipy.sparse import hstack as sp_hstack, csr_matrix
+            from sklearn.feature_extraction.text import TfidfVectorizer
+            mats_tr, mats_te = [], []
+            for kw in (WORD_TFIDF, CHAR_TFIDF):
+                vec = TfidfVectorizer(**kw)
+                mats_tr.append(vec.fit_transform([texts[i] for i in tr]))
+                mats_te.append(vec.transform([texts[i] for i in te]))
+            mats_tr.append(csr_matrix(R[tr]))
+            mats_te.append(csr_matrix(R[te]))
+            p = _fit_ordinal(sp_hstack(mats_tr).tocsr(), labels[tr],
+                             sp_hstack(mats_te).tocsr())
+        else:
+            p = _fit_ordinal(R[tr], labels[tr], R[te])
         cum[te, 0] = p[:, 0]
         cum[te, 1] = p[:, 0] + p[:, 1]
     return cum

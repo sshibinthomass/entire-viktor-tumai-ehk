@@ -124,6 +124,27 @@ def extract(req):
         "tool_memory_search": int("memory_search" in tool_names),
         "tool_background": int("wait_for_background_work" in tool_names),
         "tool_view_image": int("view_image" in tool_names),
+
+        # --- v2 lexical/structural features (ML head only; the heuristic's
+        #     validated groups are unchanged) ---
+        "usr_n_words": len(user0.split()),
+        "usr_n_lines": user0.count("\n") + 1,
+        "usr_n_bullets": len(re.findall(r"^\s*[-*•]\s", user0, re.M)),
+        "usr_n_todo": len(re.findall(r"\bTODO\b|\bto-?do\b|\[ \]", user0, re.I)),
+        "usr_n_deliverable_kw": len(re.findall(
+            r"\b(report|pdf|pptx?|deck|slide|email|summar\w+|dashboard|csv|xlsx?"
+            r"|document|invoice|spreadsheet|presentation)\b", user0, re.I)),
+        "usr_n_file_ext": len(re.findall(r"\.\w{2,4}\b", user0)),
+        "usr_n_numbers": len(re.findall(r"\b\d[\d,.]*\b", user0)),
+        "usr_has_deadline": int(bool(re.search(
+            r"\b(today|tomorrow|asap|deadline|by (mon|tue|wed|thu|fri|end)|eod|eow)\b",
+            user0, re.I))),
+        "usr_exclaim": user0.count("!"),
+        "usr_sys_ratio": round(est_tokens(user0) / max(est_tokens(system), 1), 3),
+        "tool_has_bash": int(bool(tool_names & {"bash", "shell_command"})),
+        "tool_has_write": int(bool(tool_names & {"file_edit", "file_write", "apply_patch"})),
+        "tools_n_params": sum(len(((t.get("parameters") or {}).get("properties") or {}))
+                              for t in tools),
     }
 
     # short PII-collapsed preview for the dashboard table (local use only)
@@ -157,3 +178,13 @@ FEATURE_GROUPS = {
         "usr_truncated_ctx", "usr_n_ctx_blocks", "usr_n_parts",
         "trig_thread_activity"]},
 }
+
+# v2 features consumed by the ML head on top of the group features above
+ML_EXTRA_FEATURES = [
+    "usr_n_words", "usr_n_lines", "usr_n_bullets", "usr_n_todo",
+    "usr_n_deliverable_kw", "usr_n_file_ext", "usr_n_numbers",
+    "usr_has_deadline", "usr_exclaim", "usr_sys_ratio",
+    "tool_has_bash", "tool_has_write", "tools_n_params",
+    "trig_slack", "trig_teams", "trig_scheduled",
+    "usr_has_attachment", "tool_slack", "tool_msteams",
+]

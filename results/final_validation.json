@@ -1,0 +1,33 @@
+{
+  "metrics": {
+    "exact": 0.6138509968520461,
+    "balanced": 0.5423317140874393,
+    "adjacent": 0.9559286463798531,
+    "d3_recall": 0.43356643356643354,
+    "conf": [
+      [
+        400,
+        103,
+        21
+      ],
+      [
+        103,
+        123,
+        60
+      ],
+      [
+        21,
+        60,
+        62
+      ]
+    ],
+    "spearman": 0.5771208876609761
+  },
+  "fold_picks": [
+    "usr-word+char/C=1.0/multi",
+    "usr-word+char/C=1.0/multi",
+    "usr-word+char/C=1.0/ord",
+    "usr-word+char/C=1.0/multi",
+    "usr-word+char/C=1.0/ord"
+  ]
+}

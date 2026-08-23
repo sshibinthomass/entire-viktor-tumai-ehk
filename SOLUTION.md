@@ -45,10 +45,12 @@ label-free ways:
   mean composite (unsupervised structure discovery; sign is irrelevant to the
   clustering itself since reflections preserve distances)
 
-`router/ml.py` adds the supervised head that won the benchmark: ordinal logistic
-regression on the rank features, trained on **evaluator labels** (never the logged
-model id), producing per-task sufficiency probabilities P(D≤1), P(D≤2). Three
-dispatch rules turn probabilities into tiers:
+`router/ml.py` adds the supervised head that won the two-round method ladder:
+**word(1–2) + char_wb(3–5) TF-IDF of the first user message, concatenated with the
+numeric rank features (23 group features + 19 v2 lexical/structural features),
+into cumulative ordinal logistic regression** — trained on **evaluator labels**
+(never the logged model id), producing per-task sufficiency probabilities
+P(D≤1), P(D≤2). Three dispatch rules turn probabilities into tiers:
 
 - **blend + cuts** (production default) — α·rank(ML difficulty) + (1−α)·heuristic,
   cut at percentiles. The balanced winner: improves BOTH the per-task and the
@@ -111,13 +113,43 @@ Findings that drive the shipped defaults:
    ±5 pts) the winner's served@50 %budget moves 0.865 → 0.859 ± 0.018. Not an
    artifact of one weighting.
 
+### Round 2: breaking the feature ceiling (`experiments.py`, `exp_text.py`, `exp_final.py`)
+
+Diagnosis first: always-T1 alone scores 55 % exact (D1 is 55 % of labels), tasks
+within 0.03 of a difficulty cut agree at coin-flip rates, and every numeric-only
+learner (ridge, HGB-regressor, stacks) plateaued at 55–57 % — a feature ceiling,
+not a model problem. Ruled out honestly: workspace priors (median 1 task per
+workspace in this export — LOO signal is nil), natural-breaks cuts (changes the
+task, not the quality), argmax dispatch (−6 pts: uncertainty collapses to T2),
+boosted trees (overfit 953 rows: 50–56 %), nested stacking (58.6 %).
+
+What broke the ceiling: **text**. The method ladder (all OOF, GroupKFold):
+
+| candidate | exact | balanced | D3 recall |
+|---|---|---|---|
+| ordlog, base numeric features | 57.7 % | 50.2 % | 37.8 % |
+| ordlog, + v2 lexical features | 58.6 % | 51.3 % | 39.2 % |
+| LightGBM / XGBoost / CatBoost / mord | 50–58 % | 40–51 % | 19–38 % |
+| TF-IDF(SVD-80) + LR | 61.9 % | 54.6 % | 42.7 % |
+| **word+char TF-IDF + numeric, ordinal LR** | **62.4 %** | **55.1 %** | **43.4 %** |
+
+**Honest final number (nested selection — the config is re-picked by inner CV
+inside every training fold, so zero grid optimism): 61.4 % exact, 54.2 %
+balanced, 95.6 % adjacent, D3 recall 43.4 %, ρ 0.577.** All five folds picked
+the same config independently; measured selection bias ≈ 1 pt. Versus the
+round-1 baseline: exact 56.0→61.4 %, balanced 48→54 %, confusion diagonal
+378/106/50 → 400/123/62, two-tier misses 59 → 42. Chance with these marginals
+is 41.5 %; two reasonable evaluator configurations agree ~93 % with each other,
+which bounds any router.
+
 Recommended operating points (dashboard defaults; cache-aware costs):
 
-- **Balanced (default):** blend α=0.5, cuts p55/p85 → 78.5 % served, 59.5 %
-  token-weighted, 53.2 % cost saved; exact agreement 56.0 %, adjacent 93.8 %,
-  Spearman 0.473.
-- **Quality-safe:** ML τ = 0.80 → 89.6 % served, 10.4 % under-routed, 43.2 % saved.
-- **Max tasks-per-dollar:** ML λ = $0.30 → 81.6 % served at 78.2 % saved
+- **Balanced (default):** blend α=0.85 (ML head + heuristic), cuts p55/p85 →
+  exact agreement 61.4 %, adjacent 95.8 %, Spearman 0.583, 80.9 % served, 66.2 %
+  token-weighted, 48.6 % cost saved.
+- **Quality-safe:** ML τ = 0.80 → 91.9 % served, 8.1 % under-routed, 36.7 % saved
+  (77.0 % token-weighted).
+- **Max tasks-per-dollar:** ML λ = $0.30 → 81.7 % served at 78.2 % saved
   (weighted served 42.9 % — the named sacrifice).
 
 ## Judging the router
@@ -171,6 +203,8 @@ Data loads dynamically from `dashboard/data.js` — rerun `python run_pipeline.p
 - `run_pipeline.py` — end-to-end; writes `results/router_features.jsonl`,
   `results/evaluator_metrics.jsonl`, `results/tiers.jsonl`,
   `results/comparison.json`, `dashboard/data.js`
-- `tune_router.py` — the deep-analysis benchmark; writes
-  `results/tuning_report.json` + `results/tuning_arrays.npz`
+- `tune_router.py` — round-1 frontier benchmark (`results/tuning_report.json`)
+- `experiments.py`, `exp_text.py` — round-2 method ladder
+  (`results/experiments_report.json`, `results/exp_text_report.json`)
+- `exp_final.py` — nested honest validation (`results/final_validation.json`)
 - `dashboard/index.html` — the interactive lab

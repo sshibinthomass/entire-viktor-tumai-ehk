@@ -1,32 +1,32 @@
 {
   "n": 953,
-  "exact_agreement": 0.5603357817418678,
-  "adjacent_agreement": 0.938090241343127,
-  "spearman_scores": 0.4725773128013749,
-  "under_routed": 0.21511017838405036,
-  "over_routed": 0.22455403987408185,
-  "served": 0.7848898216159497,
-  "served_token_weighted": 0.5949461733460588,
+  "exact_agreement": 0.6138509968520461,
+  "adjacent_agreement": 0.9580272822665268,
+  "spearman_scores": 0.5828288361393983,
+  "under_routed": 0.19097586568730326,
+  "over_routed": 0.19517313746065057,
+  "served": 0.8090241343126967,
+  "served_token_weighted": 0.6621848833148153,
   "confusion": [
     [
-      378,
-      112,
-      34
+      400,
+      102,
+      22
     ],
     [
-      121,
       106,
-      59
+      122,
+      58
     ],
     [
-      25,
-      68,
-      50
+      18,
+      62,
+      63
     ]
   ],
-  "est_cost_policy_usd": 121.26,
+  "est_cost_policy_usd": 133.21,
   "est_cost_all_tier3_usd": 259.18,
-  "est_savings_pct": 53.2,
+  "est_savings_pct": 48.6,
   "method": "blend",
-  "naive_cost": 68.53
+  "naive_cost": 73.48
 }

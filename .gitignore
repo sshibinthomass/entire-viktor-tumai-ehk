@@ -6,3 +6,5 @@ export/
 *.zip
 export_linked
 __pycache__/
+catboost_info/
+results/exp_cache.npz
