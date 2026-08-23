@@ -5,11 +5,39 @@ guarantees call i+1's input contains call i's input plus its output), so the
 deepest call is the fullest picture of what actually happened. All metrics are
 counted inside that input.
 
-Token numbers are chars/4 estimates — the export has no usage field.
+Token numbers are chars/4 estimates — the export has no usage field. Context
+tokens include JSON structural overhead while generated tokens don't (fine
+under ranking; stated in the writeup for raw-dollar quotes), and image
+placeholders are counted at a nominal IMG_TOKENS each (the redacted data URL
+is ~6 tokens; a real image is ~1k).
 """
 import json
+import re
 
-ERROR_MARKERS = ("error", "traceback", "exit code 1", "failed", "exception")
+# Word-boundary error detection with negation handling. Checked on the first
+# 400 AND last 800 chars of each tool output (tracebacks END outputs), after
+# (a) turning JSON-escaped whitespace like "\\n" into real separators (in the
+# serialized output "…\\nTraceback" reads as one word and defeats \b), and
+# (b) stripping negated phrases ("0 failed", "no errors", '"errors": []')
+# that the old substring match counted as errors.
+ESCAPES_RE = re.compile(r'\\+[ntr"]')
+NEGATED_RE = re.compile(
+    r"\b(?:0|no|zero|without)\s+(?:tool\s+)?(?:errors?|failures?|failed|exceptions?)\b"
+    r"|\b\d+\s+passed,?\s*0\s+failed\b"
+    r"|\berrors?\W{0,4}(?:\[\s*\]|0\b|none\b|null\b|false\b)", re.I)
+ERROR_RE = re.compile(
+    r"\berror(?:s|ed)?\b|\btraceback\b|\bexceptions?\b|\bfail(?:ed|ure)s?\b"
+    r"|\bexit code:?\s*[1-9]\d*\b", re.I)
+
+
+def is_error_output(out_text):
+    head, tail = out_text[:400], out_text[-800:]
+    window = head if tail in head else head + "\n" + tail
+    window = ESCAPES_RE.sub(" ", window)
+    return bool(ERROR_RE.search(NEGATED_RE.sub(" ", window)))
+
+
+IMG_TOKENS = 1000  # assumed tokens per redacted image placeholder
 
 MODEL_ITEM_TYPES = {"function_call", "custom_tool_call", "reasoning"}
 
@@ -43,7 +71,7 @@ def trajectory_metrics(deepest_req, n_logged_calls):
 
     n_tool_calls = n_tool_errors = n_user_turns = n_assistant_msgs = 0
     n_reasoning = reasoning_tokens = gen_tokens = tool_output_tokens = 0
-    n_llm_calls = 0
+    n_llm_calls = n_images = 0
     tools_used, streak, max_streak, last_tool = set(), 0, 0, None
     prev_model_item = False
 
@@ -70,7 +98,7 @@ def trajectory_metrics(deepest_req, n_logged_calls):
         elif t in ("function_call_output", "custom_tool_call_output"):
             out = json.dumps(it.get("output"))
             tool_output_tokens += est_tokens(out)
-            if any(m in out[:400].lower() for m in ERROR_MARKERS):
+            if is_error_output(out):
                 n_tool_errors += 1
         elif t == "reasoning":
             n_reasoning += 1
@@ -79,8 +107,15 @@ def trajectory_metrics(deepest_req, n_logged_calls):
         elif role == "assistant":
             n_assistant_msgs += 1
             gen_tokens += est_tokens(_content(it))
+            # a retry streak is same-tool calls in a row WITHIN one working
+            # burst; an assistant message or user turn breaks the burst
+            streak, last_tool = 0, None
         elif role == "user":
             n_user_turns += 1
+            streak, last_tool = 0, None
+        if role == "user" and isinstance(it.get("content"), list):
+            n_images += sum(1 for p in it["content"]
+                            if isinstance(p, dict) and p.get("type") == "input_image")
 
     # the deepest request itself still got one (unlogged) response
     n_llm_calls += 1
@@ -97,6 +132,8 @@ def trajectory_metrics(deepest_req, n_logged_calls):
         "reasoning_tokens": reasoning_tokens,
         "gen_tokens": gen_tokens,
         "tool_output_tokens": tool_output_tokens,
-        "context_tokens": est_tokens(json.dumps(items)),
+        # image placeholders serialize to ~6 tokens but a real image is ~1k;
+        # count them at IMG_TOKENS so image-heavy tasks aren't undercounted
+        "context_tokens": est_tokens(json.dumps(items)) + n_images * IMG_TOKENS,
         "n_logged_calls": n_logged_calls,
     }
