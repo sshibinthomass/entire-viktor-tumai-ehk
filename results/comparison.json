@@ -1,0 +1,32 @@
+{
+  "n": 953,
+  "exact_agreement": 0.5603357817418678,
+  "adjacent_agreement": 0.938090241343127,
+  "spearman_scores": 0.4725773128013749,
+  "under_routed": 0.21511017838405036,
+  "over_routed": 0.22455403987408185,
+  "served": 0.7848898216159497,
+  "served_token_weighted": 0.5949461733460588,
+  "confusion": [
+    [
+      378,
+      112,
+      34
+    ],
+    [
+      121,
+      106,
+      59
+    ],
+    [
+      25,
+      68,
+      50
+    ]
+  ],
+  "est_cost_policy_usd": 121.26,
+  "est_cost_all_tier3_usd": 259.18,
+  "est_savings_pct": 53.2,
+  "method": "blend",
+  "naive_cost": 68.53
+}

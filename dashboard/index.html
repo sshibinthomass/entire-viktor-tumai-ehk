@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Viktor Router Lab</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1: #fcfcfb; --page: #f9f9f7;
+    --ink-1: #0b0b0b; --ink-2: #52514e; --ink-3: #898781;
+    --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+    --tier1: #86b6ef; --tier2: #2a78d6; --tier3: #104281;
+    --seq100:#cde2fb; --seq200:#9ec5f4; --seq300:#6da7ec; --seq400:#3987e5;
+    --seq500:#256abf; --seq600:#184f95; --seq700:#0d366b;
+    --div-neg: #e34948; --div-mid: #f0efec;
+    --good: #006300; --critical: #d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1: #1a1a19; --page: #0d0d0d;
+      --ink-1: #ffffff; --ink-2: #c3c2b7; --ink-3: #898781;
+      --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+      --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+      --tier1: #86b6ef; --tier2: #3987e5; --tier3: #184f95;
+      --div-neg: #e66767; --div-mid: #383835;
+      --good: #0ca30c;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1: #1a1a19; --page: #0d0d0d;
+    --ink-1: #ffffff; --ink-2: #c3c2b7; --ink-3: #898781;
+    --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+    --tier1: #86b6ef; --tier2: #3987e5; --tier3: #184f95;
+    --div-neg: #e66767; --div-mid: #383835;
+    --good: #0ca30c;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body.viz-root {
+    background: var(--page); color: var(--ink-1);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 20px clamp(12px, 3vw, 36px) 60px;
+  }
+  h1 { font-size: 21px; font-weight: 650; }
+  .sub { color: var(--ink-2); margin-top: 3px; max-width: 78ch; }
+  .chips { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .chip { font-size: 12px; color: var(--ink-2); border: 1px solid var(--ring);
+          background: var(--surface-1); border-radius: 999px; padding: 2px 10px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(142px, 1fr));
+           gap: 10px; margin: 18px 0 14px; }
+  .tile { background: var(--surface-1); border: 1px solid var(--ring);
+          border-radius: 10px; padding: 11px 13px; }
+  .tile .lb { font-size: 12px; color: var(--ink-2); }
+  .tile .vl { font-size: 24px; font-weight: 600; margin-top: 2px; }
+  .tile .ct { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; }
+  .layout { display: grid; grid-template-columns: 316px 1fr; gap: 14px; align-items: start; }
+  @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
+  .panel, .card { background: var(--surface-1); border: 1px solid var(--ring); border-radius: 10px; }
+  .panel { padding: 13px 14px; margin-bottom: 12px; }
+  .panel h2, .card h2 { font-size: 13px; font-weight: 650; }
+  .panel .hint { font-size: 11.5px; color: var(--ink-3); margin: 2px 0 9px; }
+  .ctl { margin: 8px 0; }
+  .ctl label { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-2); }
+  .ctl label b { color: var(--ink-1); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .ctl input[type=range] { width: 100%; accent-color: var(--s1); height: 20px; }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 6px 0 4px; }
+  .seg.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+  .seg button { border: 1px solid var(--ring); border-radius: 8px; background: transparent;
+                color: var(--ink-2); padding: 6px 2px; font: inherit; font-size: 12px; cursor: pointer; }
+  .seg button.on { background: var(--s1); color: #fff; border-color: var(--s1); }
+  .num { display: flex; align-items: center; justify-content: space-between; font-size: 12px;
+         color: var(--ink-2); margin: 7px 0; gap: 8px; }
+  .num input { width: 62px; background: var(--page); color: var(--ink-1);
+               border: 1px solid var(--ring); border-radius: 6px; padding: 3px 7px; font: inherit; }
+  .btn { border: 1px solid var(--ring); background: var(--page); color: var(--ink-2);
+         border-radius: 7px; padding: 5px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+  .btn:hover { color: var(--ink-1); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 12px; }
+  .card { padding: 13px 14px 8px; min-width: 0; }
+  .card .desc { font-size: 11.5px; color: var(--ink-3); margin: 2px 0 6px; }
+  .card svg { width: 100%; height: auto; display: block; }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--ink-2); margin: 2px 0 4px; flex-wrap: wrap; }
+  .legend .k { display: inline-flex; align-items: center; gap: 5px; }
+  .legend .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .wide { grid-column: 1 / -1; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; color: var(--ink-3); font-weight: 500; font-size: 11.5px;
+       border-bottom: 1px solid var(--grid); padding: 4px 8px; }
+  td { border-bottom: 1px solid var(--grid); padding: 5px 8px; vertical-align: top; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  .pv { color: var(--ink-2); max-width: 52ch; overflow: hidden; text-overflow: ellipsis;
+        white-space: nowrap; display: block; }
+  .tierdot { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 5px; }
+  #tip { position: fixed; pointer-events: none; background: var(--surface-1); color: var(--ink-1);
+         border: 1px solid var(--ring); border-radius: 8px; padding: 7px 10px; font-size: 12px;
+         box-shadow: 0 4px 14px rgba(0,0,0,.18); max-width: 340px; z-index: 10; display: none; }
+  #tip .t2 { color: var(--ink-2); } #tip .t3 { color: var(--ink-3); font-size: 11px; }
+  .foot { color: var(--ink-3); font-size: 12px; margin-top: 16px; max-width: 100ch; }
+  svg text { font: 11px system-ui, -apple-system, "Segoe UI", sans-serif; fill: var(--ink-3); }
+  svg .val { fill: var(--ink-2); font-variant-numeric: tabular-nums; }
+  svg .ttl { fill: var(--ink-1); font-weight: 600; }
+</style>
+</head>
+<body class="viz-root">
+<h1>Viktor Router Lab</h1>
+<div class="sub">Part 1 routes each task to <b>Tier 1/2/3</b> from routing-time signals only
+(first user message + system prompt + tools). Part 2 grades <b>observed difficulty</b> from the
+full trajectory. Five router methods and two cost models below — every knob recomputes the whole
+page live. ML probabilities are <b>out-of-fold</b> (GroupKFold by workspace): no task's tier saw
+its own outcome.</div>
+<div class="chips" id="chips"></div>
+
+<div class="tiles" id="tiles"></div>
+
+<div class="layout">
+<div>
+  <div class="panel">
+    <h2>Router (Part 1)</h2>
+    <div class="hint">Blend = &alpha;&middot;ML difficulty + (1&minus;&alpha;)&middot;heuristic — the balanced
+      winner in CV. &tau; = serve with &ge;&tau; confidence (cheapest 90%-served). &lambda; = Bayes
+      tasks-per-dollar (sacrifices heavy tasks — watch the weighted tile).</div>
+    <div class="seg" id="methodSeg">
+      <button data-m="blend">Blend + cuts</button>
+      <button data-m="score">Heuristic cuts</button>
+      <button data-m="ml-tau">ML &tau;-sufficiency</button>
+      <button data-m="ml-lambda">ML &lambda;-Bayes</button>
+      <button data-m="kmeans">K-Means (k=3)</button>
+    </div>
+    <div id="alphaBox"></div>
+    <div id="tauBox"></div>
+    <div id="lamBox"></div>
+    <div id="routerWeights"></div>
+    <div id="routerCuts"></div>
+    <div class="num" id="seedRow" style="display:none">k-means seed
+      <input type="number" id="seed" value="13" step="1"></div>
+    <button class="btn" id="resetRouter">Reset router defaults</button>
+    <div class="hint" style="margin-top:8px">ML probabilities were trained against the evaluator's
+      defaults — after changing Part 2 below, rerun <code>run_pipeline.py</code> to retrain.</div>
+  </div>
+  <div class="panel">
+    <h2>Evaluator (Part 2)</h2>
+    <div class="hint">Rule-based difficulty from the full trajectory: weighted percentile ranks + cuts + hard overrides.</div>
+    <div id="evWeights"></div>
+    <div id="evCuts"></div>
+    <div class="num">tool errors &ge; <input type="number" id="ovErr" step="1" min="1"> &rarr; force D3</div>
+    <div class="num">tool calls &ge; <input type="number" id="ovCalls" step="1" min="1"> &rarr; force D3</div>
+    <button class="btn" id="resetEv">Reset evaluator defaults</button>
+  </div>
+  <div class="panel">
+    <h2>Cost model &amp; pricing ($ / 1M tokens)</h2>
+    <div class="hint">Cache-aware bills the replayed prefix at the cached rate
+      (~T&middot;(n&minus;1)/2). Prices are an assumption — model ids are anonymized.</div>
+    <div class="seg" id="costSeg">
+      <button data-c="cache">Cache-aware</button>
+      <button data-c="naive">Naive</button>
+    </div>
+    <div id="prices"></div>
+    <button class="btn" id="exportCsv">Export tiers CSV</button>
+  </div>
+</div>
+
+<div>
+  <div class="grid">
+    <div class="card"><h2>Router score</h2>
+      <div class="desc" id="histRouterDesc">Routing-time difficulty score; dashed lines are the tier cuts.</div>
+      <div id="histRouter"></div></div>
+    <div class="card"><h2>Evaluator difficulty score</h2>
+      <div class="desc">Observed effort in the trajectory; dashed lines are the difficulty cuts.</div>
+      <div id="histEval"></div></div>
+    <div class="card"><h2>Tier mix &mdash; router vs evaluator</h2>
+      <div class="legend"><span class="k"><span class="sw" style="background:var(--s1)"></span>Router tier</span>
+        <span class="k"><span class="sw" style="background:var(--s2)"></span>Evaluator difficulty</span></div>
+      <div id="mixChart"></div></div>
+    <div class="card"><h2>Confusion &mdash; router tier &times; observed difficulty</h2>
+      <div class="desc">Rows: router tier. Columns: evaluator difficulty. Diagonal = agreement.</div>
+      <div id="confChart"></div></div>
+    <div class="card wide"><h2>Cost&ndash;quality frontier</h2>
+      <div class="desc" id="frontDesc"></div>
+      <div class="legend"><span class="k"><span class="sw" style="background:var(--s1)"></span>Served (per task)</span>
+        <span class="k"><span class="sw" style="background:var(--s2)"></span>Served (token-weighted)</span></div>
+      <div id="frontChart"></div></div>
+    <div class="card"><h2>Router score vs observed difficulty</h2>
+      <div class="legend"><span class="k"><span class="sw" style="background:var(--s1)"></span>Matched</span>
+        <span class="k"><span class="sw" style="background:var(--s2)"></span>Under-routed</span>
+        <span class="k"><span class="sw" style="background:var(--s3)"></span>Over-routed</span></div>
+      <div id="scatChart"></div></div>
+    <div class="card"><h2>Routing-time signal strength</h2>
+      <div class="desc">Spearman of each feature vs the evaluator score &mdash; the structure the router runs on.</div>
+      <div id="sigChart"></div></div>
+    <div class="card wide"><h2>Largest disagreements</h2>
+      <div class="desc">Where routing-time signals and the observed trajectory tell different stories.</div>
+      <div style="overflow-x:auto"><table id="disTable"></table></div></div>
+  </div>
+  <div class="foot" id="foot"></div>
+</div>
+</div>
+<div id="tip"></div>
+
+<script src="data.js"></script>
+<script>
+'use strict';
+const D = window.VIKTOR_DATA, M = D.meta, R = D.rows, N = R.length;
+const css = n => getComputedStyle(document.body).getPropertyValue(n).trim();
+
+// ---------- state ----------
+const defaults = M.defaults;
+const state = {
+  method: defaults.method || 'blend', seed: 13,
+  alpha: defaults.alpha, tau: defaults.tau, lam: defaults['lambda'],
+  costModel: defaults.costModel || 'cache',
+  gw: {...defaults.groupWeights},
+  rCuts: [...defaults.routerCuts],
+  evW: {...defaults.evWeights},
+  evCuts: [...defaults.evCuts],
+  ov: {...defaults.overrides},
+  prices: JSON.parse(JSON.stringify(defaults.tierPrices)),
+};
+
+// ---------- math ----------
+function quantile(sortedArr, q) {
+  const idx = q * (sortedArr.length - 1), lo = Math.floor(idx), hi = Math.ceil(idx);
+  return sortedArr[lo] + (sortedArr[hi] - sortedArr[lo]) * (idx - lo);
+}
+function ranksOf(vals) { // average-rank percentiles in [0,1]
+  const n = vals.length, idx = Array.from({length: n}, (_, i) => i).sort((a, b) => vals[a] - vals[b]);
+  const out = new Float64Array(n); let i = 0;
+  while (i < n) {
+    let j = i; while (j + 1 < n && vals[idx[j + 1]] === vals[idx[i]]) j++;
+    const avg = (i + j) / 2; for (let k = i; k <= j; k++) out[idx[k]] = avg;
+    i = j + 1;
+  }
+  const mx = n - 1 || 1; for (let k = 0; k < n; k++) out[k] /= mx;
+  return out;
+}
+function pearson(a, b) {
+  let ma = 0, mb = 0; for (let i = 0; i < a.length; i++) { ma += a[i]; mb += b[i]; }
+  ma /= a.length; mb /= a.length;
+  let sab = 0, sa = 0, sb = 0;
+  for (let i = 0; i < a.length; i++) {
+    const x = a[i] - ma, y = b[i] - mb; sab += x * y; sa += x * x; sb += y * y;
+  }
+  return sab / Math.sqrt(sa * sb || 1);
+}
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+function dist2(a, b) { let s = 0; for (let i = 0; i < a.length; i++) { const d = a[i] - b[i]; s += d * d; } return s; }
+
+// group -> column indices in row.rank
+const groupIdx = {};
+{ let base = 0;
+  for (const [g, spec] of Object.entries(M.featureGroups)) {
+    groupIdx[g] = { sign: spec.sign, idx: spec.features.map((f, k) => base + k) };
+    base += spec.features.length;
+  } }
+
+// ML difficulty rank: fixed (out-of-fold cumulative probabilities from the pipeline)
+const CUM = R.map(r => r.cum);
+const mlDiffRank = ranksOf(CUM.map(c => 1 - (c[0] + c[1]) / 2));
+
+function heuristicScores() {
+  const out = new Float64Array(N);
+  let tw = 0; for (const g in state.gw) tw += state.gw[g];
+  for (let i = 0; i < N; i++) {
+    const rk = R[i].rank; let s = 0;
+    for (const g in groupIdx) {
+      const { sign, idx } = groupIdx[g];
+      let m = 0; for (const c of idx) m += rk[c];
+      s += sign * state.gw[g] * (m / idx.length);
+    }
+    out[i] = s / (tw || 1);
+  }
+  let lo = Infinity, hi = -Infinity;
+  for (const v of out) { if (v < lo) lo = v; if (v > hi) hi = v; }
+  const span = hi - lo || 1; for (let i = 0; i < N; i++) out[i] = (out[i] - lo) / span;
+  return out;
+}
+function evalScores() {
+  const out = new Float64Array(N);
+  let tw = 0; for (const k in state.evW) tw += state.evW[k];
+  for (let i = 0; i < N; i++) {
+    const rk = R[i].evRank; let s = 0;
+    M.evNames.forEach((k, c) => s += (state.evW[k] || 0) * rk[c]);
+    out[i] = s / (tw || 1);
+  }
+  return out;
+}
+function cutTiers(scores, cuts) {
+  const sorted = Array.from(scores).sort((a, b) => a - b);
+  const c1 = quantile(sorted, cuts[0]), c2 = quantile(sorted, Math.max(cuts[0], cuts[1]));
+  return { tiers: Array.from(scores, s => s <= c1 ? 1 : s <= c2 ? 2 : 3), c1, c2 };
+}
+function kmeansTiers(scores) {
+  const w = []; for (const g in groupIdx)
+    for (const _ of groupIdx[g].idx) w.push(state.gw[g]);
+  const dim = w.length, X = R.map(r => r.rank.map((v, c) => v * w[c]));
+  const rnd = mulberry32(state.seed || 13);
+  let best = null;
+  for (let init = 0; init < 5; init++) {
+    const cents = [X[Math.floor(rnd() * N)].slice()];
+    while (cents.length < 3) {
+      const d2 = X.map(x => Math.min(...cents.map(c => dist2(x, c))));
+      let sum = d2.reduce((a, b) => a + b, 0) * rnd(), pick = 0;
+      for (let i = 0; i < N; i++) { sum -= d2[i]; if (sum <= 0) { pick = i; break; } }
+      cents.push(X[pick].slice());
+    }
+    const lab = new Int8Array(N);
+    for (let it = 0; it < 60; it++) {
+      let moved = false;
+      for (let i = 0; i < N; i++) {
+        let bi = 0, bd = Infinity;
+        for (let c = 0; c < 3; c++) { const d = dist2(X[i], cents[c]); if (d < bd) { bd = d; bi = c; } }
+        if (lab[i] !== bi) { lab[i] = bi; moved = true; }
+      }
+      if (!moved) break;
+      for (let c = 0; c < 3; c++) {
+        const m = new Float64Array(dim); let cnt = 0;
+        for (let i = 0; i < N; i++) if (lab[i] === c) { cnt++; for (let d = 0; d < dim; d++) m[d] += X[i][d]; }
+        if (cnt) for (let d = 0; d < dim; d++) cents[c][d] = m[d] / cnt;
+      }
+    }
+    let inertia = 0; for (let i = 0; i < N; i++) inertia += dist2(X[i], cents[lab[i]]);
+    if (!best || inertia < best.inertia) best = { lab: lab.slice(), inertia };
+  }
+  const mean = [0, 0, 0], cnt = [0, 0, 0];
+  for (let i = 0; i < N; i++) { mean[best.lab[i]] += scores[i]; cnt[best.lab[i]]++; }
+  const order = [0, 1, 2].sort((a, b) => mean[a] / (cnt[a] || 1) - mean[b] / (cnt[b] || 1));
+  const remap = {}; order.forEach((c, t) => remap[c] = t + 1);
+  return Array.from(best.lab, c => remap[c]);
+}
+
+function gradeEval(scores) {
+  const { tiers, c1, c2 } = cutTiers(scores, state.evCuts);
+  for (let i = 0; i < N; i++) {
+    const e = R[i].ev;
+    if (e.n_tool_errors >= state.ov.errors_t3 || e.n_tool_calls >= state.ov.tool_calls_t3) tiers[i] = 3;
+  }
+  return { diffs: tiers, c1, c2 };
+}
+
+// (n x 3) cost matrix under the current cost model + prices
+function costMatrix() {
+  const Cm = new Array(N);
+  for (let i = 0; i < N; i++) {
+    const e = R[i].ev, T = e.context_tokens, g = e.gen_tokens, n = Math.max(e.n_llm_calls, 1);
+    const row = new Float64Array(3);
+    for (let t = 1; t <= 3; t++) {
+      const [pin, pc, pout] = state.prices[t];
+      row[t - 1] = state.costModel === 'cache'
+        ? (T * pin + T * (n - 1) / 2 * pc + g * pout) / 1e6
+        : (T * pin + g * pout) / 1e6;
+    }
+    Cm[i] = row;
+  }
+  return Cm;
+}
+function evalPolicy(tiers, diffs, Cm) {
+  let cost = 0, top = 0, served = 0, wServed = 0, wTot = 0;
+  for (let i = 0; i < N; i++) {
+    cost += Cm[i][tiers[i] - 1]; top += Cm[i][2];
+    const ok = tiers[i] >= diffs[i];
+    if (ok) served++;
+    wTot += Cm[i][2]; if (ok) wServed += Cm[i][2];
+  }
+  return { costShare: cost / top, cost, top, served: served / N, wServed: wServed / wTot };
+}
+
+// dispatch rules
+function tauTiers(tau) {
+  return Array.from({length: N}, (_, i) =>
+    CUM[i][0] >= tau ? 1 : CUM[i][1] >= tau ? 2 : 3);
+}
+function lambdaTiers(lam, Cm) {
+  const out = new Array(N);
+  for (let i = 0; i < N; i++) {
+    const pOver = [1 - CUM[i][0], 1 - CUM[i][1], 0];
+    let bt = 1, bv = Infinity;
+    for (let t = 1; t <= 3; t++) {
+      const v = Cm[i][t - 1] + lam * pOver[t - 1];
+      if (v < bv) { bv = v; bt = t; }
+    }
+    out[i] = bt;
+  }
+  return out;
+}
+
+// ---------- compute ----------
+let C = null;
+function computeAll() {
+  const hS = heuristicScores(), eS = evalScores();
+  const { diffs, c1: ec1, c2: ec2 } = gradeEval(eS);
+  const Cm = costMatrix();
+  const hRank = ranksOf(Array.from(hS));
+
+  let rTiers, rS, rc = null; // rc = score cuts for the histogram
+  if (state.method === 'score') {
+    rS = hS; const r = cutTiers(rS, state.rCuts); rTiers = r.tiers; rc = [r.c1, r.c2];
+  } else if (state.method === 'blend') {
+    rS = Float64Array.from({length: N}, (_, i) =>
+      state.alpha * mlDiffRank[i] + (1 - state.alpha) * hRank[i]);
+    const r = cutTiers(rS, state.rCuts); rTiers = r.tiers; rc = [r.c1, r.c2];
+  } else if (state.method === 'ml-tau') {
+    rS = mlDiffRank; rTiers = tauTiers(state.tau);
+  } else if (state.method === 'ml-lambda') {
+    rS = mlDiffRank; rTiers = lambdaTiers(state.lam, Cm);
+  } else {
+    rS = hS; rTiers = kmeansTiers(hS);
+  }
+
+  const conf = [[0,0,0],[0,0,0],[0,0,0]];
+  let exact = 0, adj = 0, under = 0, over = 0;
+  for (let i = 0; i < N; i++) {
+    conf[rTiers[i]-1][diffs[i]-1]++;
+    if (rTiers[i] === diffs[i]) exact++;
+    if (Math.abs(rTiers[i] - diffs[i]) <= 1) adj++;
+    if (rTiers[i] < diffs[i]) under++; else if (rTiers[i] > diffs[i]) over++;
+  }
+  const pol = evalPolicy(rTiers, diffs, Cm);
+  const rho = pearson(ranksOf(Array.from(rS)), ranksOf(Array.from(eS)));
+  C = { rS, eS, hS, hRank, rTiers, diffs, rc, ec1, ec2, conf, Cm,
+        exact: exact/N, adj: adj/N, under: under/N, over: over/N, rho, ...pol };
+}
+
+// frontier: sweep the active method's own knob; each point = (costShare, served, wServed)
+function frontier() {
+  const { diffs, Cm, hRank } = C;
+  const pts = [];
+  const push = tiers => { const p = evalPolicy(tiers, diffs, Cm);
+    return pts.push([p.costShare, p.served, p.wServed]); };
+  if (state.method === 'ml-tau') {
+    for (let tau = 0.30; tau <= 0.996; tau += 0.02) push(tauTiers(tau));
+    return { pts, knob: 'τ' };
+  }
+  if (state.method === 'ml-lambda') {
+    for (let k = 0; k < 40; k++) push(lambdaTiers(1e-4 * Math.pow(3e5, k / 39), Cm));
+    return { pts, knob: 'λ' };
+  }
+  // cut-based methods (score / blend / kmeans reference): sweep Tier-3 cut
+  const base = state.method === 'blend'
+    ? Float64Array.from({length: N}, (_, i) =>
+        state.alpha * mlDiffRank[i] + (1 - state.alpha) * hRank[i])
+    : C.hS;
+  const sorted = Array.from(base).sort((a, b) => a - b);
+  const ratio = state.rCuts[0] / (state.rCuts[1] || 1);
+  for (let c2 = 0.30; c2 <= 1.0001; c2 += 0.025) {
+    const cc2 = Math.min(c2, 1), q1 = quantile(sorted, cc2 * ratio), q2 = quantile(sorted, cc2);
+    push(Array.from(base, s => s <= q1 ? 1 : s <= q2 ? 2 : 3));
+  }
+  return { pts, knob: 'Tier-3 cut' };
+}
+
+// ---------- svg helpers ----------
+const fmtPct = v => (100 * v).toFixed(1) + '%';
+const fmt$ = v => '$' + v.toFixed(2);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const tip = document.getElementById('tip');
+function bindTips(root) {
+  root.querySelectorAll('[data-tip]').forEach(el => {
+    el.addEventListener('mousemove', e => {
+      tip.innerHTML = el.dataset.tip; tip.style.display = 'block';
+      const w = tip.offsetWidth, x = Math.min(e.clientX + 14, innerWidth - w - 8);
+      tip.style.left = x + 'px'; tip.style.top = (e.clientY + 16) + 'px';
+    });
+    el.addEventListener('mouseleave', () => tip.style.display = 'none');
+  });
+}
+
+function histogram(el, scores, cuts, title) {
+  const W = 660, H = 210, L = 34, Rm = 10, T = 12, B = 26, bins = 34;
+  const counts = new Array(bins).fill(0);
+  for (const s of scores) counts[Math.min(bins - 1, Math.floor(s * bins))]++;
+  const ymax = Math.max(...counts) || 1;
+  const bw = (W - L - Rm) / bins;
+  const tierCols = [css('--tier1'), css('--tier2'), css('--tier3')];
+  let bars = '';
+  for (let b = 0; b < bins; b++) {
+    const x0 = (b + 0.5) / bins;
+    const t = cuts && x0 > cuts[1] ? 2 : cuts && x0 > cuts[0] ? 1 : 0;
+    const h = counts[b] / ymax * (H - T - B);
+    const x = L + b * bw, y = H - B - h;
+    const tt = cuts ? ` &middot; ${title} ${t+1}` : '';
+    bars += `<path d="M${(x+1).toFixed(1)} ${H-B} v${-Math.max(h-3,0).toFixed(1)} a3 3 0 0 1 3 -3 h${(bw-8).toFixed(1)} a3 3 0 0 1 3 3 v${Math.max(h-3,0).toFixed(1)} z"
+      fill="${cuts ? tierCols[t] : css('--tier2')}" data-tip="score ${(b/bins).toFixed(2)}&ndash;${((b+1)/bins).toFixed(2)}<br><b>${counts[b]}</b> tasks${tt}"/>`;
+  }
+  let cutLines = '';
+  if (cuts) for (const c of cuts) {
+    const x = L + c * (W - L - Rm);
+    cutLines += `<line x1="${x}" y1="${T}" x2="${x}" y2="${H-B}" stroke="${css('--ink-3')}" stroke-width="1" stroke-dasharray="4 3"/>`;
+  }
+  const grid = [0.25, 0.5, 0.75, 1].map(g => {
+    const y = H - B - g * (H - T - B);
+    return `<line x1="${L}" y1="${y}" x2="${W-Rm}" y2="${y}" stroke="${css('--grid')}" stroke-width="1"/>
+            <text x="${L-5}" y="${y+3.5}" text-anchor="end">${Math.round(g*ymax)}</text>`;
+  }).join('');
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}">${grid}
+    <line x1="${L}" y1="${H-B}" x2="${W-Rm}" y2="${H-B}" stroke="${css('--axis')}"/>
+    ${bars}${cutLines}
+    <text x="${L}" y="${H-8}">0</text><text x="${W-Rm}" y="${H-8}" text-anchor="end">1</text>
+    <text x="${(W+L-Rm)/2}" y="${H-8}" text-anchor="middle">score</text></svg>`;
+  bindTips(el);
+}
+
+function mixChart(el) {
+  const W = 660, H = 214, L = 34, T = 20, B = 26;
+  const rC = [0,0,0], eC = [0,0,0];
+  for (let i = 0; i < N; i++) { rC[C.rTiers[i]-1]++; eC[C.diffs[i]-1]++; }
+  const ymax = Math.max(...rC, ...eC) || 1;
+  const band = (W - L - 12) / 3;
+  let out = '';
+  [0.5, 1].forEach(g => {
+    const y = H - B - g * (H - T - B);
+    out += `<line x1="${L}" y1="${y}" x2="${W-12}" y2="${y}" stroke="${css('--grid')}"/>
+            <text x="${L-5}" y="${y+3.5}" text-anchor="end">${Math.round(g*ymax)}</text>`;
+  });
+  const bw = 24, gap = 2;
+  for (let t = 0; t < 3; t++) {
+    const cx = L + band * t + band / 2;
+    [[rC[t], css('--s1'), 'Router', -bw - gap/2], [eC[t], css('--s2'), 'Evaluator', gap/2]].forEach(([v, col, nm, off]) => {
+      const h = v / ymax * (H - T - B), x = cx + off, y = H - B - h;
+      out += `<path d="M${x} ${H-B} v${-Math.max(h-4,0)} a4 4 0 0 1 4 -4 h${bw-8} a4 4 0 0 1 4 4 v${Math.max(h-4,0)} z"
+        fill="${col}" data-tip="<b>${nm}</b> tier ${t+1}: ${v} tasks (${fmtPct(v/N)})"/>
+        <text class="val" x="${x+bw/2}" y="${y-5}" text-anchor="middle">${v}</text>`;
+    });
+    out += `<text x="${cx}" y="${H-8}" text-anchor="middle">Tier ${t+1}</text>`;
+  }
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}">
+    <line x1="${L}" y1="${H-B}" x2="${W-12}" y2="${H-B}" stroke="${css('--axis')}"/>${out}</svg>`;
+  bindTips(el);
+}
+
+function confChart(el) {
+  const W = 660, H = 240, L = 120, T = 30, cell = 58, gap = 2;
+  const mx = Math.max(...C.conf.flat()) || 1;
+  const ramp = ['--seq100','--seq200','--seq300','--seq400','--seq500','--seq600','--seq700'];
+  let out = '';
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+    const v = C.conf[r][c], k = Math.min(ramp.length - 1, Math.round(v / mx * (ramp.length - 1)));
+    const fill = css(ramp[k]);
+    const x = L + c * (cell + gap), y = T + r * (cell + gap);
+    const ink = k >= 3 ? '#ffffff' : '#0b0b0b';
+    out += `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="6" fill="${fill}"
+      data-tip="Router T${r+1} &times; observed D${c+1}<br><b>${v}</b> tasks (${fmtPct(v/N)})${r<c?'<br>under-routed':r>c?'<br>over-routed':'<br>matched'}"/>
+      <text x="${x+cell/2}" y="${y+cell/2+4}" text-anchor="middle" style="fill:${ink};font-weight:600">${v}</text>`;
+  }
+  for (let i = 0; i < 3; i++) {
+    out += `<text x="${L-8}" y="${T + i*(cell+gap) + cell/2 + 4}" text-anchor="end">Router T${i+1}</text>
+            <text x="${L + i*(cell+gap) + cell/2}" y="${T-9}" text-anchor="middle">D${i+1}</text>`;
+  }
+  const dx = L + 3 * (cell + gap) + 26;
+  out += `<text x="${dx}" y="${T+14}" class="ttl">diagonal ${fmtPct(C.exact)}</text>
+          <text x="${dx}" y="${T+34}">below diag (under) ${fmtPct(C.under)}</text>
+          <text x="${dx}" y="${T+52}">above diag (over) ${fmtPct(C.over)}</text>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}">${out}</svg>`;
+  bindTips(el);
+}
+
+function scatChart(el) {
+  const W = 660, H = 320, L = 40, Rm = 12, T = 12, B = 30;
+  const cols = { m: css('--s1'), u: css('--s2'), o: css('--s3') };
+  let dots = '';
+  for (let i = 0; i < N; i++) {
+    const x = L + C.rS[i] * (W - L - Rm), y = H - B - C.eS[i] * (H - T - B);
+    const rel = C.rTiers[i] === C.diffs[i] ? 'm' : C.rTiers[i] < C.diffs[i] ? 'u' : 'o';
+    const relName = rel === 'm' ? 'matched' : rel === 'u' ? 'under-routed' : 'over-routed';
+    dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${cols[rel]}"
+      stroke="${css('--surface-1')}" stroke-width="2"
+      data-tip="<b>#${R[i].id}</b> ${esc(R[i].trigger)}<br><span class='t2'>${esc(R[i].preview.slice(0,110))}</span><br>
+      <span class='t3'>router T${C.rTiers[i]} (${C.rS[i].toFixed(2)}) &middot; observed D${C.diffs[i]} (${C.eS[i].toFixed(2)}) &middot; ${relName}<br>
+      P(D&le;1)=${CUM[i][0].toFixed(2)} P(D&le;2)=${CUM[i][1].toFixed(2)} &middot; ${R[i].ev.n_tool_calls} tool calls &middot; ${R[i].ev.n_tool_errors} errors &middot; ran on ${R[i].model}</span>"/>`;
+  }
+  const grid = [0.25,0.5,0.75].map(g => {
+    const y = H - B - g * (H - T - B), x = L + g * (W - L - Rm);
+    return `<line x1="${L}" y1="${y}" x2="${W-Rm}" y2="${y}" stroke="${css('--grid')}"/>
+            <line x1="${x}" y1="${T}" x2="${x}" y2="${H-B}" stroke="${css('--grid')}"/>`;
+  }).join('');
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}">${grid}
+    <line x1="${L}" y1="${H-B}" x2="${W-Rm}" y2="${H-B}" stroke="${css('--axis')}"/>
+    <line x1="${L}" y1="${T}" x2="${L}" y2="${H-B}" stroke="${css('--axis')}"/>
+    ${dots}
+    <text x="${(W+L)/2}" y="${H-8}" text-anchor="middle">router score (routing time)</text>
+    <text transform="rotate(-90)" x="${-(H-B+T)/2}" y="12" text-anchor="middle">observed difficulty score</text></svg>`;
+  bindTips(el);
+}
+
+function frontChart(el) {
+  const { pts, knob } = frontier();
+  document.getElementById('frontDesc').innerHTML =
+    `Sweeping <b>${knob}</b> for the active method. Served = router tier &ge; observed difficulty; the
+     token-weighted line weights each task by its Tier-3 cost — a policy that games the count metric
+     by starving big tasks drops here. Cost relative to all-Tier-3. Dots on both lines mark the current setting.`;
+  const W = 1000, H = 270, L = 46, Rm = 16, T = 14, B = 34;
+  const ymin = Math.max(0, Math.min(0.5, ...pts.map(p => p[2]))) - 0.02;
+  const x = v => L + v * (W - L - Rm);
+  const y = v => H - B - (Math.max(v, ymin) - ymin) / (1 - ymin) * (H - T - B);
+  let grid = '';
+  for (const g of [0.2, 0.4, 0.6, 0.8, 1.0]) if (g >= ymin) grid +=
+    `<line x1="${L}" y1="${y(g)}" x2="${W-Rm}" y2="${y(g)}" stroke="${css('--grid')}"/>
+     <text x="${L-6}" y="${y(g)+3.5}" text-anchor="end">${Math.round(g*100)}%</text>`;
+  for (const g of [0.25, 0.5, 0.75, 1]) grid +=
+    `<text x="${x(g)}" y="${H-10}" text-anchor="middle">${Math.round(g*100)}%</text>`;
+  const line = (col, yi, name) => {
+    let path = '', dots = '';
+    const srt = pts.slice().sort((a, b) => a[0] - b[0]);
+    srt.forEach((p, i) => {
+      const px = x(Math.min(p[0], 1)), py = y(p[yi]);
+      path += (i ? 'L' : 'M') + px.toFixed(1) + ' ' + py.toFixed(1);
+      dots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="4" fill="${col}"
+        stroke="${css('--surface-1')}" stroke-width="2"
+        data-tip="${name}<br><b>${fmtPct(p[yi])}</b> at <b>${fmtPct(p[0])}</b> of all-Tier3 cost"/>`;
+    });
+    return `<path d="${path}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>${dots}`;
+  };
+  const cur = (col, v) => `<circle cx="${x(Math.min(C.costShare,1))}" cy="${y(v)}" r="6.5" fill="${col}"
+      stroke="${css('--ink-1')}" stroke-width="2"
+      data-tip="<b>Current setting</b><br>${fmtPct(v)} at ${fmtPct(C.costShare)} cost"/>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}">${grid}
+    <line x1="${L}" y1="${H-B}" x2="${W-Rm}" y2="${H-B}" stroke="${css('--axis')}"/>
+    ${line(css('--s2'), 2, 'token-weighted served')}
+    ${line(css('--s1'), 1, 'served (per task)')}
+    ${cur(css('--s1'), C.served)}${cur(css('--s2'), C.wServed)}
+    <text x="${(W+L)/2}" y="${H-10}" text-anchor="middle">est. cost vs all-Tier-3</text>
+    <text transform="rotate(-90)" x="${-(H-B+T)/2}" y="14" text-anchor="middle">share served</text></svg>`;
+  bindTips(el);
+}
+
+function sigChart(el) {
+  const eR = ranksOf(Array.from(C.eS));
+  const rows = [];
+  let base = 0;
+  for (const [g, spec] of Object.entries(M.featureGroups)) {
+    spec.features.forEach((f, k) => {
+      const col = base + k;
+      const vals = new Float64Array(N);
+      for (let i = 0; i < N; i++) vals[i] = R[i].rank[col];
+      rows.push({ f, g, rho: pearson(vals, eR) });
+    });
+    base += spec.features.length;
+  }
+  rows.sort((a, b) => b.rho - a.rho);
+  const W = 700, rh = 17, T = 8, H = T + rows.length * rh + 22, mid = 410;
+  const scale = 250 / Math.max(0.45, ...rows.map(r => Math.abs(r.rho)));
+  let out = `<line x1="${mid}" y1="${T}" x2="${mid}" y2="${H-18}" stroke="${css('--axis')}"/>`;
+  rows.forEach((r, i) => {
+    const yy = T + i * rh, w = Math.abs(r.rho) * scale;
+    const fill = r.rho >= 0 ? css('--s1') : css('--div-neg');
+    const bx = r.rho >= 0 ? mid : mid - w;
+    out += `<rect x="${bx}" y="${yy+3}" width="${Math.max(w,1)}" height="${rh-7}" rx="3" fill="${fill}"
+      data-tip="<b>${r.f}</b> (${r.g})<br>Spearman vs evaluator score: <b>${r.rho.toFixed(3)}</b>"/>
+      <text x="${mid - (r.rho>=0? 6 : w+6)}" y="${yy+rh-5}" text-anchor="end">${r.f}</text>
+      <text class="val" x="${mid + (r.rho>=0? w+5 : 6)}" y="${yy+rh-5}">${r.rho.toFixed(2)}</text>`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}">${out}
+    <text x="${mid}" y="${H-4}" text-anchor="middle">&larr; marks easy &nbsp;|&nbsp; marks hard &rarr;</text></svg>`;
+  bindTips(el);
+}
+
+function disTable() {
+  const idx = Array.from({length: N}, (_, i) => i)
+    .sort((a, b) => Math.abs(C.rTiers[b]-C.diffs[b]) - Math.abs(C.rTiers[a]-C.diffs[a])
+                 || Math.abs(C.rS[b]-C.eS[b]) - Math.abs(C.rS[a]-C.eS[a]))
+    .slice(0, 15);
+  const tierCols = ['--tier1','--tier2','--tier3'];
+  const td = t => `<span class="tierdot" style="background:var(${tierCols[t-1]})"></span>${t}`;
+  document.getElementById('disTable').innerHTML =
+    `<tr><th>id</th><th>trigger</th><th>task preview</th><th class="n">router</th>
+     <th class="n">observed</th><th class="n">P(D&le;2)</th><th class="n">tool calls</th><th class="n">errors</th><th>ran on</th></tr>` +
+    idx.map(i => `<tr><td class="n">${R[i].id}</td><td>${esc(R[i].trigger)||'&mdash;'}</td>
+      <td><span class="pv" title="${esc(R[i].preview)}">${esc(R[i].preview)}</span></td>
+      <td class="n">${td(C.rTiers[i])}</td><td class="n">${td(C.diffs[i])}</td>
+      <td class="n">${CUM[i][1].toFixed(2)}</td>
+      <td class="n">${R[i].ev.n_tool_calls}</td><td class="n">${R[i].ev.n_tool_errors}</td>
+      <td>${esc(R[i].model)}</td></tr>`).join('');
+}
+
+// ---------- controls ----------
+function slider(parent, label, value, min, max, step, oninput, opts) {
+  const d = document.createElement('div'); d.className = 'ctl';
+  const sign = opts && opts.sign ? (opts.sign === -1 ? '&minus; ' : '+ ') : '';
+  d.innerHTML = `<label><span>${sign}${label}</span><b></b></label>
+    <input type="range" min="${min}" max="${max}" step="${step}" value="${value}">`;
+  const b = d.querySelector('b'), inp = d.querySelector('input');
+  const show = v => b.textContent = (opts && opts.fmt) ? opts.fmt(v) : (+v).toFixed(2);
+  show(value);
+  inp.addEventListener('input', () => { show(+inp.value); oninput(+inp.value); schedule(); });
+  parent.appendChild(d);
+  return inp;
+}
+const boxes = {
+  alpha: document.getElementById('alphaBox'), tau: document.getElementById('tauBox'),
+  lam: document.getElementById('lamBox'),
+  rw: document.getElementById('routerWeights'), rc: document.getElementById('routerCuts'),
+  ew: document.getElementById('evWeights'), ec: document.getElementById('evCuts'),
+};
+function buildControls() {
+  for (const k in boxes) boxes[k].innerHTML = '';
+  slider(boxes.alpha, 'α (ML share of the blend)', state.alpha, 0, 1, 0.05,
+         v => state.alpha = v);
+  slider(boxes.tau, 'τ confidence to stay cheap', state.tau, 0.3, 0.99, 0.01,
+         v => state.tau = v);
+  slider(boxes.lam, 'λ miss penalty ($, log)', Math.log10(state.lam), -3, 1.7, 0.05,
+         v => state.lam = Math.pow(10, v), { fmt: v => '$' + Math.pow(10, v).toFixed(3) });
+  for (const g in state.gw)
+    slider(boxes.rw, g + ' weight', state.gw[g], 0, 2, 0.05, v => state.gw[g] = v,
+           { sign: M.featureGroups[g].sign });
+  slider(boxes.rc, 'Tier 1 | 2 cut (percentile)', state.rCuts[0], 0.05, 0.95, 0.01,
+         v => state.rCuts[0] = Math.min(v, state.rCuts[1] - 0.01));
+  slider(boxes.rc, 'Tier 2 | 3 cut (percentile)', state.rCuts[1], 0.1, 1, 0.01,
+         v => state.rCuts[1] = Math.max(v, state.rCuts[0] + 0.01));
+  for (const k of M.evNames)
+    slider(boxes.ew, k, state.evW[k], 0, 0.5, 0.01, v => state.evW[k] = v);
+  slider(boxes.ec, 'D1 | D2 cut (percentile)', state.evCuts[0], 0.05, 0.95, 0.01,
+         v => state.evCuts[0] = Math.min(v, state.evCuts[1] - 0.01));
+  slider(boxes.ec, 'D2 | D3 cut (percentile)', state.evCuts[1], 0.1, 1, 0.01,
+         v => state.evCuts[1] = Math.max(v, state.evCuts[0] + 0.01));
+  document.getElementById('ovErr').value = state.ov.errors_t3;
+  document.getElementById('ovCalls').value = state.ov.tool_calls_t3;
+  const pr = document.getElementById('prices'); pr.innerHTML = '';
+  for (const t of [1, 2, 3]) {
+    const d = document.createElement('div'); d.className = 'num';
+    d.innerHTML = `T${t} in <input type="number" step="0.1" min="0" value="${state.prices[t][0]}">
+                   cached <input type="number" step="0.01" min="0" value="${state.prices[t][1]}">
+                   out <input type="number" step="0.1" min="0" value="${state.prices[t][2]}">`;
+    d.querySelectorAll('input').forEach((inp, k) =>
+      inp.addEventListener('input', () => { state.prices[t][k] = +inp.value || 0; schedule(); }));
+    pr.appendChild(d);
+  }
+  syncVisibility();
+}
+function syncVisibility() {
+  const m = state.method;
+  boxes.alpha.style.display = m === 'blend' ? 'block' : 'none';
+  boxes.tau.style.display = m === 'ml-tau' ? 'block' : 'none';
+  boxes.lam.style.display = m === 'ml-lambda' ? 'block' : 'none';
+  boxes.rw.style.display = (m === 'score' || m === 'blend' || m === 'kmeans') ? 'block' : 'none';
+  boxes.rc.style.display = (m === 'score' || m === 'blend') ? 'block' : 'none';
+  document.getElementById('seedRow').style.display = m === 'kmeans' ? 'flex' : 'none';
+  document.querySelectorAll('#methodSeg button').forEach(b =>
+    b.classList.toggle('on', b.dataset.m === m));
+  document.querySelectorAll('#costSeg button').forEach(b =>
+    b.classList.toggle('on', b.dataset.c === state.costModel));
+  document.getElementById('histRouterDesc').textContent =
+    m === 'ml-tau' || m === 'ml-lambda'
+      ? 'ML difficulty rank (1 − expected sufficiency, out-of-fold); tiers come from the dispatch rule, not cuts.'
+      : 'Routing-time difficulty score; dashed lines are the tier cuts.';
+}
+document.getElementById('ovErr').addEventListener('input', e => { state.ov.errors_t3 = +e.target.value || 1e9; schedule(); });
+document.getElementById('ovCalls').addEventListener('input', e => { state.ov.tool_calls_t3 = +e.target.value || 1e9; schedule(); });
+document.getElementById('seed').addEventListener('input', e => { state.seed = +e.target.value || 13; schedule(); });
+document.querySelectorAll('#methodSeg button').forEach(b =>
+  b.addEventListener('click', () => { state.method = b.dataset.m; syncVisibility(); schedule(); }));
+document.querySelectorAll('#costSeg button').forEach(b =>
+  b.addEventListener('click', () => { state.costModel = b.dataset.c; syncVisibility(); schedule(); }));
+document.getElementById('resetRouter').addEventListener('click', () => {
+  state.gw = {...defaults.groupWeights}; state.rCuts = [...defaults.routerCuts];
+  state.alpha = defaults.alpha; state.tau = defaults.tau; state.lam = defaults['lambda'];
+  buildControls(); schedule();
+});
+document.getElementById('resetEv').addEventListener('click', () => {
+  state.evW = {...defaults.evWeights}; state.evCuts = [...defaults.evCuts];
+  state.ov = {...defaults.overrides}; buildControls(); schedule();
+});
+document.getElementById('exportCsv').addEventListener('click', () => {
+  let csv = 'trajectory_id,router_tier,router_score,p_d1,p_d2,evaluator_difficulty,evaluator_score\n';
+  for (let i = 0; i < N; i++)
+    csv += `${R[i].id},${C.rTiers[i]},${C.rS[i].toFixed(4)},${CUM[i][0]},${CUM[i][1]},${C.diffs[i]},${C.eS[i].toFixed(4)}\n`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type: 'text/csv'}));
+  a.download = 'tiers.csv'; a.click();
+});
+
+// ---------- render ----------
+function tiles() {
+  const items = [
+    ['Exact agreement', fmtPct(C.exact), 'router tier = observed difficulty'],
+    ['Adjacent agreement', fmtPct(C.adj), 'within one tier'],
+    ['Rank correlation', C.rho.toFixed(3), 'Spearman, scores'],
+    ['Under-routed', fmtPct(C.under), 'quality risk: tier below difficulty'],
+    ['Served', fmtPct(C.served), 'tier &ge; observed difficulty'],
+    ['Weighted served', fmtPct(C.wServed), 'big tasks count more'],
+    ['Est. savings', fmtPct(1 - C.costShare), fmt$(C.cost) + ' vs ' + fmt$(C.top) +
+       (state.costModel === 'cache' ? ' (cache-aware)' : ' (naive)')],
+  ];
+  document.getElementById('tiles').innerHTML = items.map(([l, v, c]) =>
+    `<div class="tile"><div class="lb">${l}</div><div class="vl">${v}</div><div class="ct">${c}</div></div>`).join('');
+}
+function chips() {
+  document.getElementById('chips').innerHTML = [
+    `${N} trajectories`, esc(M.source),
+    'tokens = chars/4 estimates', 'router never sees the logged model',
+    'ML probs: out-of-fold (GroupKFold by workspace)',
+  ].map(c => `<span class="chip">${c}</span>`).join('');
+}
+function renderAll() {
+  tip.style.display = 'none';
+  computeAll();
+  tiles();
+  histogram(document.getElementById('histRouter'), C.rS, C.rc, 'tier');
+  histogram(document.getElementById('histEval'), C.eS, state.evCuts.map(q => {
+    const sorted = Array.from(C.eS).sort((a,b)=>a-b); return quantile(sorted, q);
+  }), 'difficulty');
+  mixChart(document.getElementById('mixChart'));
+  confChart(document.getElementById('confChart'));
+  frontChart(document.getElementById('frontChart'));
+  scatChart(document.getElementById('scatChart'));
+  sigChart(document.getElementById('sigChart'));
+  disTable();
+  document.getElementById('foot').innerHTML =
+    `<b>Honesty notes.</b> Difficulty is an <i>effort</i> proxy measured on the logged trajectory — a task can be
+    long-and-easy or short-and-hard, and the logged model itself shapes effort (weaker models retry more).
+    Token counts are chars/4 estimates (the export has no usage). Prices are assumed (anonymized model ids);
+    the cache-aware model bills prefix replay at the cached rate and assumes one tier per task, so no policy
+    pays a cache-reset penalty. The &lambda;-Bayes rule optimizes tasks-per-dollar and is known to sacrifice
+    token-heavy tasks — the weighted-served tile and orange frontier line make that visible. ML probabilities
+    are out-of-fold and were trained against the evaluator's default settings; rerun the pipeline after
+    changing the evaluator. reasoning_tokens exist only for the gpt family — keep its weight small or you
+    grade providers, not tasks.`;
+}
+let timer = null;
+function schedule() { clearTimeout(timer); timer = setTimeout(renderAll, 70); }
+
+chips();
+buildControls();
+renderAll();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', renderAll);
+</script>
+</body>
+</html>
