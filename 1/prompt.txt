@@ -1,0 +1,1 @@
+we need to now implement some kind of evalutator logic in order to evaluate whether the router has chosen the best model. what are your ideas on that
