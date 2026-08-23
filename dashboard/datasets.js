@@ -1,0 +1,1 @@
+window.VIKTOR_DATASETS = [{"id":"export_linked","source":"export_linked","n":1025,"label":"export_linked \u2014 1025 tasks"},{"id":"trajectories_v1_00","source":"trajectories_v1_00.jsonl","n":25,"label":"trajectories_v1_00.jsonl \u2014 25 tasks"},{"id":"trajectories_v1_02","source":"trajectories_v1_02.jsonl","n":1000,"label":"trajectories_v1_02.jsonl \u2014 1000 tasks"}];
