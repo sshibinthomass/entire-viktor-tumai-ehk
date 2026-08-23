@@ -26,7 +26,7 @@
       --s1: #3987e5; --s2: #d95926; --s3: #199e70;
       --tier1: #86b6ef; --tier2: #3987e5; --tier3: #184f95;
       --div-neg: #e66767; --div-mid: #383835;
-      --good: #0ca30c;
+      --good: #0ca30c; --critical: #e66767;
     }
   }
   :root[data-theme="dark"] .viz-root {
@@ -37,7 +37,7 @@
     --s1: #3987e5; --s2: #d95926; --s3: #199e70;
     --tier1: #86b6ef; --tier2: #3987e5; --tier3: #184f95;
     --div-neg: #e66767; --div-mid: #383835;
-    --good: #0ca30c;
+    --good: #0ca30c; --critical: #e66767;
   }
   * { box-sizing: border-box; margin: 0; }
   body.viz-root {
@@ -204,6 +204,10 @@ its own outcome.</div>
         <span class="k"><span class="sw" style="background:var(--s3);border-radius:50%"></span>Logged dispatch (under our inferred tier map)</span>
         <span class="k"><span class="sw" style="background:var(--surface-1);border:2px solid var(--ink-1);border-radius:50%"></span>Always top tier</span></div>
       <div id="frontChart"></div></div>
+    <div class="card wide" id="ledgerCard"><h2>Logged dispatch &rarr; our router &mdash; what it saves, what it buys</h2>
+      <div class="desc" id="ledgerDesc"></div>
+      <div style="overflow-x:auto"><table id="ledgerTable"></table></div>
+      <div class="desc" id="ledgerNote" style="margin-top:6px"></div></div>
     <div class="card"><h2>Router score vs observed difficulty</h2>
       <div class="legend"><span class="k"><span class="sw" style="background:var(--s1)"></span>Matched</span>
         <span class="k"><span class="sw" style="background:var(--s2)"></span>Under-routed</span>
@@ -526,12 +530,13 @@ function loggedPolicy(Cm) {
   return { ...main, alt, ours };
 }
 
-// frontier: sweep the active method's own knob; each point = (costShare, served, wServed)
-function frontier() {
-  const { diffs, Cm, hRank } = C;
+// candidate policies along the active method's own knob. Kept separate from the
+// scoring so the frontier chart (default grading) and the savings ledger
+// (struggle-free grading, for a fair logged comparison) sweep the SAME settings.
+function frontierTiers() {
+  const { Cm, hRank } = C;
   const pts = [];
-  const push = tiers => { const p = evalPolicy(tiers, diffs, Cm);
-    return pts.push([p.costShare, p.served, p.wServed]); };
+  const push = tiers => pts.push(tiers);
   if (state.method === 'ml-tau') {
     for (let tau = 0.30; tau <= 0.996; tau += 0.02) push(tauTiers(tau));
     return { pts, knob: 'τ' };
@@ -555,6 +560,13 @@ function frontier() {
   }
   return { pts, knob: state.method === 'kmeans'
     ? 'Tier-3 cut (heuristic reference — k-means itself has no knob)' : 'Tier-3 cut' };
+}
+
+// frontier: score the knob sweep on the default grading; each point = (costShare, served, wServed)
+function frontier() {
+  const { pts, knob } = frontierTiers();
+  return { knob, pts: pts.map(t => { const p = evalPolicy(t, C.diffs, C.Cm);
+    return [p.costShare, p.served, p.wServed]; }) };
 }
 
 // ---------- svg helpers ----------
@@ -632,6 +644,7 @@ const CHART_TIPS = {
   confChart: 'Rows = router decision, columns = what the trajectory revealed. Below the diagonal = under-routed (risk), above = over-routed (waste).',
   frontChart: 'THE headline artifact: quality kept vs money spent, traced by sweeping the active method\'s own knob. Two quality definitions, one cost axis.',
   scatChart: 'Every dot is a task: routing-time score vs observed difficulty. Hover any dot for its trigger, counts, probabilities and the model that actually ran.',
+  ledgerTable: 'The frontier in dollars: what the logged dispatch spent and kept, versus our router at the current knobs and at the two settings that match the log on money or on quality.',
   sigChart: 'Spearman correlation of each routing-time feature with observed difficulty — the nameable structure the router runs on. Blue right = marks hard, red left = marks easy.',
 };
 
@@ -872,6 +885,86 @@ function disTable() {
       <td>${esc(R[i].model)}</td></tr>`).join('');
 }
 
+// ---------- savings ledger: logged dispatch -> our router ----------
+// Every row is priced with the same cost matrix and graded the same way, so the
+// deltas are apples-to-apples. Both sides use gradeStruggleFree(): tool errors
+// and retry streaks also drove the tier inference, so grading with them would
+// depress the logged row mechanically and flatter the router.
+function ledger() {
+  const card = document.getElementById('ledgerCard');
+  const lg = loggedPolicy(C.Cm);
+  if (!lg) { card.style.display = 'none'; return; } // no inferred tier map -> no baseline to beat
+  card.style.display = '';
+  const fair = gradeStruggleFree();
+  const ft = frontierTiers();
+  const cands = ft.pts.map(t => evalPolicy(t, fair, C.Cm));
+  // budget-matched: most quality obtainable without spending more than the log
+  const bm = cands.filter(p => p.cost <= lg.cost).sort((a, b) => b.served - a.served)[0];
+  // quality-matched: cheapest setting that still serves as many tasks as the log
+  const qm = cands.filter(p => p.served >= lg.served).sort((a, b) => a.cost - b.cost)[0];
+
+  const dim = t => `<span style="color:var(--ink-3)">${t}</span>`;
+  const good = ok => ok ? 'var(--good)' : 'var(--critical)';
+  const signed$ = v => (v < 0 ? '&minus;' : '+') + '$' + Math.abs(v).toFixed(2);
+  const signedPt = v => (v >= 0 ? '+' : '&minus;') + Math.abs(100 * v).toFixed(1) + ' pt';
+  const dCost = p => { const d = p.cost - lg.cost;
+    const rel = 100 * d / (lg.cost || 1);
+    return `<span style="color:${good(d <= 0)}">${signed$(d)}</span> `
+      + dim(`(${(rel < 0 ? '&minus;' : '+') + Math.abs(rel).toFixed(1)}%)`); };
+  const dQ = d => `<span style="color:${good(d >= 0)}">${signedPt(d)}</span>`;
+  const row = (name, note, p, base) => `<tr>
+    <td>${name}${note ? ' ' + dim(note) : ''}</td>
+    <td class="n">${fmt$(p.cost)}</td><td class="n">${fmtPct(p.costShare)}</td>
+    <td class="n">${base ? '&mdash;' : dCost(p)}</td>
+    <td class="n">${fmtPct(p.served)}</td>
+    <td class="n">${base ? '&mdash;' : dQ(p.served - lg.served)}</td>
+    <td class="n">${fmtPct(p.wServed)}</td>
+    <td class="n">${base ? '&mdash;' : dQ(p.wServed - lg.wServed)}</td>
+    <td class="n">${fmtPct(1 - p.served)}</td></tr>`;
+  const knobNow = state.method === 'ml-tau' ? `&tau;=${state.tau.toFixed(2)}`
+    : state.method === 'ml-lambda' ? `&lambda;=$${state.lam.toFixed(2)}`
+    : state.method === 'kmeans' ? 'k=3'
+    : `cuts p${Math.round(state.rCuts[0] * 100)}/p${Math.round(state.rCuts[1] * 100)}`;
+
+  document.getElementById('ledgerTable').innerHTML =
+    `<tr><th>policy</th><th class="n">est. cost</th><th class="n">of all-T3</th>
+      <th class="n">&Delta; cost vs logged</th><th class="n">served</th><th class="n">&Delta;</th>
+      <th class="n">weighted served</th><th class="n">&Delta;</th><th class="n">under-routed</th></tr>`
+    + row('Logged dispatch', '(what actually ran, repriced)', lg, true)
+    + row('Our router', `(current knobs: ${esc(state.method)}, ${knobNow})`, lg.ours)
+    + (bm && bm === qm
+        ? row('Our router, matched to the log',
+              '(same bill as the log &mdash; and the cheapest knob that matches its served %)', bm)
+        : (bm ? row('Our router, budget-matched', '(same bill as the log, quality maximized)', bm) : '')
+        + (qm ? row('Our router, quality-matched', '(cheapest knob that matches logged served)', qm) : ''))
+    + row('Always top tier', '(reference ceiling)',
+          { cost: lg.top, costShare: 1, served: 1, wServed: 1 });
+
+  const dC = lg.ours.cost - lg.cost, dS = lg.ours.served - lg.served,
+        dW = lg.ours.wServed - lg.wServed, per1k = -dC / N * 1000;
+  document.getElementById('ledgerDesc').innerHTML =
+    `The green dot above, in money. Same tasks, same assumed prices, one grading for both sides.
+     At the current knobs the router spends <b>${fmt$(lg.ours.cost)}</b> against the log's
+     <b>${fmt$(lg.cost)}</b> &mdash; ${dC <= 0 ? 'a saving of' : 'an extra'}
+     <b>${fmt$(Math.abs(dC))} (${Math.abs(100 * dC / (lg.cost || 1)).toFixed(1)}%)</b> &mdash; and serves
+     <b>${fmtPct(lg.ours.served)}</b> of tasks against the log's <b>${fmtPct(lg.served)}</b>
+     (<b>${signedPt(dS)}</b>; <b>${signedPt(dW)}</b> token-weighted).
+     Cheaper-but-worse is a real outcome at some knobs &mdash; the matched rows below are the
+     like-for-like comparison.
+     Scaled linearly at this task mix that is <b>${fmt$(Math.abs(per1k))}
+     ${per1k >= 0 ? 'saved' : 'added'} per 1,000 trajectories</b>.`;
+  document.getElementById('ledgerNote').innerHTML =
+    `Both sides are graded with the error and retry-streak metrics zeroed &mdash; those two also drove the
+     tier inference, so grading with them would depress the logged row mechanically; that is why the router
+     row here differs from the Served tile at the top. The matched rows are the best setting of
+     <b>${ft.knob}</b> on the sweep drawn above, and are omitted when no setting qualifies. Dollars are
+     chars/4 token estimates at assumed prices under the
+     ${state.costModel === 'cache' ? 'cache-aware' : 'cache-blind'} cost model; the logged row is repriced
+     through the inferred tier map, and demoting the least-stable Tier-3 id moves it to
+     ${fmtPct(lg.alt.served)} served at ${fmtPct(lg.alt.costShare)} cost. The per-1,000 figure is straight
+     linear scaling &mdash; same task mix, no volume pricing, no cache-reset penalty.`;
+}
+
 // ---------- controls ----------
 function slider(parent, label, value, min, max, step, oninput, opts) {
   const d = document.createElement('div'); d.className = 'ctl';
@@ -1018,6 +1111,7 @@ function renderAll() {
   mixChart(document.getElementById('mixChart'));
   confChart(document.getElementById('confChart'));
   frontChart(document.getElementById('frontChart'));
+  ledger();
   scatChart(document.getElementById('scatChart'));
   sigChart(document.getElementById('sigChart'));
   disTable();
