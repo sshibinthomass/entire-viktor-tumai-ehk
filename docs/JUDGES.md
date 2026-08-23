@@ -21,7 +21,13 @@ python -m http.server 8017 -d dashboard
 The one chart is the **cost–quality frontier**: share of tasks served
 (tier ≥ observed difficulty) vs estimated cost relative to sending everything to
 the top tier, swept over the active method's own knob, drawn against expected
-random routing, the repriced logged dispatch, and the always-top-tier dot.
+random routing, the repriced logged dispatch, and the always-top-tier dot. On the
+deck the same chart carries four labeled baselines — always-cheap (all T1),
+always-strong (all T3), logged dispatch, and **random at matched cost** — plus 95%
+bootstrap error bars (2,000 resamples of the 1,025 tasks) on the operating point.
+The comparison worth reading is at equal cost: the task-count edge over random is
+small, the token-weighted edge is several times larger. Both deltas and their CIs
+are printed on the slide, recomputed from the current artifacts.
 
 ## What is claimed, and which artifact proves it
 
