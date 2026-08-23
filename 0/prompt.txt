@@ -1,0 +1,1 @@
+Do a deepp search on all the rule based or ML based router for input message and hareness of the agent in whole github and come up with few option where I can create a router for the trajectory data.
