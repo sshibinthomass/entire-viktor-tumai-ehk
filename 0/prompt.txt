@@ -1,0 +1,1 @@
+If i had to create a router based on system prompt and user input what do you think I need to consider?
